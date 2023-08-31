@@ -19,21 +19,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\thirdparty\imgui\backends\imgui_impl_dx12.h" />
-    <ClInclude Include="..\..\thirdparty\imgui\imconfig.h" />
-    <ClInclude Include="..\..\thirdparty\imgui\imgui.h" />
-    <ClInclude Include="..\..\thirdparty\imgui\imgui_internal.h" />
-    <ClInclude Include="..\..\thirdparty\imgui\imstb_rectpack.h" />
-    <ClInclude Include="..\..\thirdparty\imgui\imstb_textedit.h" />
-    <ClInclude Include="..\..\thirdparty\imgui\imstb_truetype.h" />
+    <ClInclude Include="..\..\..\thirdparty\imgui\imconfig.h" />
+    <ClInclude Include="..\..\..\thirdparty\imgui\imgui.h" />
+    <ClInclude Include="..\..\..\thirdparty\imgui\imgui_internal.h" />
+    <ClInclude Include="..\..\..\thirdparty\imgui\imstb_rectpack.h" />
+    <ClInclude Include="..\..\..\thirdparty\imgui\imstb_textedit.h" />
+    <ClInclude Include="..\..\..\thirdparty\imgui\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\thirdparty\imgui\backends\imgui_impl_dx12.cpp" />
-    <ClCompile Include="..\..\thirdparty\imgui\imgui.cpp" />
-    <ClCompile Include="..\..\thirdparty\imgui\imgui_demo.cpp" />
-    <ClCompile Include="..\..\thirdparty\imgui\imgui_draw.cpp" />
-    <ClCompile Include="..\..\thirdparty\imgui\imgui_tables.cpp" />
-    <ClCompile Include="..\..\thirdparty\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="..\..\..\thirdparty\imgui\imgui.cpp" />
+    <ClCompile Include="..\..\..\thirdparty\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\..\..\thirdparty\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\..\..\thirdparty\imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\..\..\thirdparty\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -129,7 +127,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -147,7 +145,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\thirdparty\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
