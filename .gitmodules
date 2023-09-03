@@ -1,9 +1,9 @@
 [submodule "thirdparty/imgui"]
     path = "thirdparty/imgui"
-    url = https://github.com/AlsonEntuna/imgui.git
+    url = https://github.com/AlsonEntuna/imgui
     branch = master
 
 [submodule "thirdparty/usd"]
     path = "thirdparty/usd"
-    url = https://github.com/AlsonEntuna/OpenUSD.git
+    url = https://github.com/AlsonEntuna/OpenUSD
     branch = release
