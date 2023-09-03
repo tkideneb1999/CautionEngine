@@ -2,8 +2,11 @@
 **/bin/
 bin-int/
 
-# Hazel files
+# Log files
 *.log
+
+# VsCode
+.vscode/
 
 # Visual Studio files and folder
 .vs/
@@ -15,4 +18,3 @@ bin-int/
 # USD Engine Directories
 src/solutions
 scripts/__pycache__
-.vs

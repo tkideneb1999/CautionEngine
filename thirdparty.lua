@@ -1,6 +1,6 @@
 -- Dependencies
 
 IncludeDirectories = {}
-IncludeDirectories["ImGui"] = ""
+IncludeDirectories["ImGui"] = "%{wks.location}/thirdparty/imgui"
 
 LibraryDirectories = {}
