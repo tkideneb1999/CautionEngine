@@ -400,3 +400,4 @@ FodyWeavers.xsd
 # USD Engine Directories
 src/solutions
 scripts/__pycache__
+.vs
