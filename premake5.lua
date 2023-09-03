@@ -11,3 +11,10 @@ workspace "USDEngine"
 	local builddir = ("bin/" .. buildname)
 	local intermediate = ("intermediate/" .. buildname)
 	local solutionlocations = "src/solutions/%{prj.name}"
+
+-- ThirdParty solutions
+group "thirdparty"
+	include "thirdparty/premake"
+	include "thirdparty/imgui"
+group ""
+
