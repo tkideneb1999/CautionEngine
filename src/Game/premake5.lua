@@ -1,5 +1,14 @@
-project "Game"
+project "USDEngine.Game"
     kind "SharedLib"
+
+	local lang = "C++"
+	local dialect = "C++20"
+	
+	local buildname = "%{prj.name}_%{cfg.buildcfg}"
+	local builddir = ("bin/" .. buildname)
+	local intermediate = ("intermediate/" .. buildname)
+	local solutionlocations = "../../solutions/%{prj.name}"
+
     language (lang)
     cppdialect (dialect)
     
@@ -8,15 +17,32 @@ project "Game"
     targetdir (builddir)
     objdir (intermediate)
     
-    files {
-        "src/Game/**.h",
+    files 
+    {
+        "src/Game/**.h", 
         "src/Game/**.cpp"
+    }
+
+    includedirs
+    {
+        "src/Game",
+        "src/USDEngine",
+        "%{IncludeDirectories.ImGui}",
+        "%{IncludeDirectories.usd}"
     }
     
     filter "configurations:Debug"
-        defines {"DEBUG"}
+        runtime "Debug"
+        defines 
+        {
+            "DEBUG"
+        }
         symbols "On"
         
     filter "configurations:Release"
-        defines {"NDEBUG"}
+        runtime "Release"
+        defines 
+        {
+            "RELEASE"
+        }
         optimize "On"

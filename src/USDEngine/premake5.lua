@@ -1,5 +1,14 @@
 project "USDEngine"
     kind "ConsoleApp"
+
+	local lang = "C++"
+	local dialect = "C++20"
+	
+	local buildname = "%{prj.name}_%{cfg.buildcfg}"
+	local builddir = ("bin/" .. buildname)
+	local intermediate = ("intermediate/" .. buildname)
+	local solutionlocations = "../../solutions/%{prj.name}"
+
     language (lang)
     cppdialect (dialect)
     
@@ -8,15 +17,32 @@ project "USDEngine"
     targetdir (builddir)
     objdir (intermediate)
     
-    files {
+    files 
+    {
         "src/USDEngine/**.h", 
-        "src/USDEngine/**.cpp"
+        "src/USDEngine/**.cpp",
+        "src/USDEngine/**.inl"
+    }
+
+    includedirs
+    {
+        "src/USDEngine",
+        "%{IncludeDirectories.ImGui}",
+        "%{IncludeDirectories.usd}"
     }
     
     filter "configurations:Debug"
-        defines {"DEBUG"}
+        runtime "Debug"
+        defines 
+        {
+            "DEBUG"
+        }
         symbols "On"
         
     filter "configurations:Release"
-        defines {"NDEBUG", "RELEASE"}
+        runtime "Release"
+        defines 
+        {
+            "RELEASE"
+        }
         optimize "On"

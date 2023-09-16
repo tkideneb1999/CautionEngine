@@ -2,7 +2,14 @@ include "thirdparty.lua"
 
 workspace "USDEngine"
 	architecture "x64"
-	configurations { "Debug", "Release" }
+	location "solutions"
+	startproject "USDEngine.Editor"
+	
+	configurations
+	{ 
+		"Debug", 
+		"Release"
+	}
 	
 	local lang = "C++"
 	local dialect = "C++20"
@@ -14,7 +21,11 @@ workspace "USDEngine"
 
 -- ThirdParty solutions
 group "thirdparty"
-	include "thirdparty/premake"
 	include "thirdparty/imgui"
+	include "thirdparty/usd"
 group ""
+
+include "src/Editor"
+include "src/Game"
+include "src/USDEngine"
 
