@@ -16,5 +16,5 @@ bin-int/
 **.vcxproj.user
 
 # USD Engine Directories
-src/solutions
+solutions
 scripts/__pycache__
