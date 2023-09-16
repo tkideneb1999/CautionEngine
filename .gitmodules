@@ -4,3 +4,6 @@
 [submodule "thirdparty/usd"]
 	path = thirdparty/usd
 	url = https://github.com/AlsonEntuna/OpenUSD
+[submodule "thirdparty/imguizmo"]
+	path = thirdparty/imguizmo
+	url = https://github.com/AlsonEntuna/ImGuizmo
