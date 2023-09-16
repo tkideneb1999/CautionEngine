@@ -1,5 +1,5 @@
 project "USDEngine"
-    kind "ConsoleApp"
+    kind "StaticLib" -- Still not decided yet if we use .lib or .dll
 
 	local lang = "C++"
 	local dialect = "C++20"
@@ -19,9 +19,9 @@ project "USDEngine"
     
     files 
     {
-        "src/USDEngine/**.h", 
-        "src/USDEngine/**.cpp",
-        "src/USDEngine/**.inl"
+        "**.h", 
+        "**.cpp",
+        "**.inl"
     }
 
     includedirs

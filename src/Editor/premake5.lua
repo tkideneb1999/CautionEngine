@@ -19,8 +19,8 @@ project "USDEngine.Editor"
     
     files 
     {
-        "src/Editor/**.h", 
-        "src/Editor/**.cpp"
+        "**.h", 
+        "**.cpp"
     }
 
     includedirs

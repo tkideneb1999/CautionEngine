@@ -19,8 +19,8 @@ project "USDEngine.Game"
     
     files 
     {
-        "src/Game/**.h", 
-        "src/Game/**.cpp"
+        "**.h", 
+        "**.cpp"
     }
 
     includedirs
