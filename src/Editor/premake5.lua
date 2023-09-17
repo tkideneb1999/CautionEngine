@@ -1,13 +1,14 @@
 project "USDEngine.Editor"
-    kind "SharedLib"
+    kind "ConsoleApp"
 
 	local lang = "C++"
 	local dialect = "C++20"
 	
 	local buildname = "%{prj.name}_%{cfg.buildcfg}"
-	local builddir = ("bin/" .. buildname)
-	local intermediate = ("intermediate/" .. buildname)
 	local solutionlocations = "../../solutions/%{prj.name}"
+
+    local builddir = (solutionlocations.. "/bin/" .. buildname)
+	local intermediate = (solutionlocations.. "/intermediate/" .. buildname)
 
     language (lang)
     cppdialect (dialect)
@@ -20,20 +21,24 @@ project "USDEngine.Editor"
     files 
     {
         "**.h", 
-        "**.cpp"
+        "**.cpp",
+
+        "../../thirdparty/imguizmo/ImGuizmo.h",
+        "../../thirdparty/imguizmo/ImGuizmo.cpp"
     }
 
     includedirs
     {
-        "src/Editor",
-        "src/USDEngine",
-        "%{IncludeDirectories.ImGui}",
+        "../",
+        "../../thirdparty/imgui",
+        "../../thidparty/imguizmo",
         "%{IncludeDirectories.usd}"
     }
 
     links
     {
-        "ImGui"
+        -- "ImGui",
+        "USDEngine"
     }
     
     filter "configurations:Debug"

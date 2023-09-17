@@ -25,6 +25,7 @@ group "thirdparty"
 	include "thirdparty/usd"
 group ""
 
+-- Include other projects / solutions
 include "src/Editor"
 include "src/Game"
 include "src/USDEngine"

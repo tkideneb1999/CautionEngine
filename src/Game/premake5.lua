@@ -1,5 +1,5 @@
 project "USDEngine.Game"
-    kind "SharedLib"
+    kind "StaticLib"
 
 	local lang = "C++"
 	local dialect = "C++20"
