@@ -37,7 +37,7 @@ project "RecklessEditor"
 
     links
     {
-        -- "ImGui",
+        "ImGui",
         "CautionEngine"
     }
     

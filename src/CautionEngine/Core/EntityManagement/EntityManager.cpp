@@ -1,8 +1,10 @@
-#include "Entity.h"
+#include "../Entity.h"
+#include "EntityManager.h"
 
-namespace USDEngine::Core
+namespace CautionEngine::Core
 {
-	void Entity::AddComponent()
+	void EntityManager::AddEntity(Entity* entity)
 	{
+
 	}
 }

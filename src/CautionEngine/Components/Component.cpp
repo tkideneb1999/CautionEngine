@@ -1,6 +1,6 @@
 # include "Component.h"
 
-namespace  USDEngine::Components
+namespace  CautionEngine::Components
 {
 	void Component::Register()
 	{

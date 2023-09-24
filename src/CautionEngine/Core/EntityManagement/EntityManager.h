@@ -1,20 +1,20 @@
 #pragma once
 
-#include "BaseObject.h"
-
 #include <string>
+#include <vector>
 
-namespace USDEngine::Core
+namespace CautionEngine::Core
 {
+	class Entity;
 	/*class BaseObject;*/
-	class Entity : public BaseObject
+	class EntityManager
 	{
 	public:
-		Entity() = default;
+		EntityManager() = default;
 
-		void AddComponent();
+		void AddEntity(Entity* entity);
 
 	private:
-		std::string m_name;
+		std::vector<Entity*> m_entities;
 	};
 }

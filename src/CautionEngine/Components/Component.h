@@ -1,6 +1,6 @@
 #pragma once
 
-namespace USDEngine::Components
+namespace CautionEngine::Components
 {
 	class Component
 	{

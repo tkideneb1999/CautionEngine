@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace USDEngine::Core
+namespace CautionEngine::Core
 {
 	/*class BaseObject;*/
 	class Entity : public BaseObject

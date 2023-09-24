@@ -1,6 +1,6 @@
 #include "Entity.h"
 
-namespace USDEngine::Core
+namespace CautionEngine::Core
 {
 	void Entity::AddComponent()
 	{
