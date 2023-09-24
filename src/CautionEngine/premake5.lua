@@ -1,4 +1,4 @@
-project "USDEngine"
+project "CautionEngine"
     kind "StaticLib" -- Still not decided yet if we use .lib or .dll
 
 	local lang = "C++"
@@ -26,7 +26,7 @@ project "USDEngine"
 
     includedirs
     {
-        "src/USDEngine",
+        "src/CautionEngine",
         "%{IncludeDirectories.ImGui}",
         "%{IncludeDirectories.usd}"
     }

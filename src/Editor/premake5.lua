@@ -1,4 +1,4 @@
-project "USDEngine.Editor"
+project "RecklessEditor"
     kind "ConsoleApp"
 
 	local lang = "C++"
@@ -38,7 +38,7 @@ project "USDEngine.Editor"
     links
     {
         -- "ImGui",
-        "USDEngine"
+        "CautionEngine"
     }
     
     filter "configurations:Debug"

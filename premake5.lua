@@ -1,9 +1,9 @@
 include "thirdparty.lua"
 
-workspace "USDEngine"
+workspace "CautionEngine"
 	architecture "x64"
 	location "solutions"
-	startproject "USDEngine.Editor"
+	startproject "Editor"
 	
 	configurations
 	{ 
@@ -28,5 +28,5 @@ group ""
 -- Include other projects / solutions
 include "src/Editor"
 include "src/Game"
-include "src/USDEngine"
+include "src/CautionEngine"
 
