@@ -18,10 +18,10 @@ bin-int/
 # USD Engine Directories
 solutions
 scripts/__pycache__
-src/USDEngine/intermediate/
+src/CautionEngine/intermediate/
 src/Editor/intermediate/
 src/Game/intermediate
 
-src/USDEngine/bin/
+src/CautionEngine/bin/
 src/Editor/bin/
 src/Game/bin/
