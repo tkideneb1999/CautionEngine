@@ -23,16 +23,21 @@ project "RecklessEditor"
         "**.h", 
         "**.cpp",
 
+        -- imguizmo
         "../../thirdparty/imguizmo/ImGuizmo.h",
-        "../../thirdparty/imguizmo/ImGuizmo.cpp"
+        "../../thirdparty/imguizmo/ImGuizmo.cpp",
+
+        -- glm
+        "../../thirdparty/glm/glm/**.hpp",
+        "../../thirdparty/glm/glm/**.inl",
     }
 
     includedirs
     {
-        "../",
+        "../../src/CautionEngine",
         "../../thirdparty/imgui",
         "../../thidparty/imguizmo",
-        "%{IncludeDirectories.usd}"
+        "../../thidparty/glm",
     }
 
     links

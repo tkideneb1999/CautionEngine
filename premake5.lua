@@ -27,6 +27,8 @@ group ""
 
 -- Include other projects / solutions
 include "src/Editor"
-include "src/Game"
 include "src/CautionEngine"
 
+group "games"
+	include "src/Game"
+group ""

@@ -21,14 +21,17 @@ project "CautionEngine"
     {
         "**.h", 
         "**.cpp",
-        "**.inl"
+        "**.inl",
+
+        -- glm
+        "../../thirdparty/glm/glm/**.hpp",
+        "../../thirdparty/glm/glm/**.inl",
     }
 
     includedirs
     {
         "src/CautionEngine",
-        "%{IncludeDirectories.ImGui}",
-        "%{IncludeDirectories.usd}"
+        "../../thidparty/glm",
     }
     
     filter "configurations:Debug"
