@@ -28,6 +28,16 @@ project "CautionEngine"
         "../../thirdparty/glm/glm/**.inl",
     }
 
+    links
+    {
+        "%{Library.dx_12}",
+        "%{Library.dx_compiler}",
+        "../../%{Library.usd_utils}",
+        "../../%{Library.usd_imaging}",
+        "../../%{Library.usd_geom}",
+        "../../%{Library.usd_mtlx}"
+    }
+
     includedirs
     {
         "src/CautionEngine",
