@@ -31,7 +31,7 @@ project "CautionEngine"
     includedirs
     {
         "src/CautionEngine",
-        "../../thidparty/glm",
+        "../../thirdparty/glm",
     }
     
     filter "configurations:Debug"

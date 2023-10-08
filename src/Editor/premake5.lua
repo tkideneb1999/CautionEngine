@@ -36,14 +36,17 @@ project "RecklessEditor"
     {
         "../../src/CautionEngine",
         "../../thirdparty/imgui",
-        "../../thidparty/imguizmo",
-        "../../thidparty/glm",
+        "../../thirdparty/imguizmo",
+        "../../thirdparty/glm",
     }
 
     links
     {
         "ImGui",
-        "CautionEngine"
+        "CautionEngine",
+        "%{Library.dx_12}",
+        "%{Library.dx_compiler}",
+        "%{Library.dx_gi}"
     }
     
     filter "configurations:Debug"

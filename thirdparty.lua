@@ -10,3 +10,6 @@ LibraryDirectories = {}
 
 -- Libraries (*.lib)
 Library = {}
+Library["dx_12"] = "d3d12.lib"
+Library["dx_compiler"] = "d3dcompiler.lib"
+Library["dx_gi"] = "dxgi.lib"
