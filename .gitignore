@@ -15,7 +15,7 @@ bin-int/
 **.vcxproj.filters
 **.vcxproj.user
 
-# USD Engine Directories
+# CautionEngine Directories
 solutions
 scripts/__pycache__
 src/CautionEngine/intermediate/
@@ -25,3 +25,5 @@ src/Game/intermediate
 src/CautionEngine/bin/
 src/Editor/bin/
 src/Game/bin/
+
+thirdparty/usd_bin
