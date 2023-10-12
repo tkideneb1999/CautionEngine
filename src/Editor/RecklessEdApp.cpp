@@ -1,63 +1,24 @@
-#include <Windows.h>
-#include <iostream>
+#include <vector>
+#include <string>
+
+#include "Widgets/Application.h"
 
 bool g_applicationRunning = true;
 const wchar_t CLASS_NAME[] = L"Reckless Editor Class";
-
-LRESULT CALLBACK EditorProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
-{
-	switch (msg) 
-	{
-		case WM_CLOSE:
-			PostQuitMessage(0);
-			break;
-	}
-	return DefWindowProc(hWnd, msg, wParam, lParam);
-}
+const wchar_t WINDOW_NAME[] = L"Reckless Editor";
 
 
 void main(int argc, char** argv)
 {
-	HINSTANCE hInstance = GetModuleHandle(nullptr);
-
-	WNDCLASS editorWindowClass = {0};
-	editorWindowClass.lpfnWndProc = EditorProc;
-	editorWindowClass.hInstance = hInstance;
-	editorWindowClass.lpszClassName = CLASS_NAME;
-
-	RegisterClass(&editorWindowClass);
-
-	HWND hEditorHandle = CreateWindowEx(
-		0,
-		CLASS_NAME,
-		L"Reckless Editor",
-		WS_OVERLAPPEDWINDOW, // Window Style
-
-		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, // Position & Size
-
-		nullptr,
-		nullptr,
-		hInstance,
-		nullptr
-	);
-
-	if (hEditorHandle == nullptr)
+	std::vector<std::string> args(argc);
+	for (int i = 0; i < argc; i++) 
 	{
-		return;
+		args[i] = argv[i];
 	}
+	Reckless::Application editor(CLASS_NAME, WINDOW_NAME, args);
 
-	ShowWindow(hEditorHandle, SW_SHOW);
-
-	MSG msg;
-	BOOL msgResult;
-	while ((msgResult = GetMessage(&msg, nullptr, 0, 0)) > 0)
+	while (true)
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-		// TODO: application running here...
-	}
-
-	if (msgResult == -1) {
-		std::cout << "Error Occurred" << std::endl;
+		if (!editor.Update()) return;
 	}
 }
