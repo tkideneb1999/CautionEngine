@@ -1,9 +1,10 @@
 -- Include Directories
 IncludeDirectories = {}
-IncludeDirectories["ImGui"] = "%{wks.location}/thirdparty/imgui"
-IncludeDirectories["usd"] = "%{wks.location}/thirdparty/usd_bin/include"
-IncludeDirectories["ImGuizmo"] = "%{wks.location}/thirdparty/imguizmo"
-IncludeDirectories["glm"] = "%{wks.location}/thirdparty/glm"
+IncludeDirectories["ImGui"] = "thirdparty/imgui"
+IncludeDirectories["ImGui_backends"] = "thirdparty/imgui/backends"
+IncludeDirectories["usd"] = "thirdparty/usd_bin/include"
+IncludeDirectories["ImGuizmo"] = "thirdparty/imguizmo"
+IncludeDirectories["glm"] = "thirdparty/glm"
 
 -- Librarian Additional Directories
 LibraryDirectories = {}

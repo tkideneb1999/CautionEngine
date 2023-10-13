@@ -35,9 +35,10 @@ project "RecklessEditor"
     includedirs
     {
         "../../src/CautionEngine",
-        "../../thirdparty/imgui",
-        "../../thirdparty/imguizmo",
-        "../../thirdparty/glm",
+        "../../%{IncludeDirectories.ImGui}",
+        "../../%{IncludeDirectories.ImGui_backends}",
+        "../../%{IncludeDirectories.ImGuizmo}",
+        "../../%{IncludeDirectories.glm}"
     }
 
     links

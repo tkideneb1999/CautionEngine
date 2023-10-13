@@ -32,6 +32,7 @@ project "CautionEngine"
     {
         "%{Library.dx_12}",
         "%{Library.dx_compiler}",
+        "%{Library.dx_gi}",
         "../../%{Library.usd_utils}",
         "../../%{Library.usd_imaging}",
         "../../%{Library.usd_geom}",
@@ -41,7 +42,8 @@ project "CautionEngine"
     includedirs
     {
         "src/CautionEngine",
-        "../../thirdparty/glm",
+        "../../%{IncludeDirectories.glm}",
+        "../../%{IncludeDirectories.usd}"
     }
     
     filter "configurations:Debug"
