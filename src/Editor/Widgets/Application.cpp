@@ -4,7 +4,7 @@
 
 namespace Reckless {
 	Application::Application(const wchar_t wndClassName[], const wchar_t wndName[], std::vector<std::string> lArgs)
-		:args{ lArgs }
+		: args(lArgs)
 	{
 		hInstance = GetModuleHandle(nullptr);
 

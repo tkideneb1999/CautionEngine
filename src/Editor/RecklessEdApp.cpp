@@ -17,7 +17,7 @@ void main(int argc, char** argv)
 	}
 	Reckless::Application editor(CLASS_NAME, WINDOW_NAME, args);
 
-	while (true)
+	while (g_applicationRunning)
 	{
 		if (!editor.Update()) return;
 	}
