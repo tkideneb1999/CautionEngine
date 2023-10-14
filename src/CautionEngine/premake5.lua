@@ -45,6 +45,14 @@ project "CautionEngine"
         "../../%{IncludeDirectories.glm}",
         "../../%{IncludeDirectories.usd}"
     }
+
+    filter "system:windows"
+        systemversion "latest"
+        defines
+        {
+            "WINDOWS",
+            "WIN32"
+        }
     
     filter "configurations:Debug"
         runtime "Debug"

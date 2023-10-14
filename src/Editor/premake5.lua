@@ -49,6 +49,14 @@ project "RecklessEditor"
         "%{Library.dx_compiler}",
         "%{Library.dx_gi}"
     }
+
+    filter "system:windows"
+        systemversion "latest"
+        defines
+        {
+            "WINDOWS",
+            "WIN32"
+        }
     
     filter "configurations:Debug"
         runtime "Debug"
