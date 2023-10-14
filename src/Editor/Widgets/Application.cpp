@@ -3,6 +3,7 @@
 #include <stdexcept>
 
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "backends/imgui_impl_dx12.h"
 #include "backends/imgui_impl_win32.h"
 
@@ -79,9 +80,11 @@ namespace Reckless {
 			throw std::runtime_error("Error Initializing Window");
 		}
 
-		ShowWindow(hWnd, SW_SHOW);
-
+		// Initialization
 		Init();
+
+		// Showing of the window
+		ShowWindow(hWnd, SW_SHOW);
 	}
 
 	Application::~Application()
@@ -104,6 +107,14 @@ namespace Reckless {
 			// TODO: we need to pass in the parameter of the timestamp here...
 			editorLayers->Update();
 		}
+
+		// Rendering, ImGuiContext
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+		// Layers -> Drawing
+		DrawEditorLayers();
+		ImGui::Render();
 
 		return true;
 	}
@@ -144,7 +155,28 @@ namespace Reckless {
 		// TODO: initialize dx12 related stuff here and imgui
 
 		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		//io.ConfigViewportsNoAutoMerge = true;
+		//io.ConfigViewportsNoTaskBarIcon = true;
 
+		// Style
+		// TODO: implement the reckless editor style later here...
+		ImGui::StyleColorsDark();
+
+		// Setting of the ImGui platform and renderer
+		ImGui_ImplWin32_Init(hWnd);
+		// DX12 Info
+		ImGui_ImplDX12_Init
+		(g_pd3dDevice
+			, NUM_FRAMES_IN_FLIGHT
+			, DXGI_FORMAT_R8G8B8A8_UNORM
+			, g_pd3dSrvDescHeap
+			, g_pd3dSrvDescHeap->GetCPUDescriptorHandleForHeapStart()
+			, g_pd3dSrvDescHeap->GetGPUDescriptorHandleForHeapStart()
+		);
 	}
 	void Application::Shutdown()
 	{
