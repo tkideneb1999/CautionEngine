@@ -3,12 +3,13 @@
 
 #include "Widgets/Application.h"
 
+// configs
 bool g_applicationRunning = true;
 const wchar_t CLASS_NAME[] = L"Reckless Editor Class";
 const wchar_t WINDOW_NAME[] = L"Reckless Editor";
 
 
-void main(int argc, char** argv)
+int main(int argc, char** argv)
 {
 	std::vector<std::string> args(argc);
 	for (int i = 0; i < argc; i++) 
@@ -19,6 +20,9 @@ void main(int argc, char** argv)
 
 	while (g_applicationRunning)
 	{
-		if (!editor.Update()) return;
+		if (!editor.Update())
+			return 0;
 	}
+
+	return 0;
 }

@@ -36,7 +36,7 @@ namespace Reckless {
 		ShowWindow(hWnd, SW_SHOW);
 	}
 
-	bool Application::Update() 
+	bool Application::Update()
 	{
 		// Handle Messages
 		if (HandleMessages() != 1) 
@@ -46,7 +46,18 @@ namespace Reckless {
 		}
 		// TODO: More Update Code
 
+		for (auto editorLayers : m_editorLayers)
+		{
+			// TODO: we need to pass in the parameter of the timestamp here...
+			editorLayers->Update();
+		}
+
 		return true;
+	}
+
+	float Application::GetTimeStamp()
+	{
+		return 0.0f;
 	}
 
 	LRESULT CALLBACK Application::AppProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
@@ -73,5 +84,13 @@ namespace Reckless {
 			DispatchMessage(&currentMsg);
 		}
 		return 1;
+	}
+	void Application::Init()
+	{
+
+	}
+	void Application::Shutdown()
+	{
+
 	}
 }
