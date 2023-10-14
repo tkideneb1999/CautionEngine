@@ -1,12 +1,13 @@
 #pragma once 
 
-#include "../EditorLayer.h"
+#include "../IEditorLayer.h"
 
 namespace Reckless
 {
-	class Toolbar : public EditorLayer
+	class Toolbar : public IEditorLayer
 	{
 	public:
 		virtual void OnEditorLayerAttach() override;
+		virtual void DrawLayer() override;
 	};
 }

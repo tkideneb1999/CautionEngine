@@ -2,6 +2,10 @@
 
 #include <stdexcept>
 
+#include "imgui.h"
+#include "backends/imgui_impl_dx12.h"
+#include "backends/imgui_impl_win32.h"
+
 namespace Reckless {
 	Application::Application(const wchar_t wndClassName[], const wchar_t wndName[], std::vector<std::string> lArgs)
 		: args(lArgs)
@@ -34,6 +38,13 @@ namespace Reckless {
 		}
 
 		ShowWindow(hWnd, SW_SHOW);
+
+		Init();
+	}
+
+	Application::~Application()
+	{
+		Shutdown();
 	}
 
 	bool Application::Update()
@@ -57,6 +68,7 @@ namespace Reckless {
 
 	float Application::GetTimeStamp()
 	{
+		// TODO: implement, we might need to look for dx12 related timestamps/frequency here...
 		return 0.0f;
 	}
 
@@ -87,10 +99,23 @@ namespace Reckless {
 	}
 	void Application::Init()
 	{
+		// TODO: initialize dx12 related stuff here and imgui
+
+		IMGUI_CHECKVERSION();
 
 	}
 	void Application::Shutdown()
 	{
-
+		// ImGui
+		ImGui_ImplDX12_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
+	}
+	void Application::DrawEditorLayers()
+	{
+		for (auto& layer : m_editorLayers)
+		{
+			layer->DrawLayer();
+		}
 	}
 }

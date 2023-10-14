@@ -2,14 +2,15 @@
 
 namespace Reckless
 {
-	class EditorLayer
+	class IEditorLayer
 	{
 	public:
-		virtual ~EditorLayer() = default;
+		virtual ~IEditorLayer() = default;
 
 		virtual void OnEditorLayerAttach() { }
 		virtual void OnEditorLayerDetach() { }
 
+		virtual void DrawLayer() = 0;
 		virtual void Update() { }
 		virtual void OnRender() { }
 	};

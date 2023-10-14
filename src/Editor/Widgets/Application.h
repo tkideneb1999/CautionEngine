@@ -5,7 +5,7 @@
 #include <string>
 #include <memory>
 
-#include "EditorLayer.h"
+#include "IEditorLayer.h"
 
 #include "imgui.h"
 #include <d3d12.h>
@@ -32,12 +32,13 @@ namespace Reckless
 
 	public:
 		Application(const wchar_t wndClassName[], const wchar_t windowName[], std::vector<std::string> args);
+		~Application();
 
 		bool Update();
 		float GetTimeStamp();
 
 		// Layer functions
-		void AddEditorLayer(const std::shared_ptr<EditorLayer> layer) 
+		void AddEditorLayer(const std::shared_ptr<IEditorLayer> layer) 
 		{
 			m_editorLayers.emplace_back(layer);
 			layer->OnEditorLayerAttach();
@@ -53,7 +54,7 @@ namespace Reckless
 		float m_frameStamp = 0.f;
 		float m_lastFrameStamp = 0.f;
 
-		std::vector <std::shared_ptr<EditorLayer>> m_editorLayers;
+		std::vector <std::shared_ptr<IEditorLayer>> m_editorLayers;
 
 		static LRESULT CALLBACK AppProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		int HandleMessages();
@@ -62,5 +63,6 @@ namespace Reckless
 		// TODO: this will be useful in the future
 		void Init();
 		void Shutdown();
+		void DrawEditorLayers();
 	};
 }
