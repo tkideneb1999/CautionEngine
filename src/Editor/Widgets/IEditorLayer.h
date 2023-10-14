@@ -12,6 +12,5 @@ namespace Reckless
 
 		virtual void DrawLayer() = 0;
 		virtual void Update() { }
-		virtual void OnRender() { }
 	};
 }
