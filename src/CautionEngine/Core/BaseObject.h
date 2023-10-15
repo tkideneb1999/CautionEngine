@@ -4,13 +4,14 @@
 
 namespace CautionEngine::Core 
 {
-	class BaseObject 
+	class BaseObject
 	{
 	public:
 		BaseObject() = default;
 
 		const ObjectID& GetID() const { return m_id; }
-	private:
+
+	protected:
 		ObjectID m_id;
 	};
 }

@@ -27,9 +27,14 @@ namespace CautionEngine::Core
 
 		Component* GetComponentByID(const ObjectID* id);
 
-		template <typename T>
-		T* GetComponentByClass();
+		template <typename ComponentType>
+		ComponentType* GetComponentByClass() {
+			// TODO: make a caster that will generated the ComponentID of the component
+			return nullptr;
+		}
 		void RemoveComponent(Component* component);
+
+		void Destroy();
 
 	private:
 		std::string m_name;

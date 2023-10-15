@@ -19,10 +19,12 @@ namespace CautionEngine::Components
 
 		const ObjectID& GetID() const { return m_id; }
 
+		Entity* GetEntityOwner() const { return m_owner; }
+		inline void SetOwner(Entity* owner) { m_owner = owner; }
 	protected:
 		friend Entity;
-
-	private:
+		ObjectID m_componentId;
 		ObjectID m_id;
+		Entity* m_owner;
 	};
 }

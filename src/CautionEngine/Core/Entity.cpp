@@ -14,6 +14,9 @@ namespace CautionEngine::Core
 	void Entity::RemoveComponent(Component* component)
 	{
 	}
+	void Entity::Destroy()
+	{
+	}
 	Component* Entity::GetComponentByID(const ObjectID* id)
 	{
 		return nullptr;
