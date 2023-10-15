@@ -21,10 +21,11 @@ namespace Reckless
 	{
 	public:
 		HWND hWnd;
-		HINSTANCE hInstance;
 
 	private:
 		WNDCLASS windowClass;
+		HINSTANCE hInstance;
+
 		std::vector<std::string> args;
 
 		MSG currentMsg;
@@ -36,6 +37,7 @@ namespace Reckless
 
 		bool Update();
 		float GetTimeStamp();
+		HINSTANCE GetInstance() const;
 
 		// Layer functions
 		void AddEditorLayer(const std::shared_ptr<IEditorLayer> layer) 

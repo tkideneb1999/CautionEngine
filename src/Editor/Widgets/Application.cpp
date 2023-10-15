@@ -20,8 +20,8 @@
 
 struct FrameContext
 {
-	ID3D12CommandAllocator* CommandAllocator;
-	UINT64                  FenceValue;
+	ID3D12CommandAllocator*         CommandAllocator;
+	UINT64                          FenceValue;
 };
 
 // DX12 Globals
@@ -30,20 +30,20 @@ static FrameContext                 g_frameContext[NUM_FRAMES_IN_FLIGHT] = {};
 static UINT                         g_frameIndex = 0;
 
 static int const                    NUM_BACK_BUFFERS = 3;
-static ID3D12Device* g_pd3dDevice = NULL;
-static ID3D12DescriptorHeap* g_pd3dRtvDescHeap = NULL;
-static ID3D12DescriptorHeap* g_pd3dSrvDescHeap = NULL;
-static ID3D12CommandQueue* g_pd3dCommandQueue = NULL;
-static ID3D12GraphicsCommandList* g_pd3dCommandList = NULL;
-static ID3D12Fence* g_fence = NULL;
+static ID3D12Device*                g_pd3dDevice = NULL;
+static ID3D12DescriptorHeap*        g_pd3dRtvDescHeap = NULL;
+static ID3D12DescriptorHeap*        g_pd3dSrvDescHeap = NULL;
+static ID3D12CommandQueue*          g_pd3dCommandQueue = NULL;
+static ID3D12GraphicsCommandList*   g_pd3dCommandList = NULL;
+static ID3D12Fence*                 g_fence = NULL;
 static HANDLE                       g_fenceEvent = NULL;
 static UINT64                       g_fenceLastSignaledValue = 0;
-static IDXGISwapChain3* g_pSwapChain = NULL;
+static IDXGISwapChain3*             g_pSwapChain = NULL;
 static HANDLE                       g_hSwapChainWaitableObject = NULL;
-static ID3D12Resource* g_mainRenderTargetResource[NUM_BACK_BUFFERS] = {};
+static ID3D12Resource*              g_mainRenderTargetResource[NUM_BACK_BUFFERS] = {};
 static D3D12_CPU_DESCRIPTOR_HANDLE  g_mainRenderTargetDescriptor[NUM_BACK_BUFFERS] = {};
 
-// TODO: implement
+// TODO: implement setting up d3d devices
 static void SetupDX()
 {
 
@@ -123,6 +123,11 @@ namespace Reckless {
 	{
 		// TODO: implement, we might need to look for dx12 related timestamps/frequency here...
 		return 0.0f;
+	}
+
+	HINSTANCE Application::GetInstance() const
+	{
+		return hInstance;
 	}
 
 	LRESULT CALLBACK Application::AppProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
