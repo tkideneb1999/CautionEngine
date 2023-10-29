@@ -65,6 +65,7 @@ project "RecklessEditor"
             "DEBUG"
         }
         symbols "On"
+        inlining("Auto")
         
     filter "configurations:Release"
         runtime "Release"
@@ -73,3 +74,4 @@ project "RecklessEditor"
             "RELEASE"
         }
         optimize "On"
+        inlining("Auto")
