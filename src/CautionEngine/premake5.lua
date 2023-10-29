@@ -61,6 +61,7 @@ project "CautionEngine"
             "DEBUG"
         }
         symbols "On"
+        inlining("Auto")
         
     filter "configurations:Release"
         runtime "Release"
@@ -69,3 +70,4 @@ project "CautionEngine"
             "RELEASE"
         }
         optimize "On"
+        inlining("Auto")

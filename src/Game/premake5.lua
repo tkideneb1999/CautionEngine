@@ -39,6 +39,7 @@ project "Game"
             "DEBUG"
         }
         symbols "On"
+        inlining("Auto")
         
     filter "configurations:Release"
         runtime "Release"
@@ -47,3 +48,4 @@ project "Game"
             "RELEASE"
         }
         optimize "On"
+        inlining("Auto")
