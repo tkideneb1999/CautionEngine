@@ -17,9 +17,9 @@ namespace CautionEngine::Core
 		Entity();
 		Entity(const char* name);
 
-		const char* GetName() const { return m_name.c_str(); }
+		inline const char* GetName() const { return m_name.c_str(); }
 
-		inline void AddComponent(Component* component)
+		__forceinline void AddComponent(Component* component)
 		{
 			// TODO: do more later...
 			m_components.push_back(component);
