@@ -158,7 +158,7 @@ namespace Reckless {
 		renderer.InitDescriptorHeaps(1024, 32, 256, 256);
 
 		RECT rect;
-		if (!GetWindowRect(hWnd, &rect))
+		if (!GetClientRect(hWnd, &rect))
 			throw std::exception("Couldn't get window size");
 		
 		renderer.InitSwapChain(rect.right - rect.left, rect.bottom - rect.top, NUM_BACK_BUFFERS, hWnd);
