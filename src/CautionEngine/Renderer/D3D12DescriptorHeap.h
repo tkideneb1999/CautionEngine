@@ -21,11 +21,20 @@ namespace CautionEngine::Rendering::D3D12
 		D3D12_CPU_DESCRIPTOR_HANDLE m_cpuStartHandle;
 		D3D12_GPU_DESCRIPTOR_HANDLE m_gpuStartHandle;
 
+		UINT m_maxDescriptors = 0;
+		UINT m_allocatedDescriptors = 0;
+
 	public:
 		DescriptorHeap()
 			:m_DescriptorHeap(), m_incrementSize(0), m_cpuStartHandle(),m_gpuStartHandle()
 		{};
 		DescriptorHeap(ID3D12Device* pDevice, D3D12_DESCRIPTOR_HEAP_TYPE type, UINT numDescriptors, bool isShaderVisible);
 		DescriptorHeapHandle GetHandle(SIZE_T index);
+
+		DescriptorHeapHandle Allocate();
+
+		const ComPtr<ID3D12DescriptorHeap> GetHeapPtr() { return m_DescriptorHeap; }
+
+		bool Initialized() { return m_DescriptorHeap.Get() != nullptr; }
 	};
 }

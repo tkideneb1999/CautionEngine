@@ -1,6 +1,7 @@
 #include "D3D12DescriptorHeap.h"
 
 #include <sstream>
+#include <iostream>
 
 #include "D3D12Helpers.h"
 
@@ -19,7 +20,7 @@ namespace CautionEngine::Rendering::D3D12
 
 #if _DEBUG
 		std::stringstream report;
-		report << "Failed to Create Descriptor Heap for type: " << type;
+		report << "Failed to Create Descriptor Heap for type: " << type << std::endl;
 #endif
 		
 		ThrowIfFailed(
@@ -33,6 +34,8 @@ namespace CautionEngine::Rendering::D3D12
 		m_incrementSize = pDevice->GetDescriptorHandleIncrementSize(type);
 		m_cpuStartHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		m_gpuStartHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+
+		m_maxDescriptors = numDescriptors;
 	}
 
 	DescriptorHeapHandle DescriptorHeap::GetHandle(SIZE_T index)
@@ -41,5 +44,18 @@ namespace CautionEngine::Rendering::D3D12
 		handle.cpuHandle.ptr = m_cpuStartHandle.ptr + index * m_incrementSize;
 		handle.gpuHandle.ptr = m_gpuStartHandle.ptr + index * m_incrementSize;
 		return handle;
+	}
+
+	DescriptorHeapHandle DescriptorHeap::Allocate()
+	{
+		if (m_allocatedDescriptors >= m_maxDescriptors)
+			throw std::exception("Maximum Number of Descriptors Allocated");
+
+		DescriptorHeapHandle allocatedHandle = GetHandle(m_allocatedDescriptors);
+		m_allocatedDescriptors++;
+#if _DEBUG
+		std::cout << "Allocated Descriptor: " << m_allocatedDescriptors << "/" << m_maxDescriptors << std::endl;
+#endif
+		return allocatedHandle;
 	}
 }

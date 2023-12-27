@@ -17,17 +17,17 @@ namespace CautionEngine::Rendering
 		ComPtr<IDXGIFactory7> m_factory;
 		ComPtr<IDXGIAdapter4> m_adapter;
 
-		D3D12::DescriptorHeap m_cbv_srv_uav_descHeap;
-		D3D12::DescriptorHeap m_rtv_descHeap;
-		D3D12::DescriptorHeap m_dsv_descHeap;
-		D3D12::DescriptorHeap m_sampler_descHeap;
-
 	public:
 		D3D12API();
 
 		// Disable Copying
 		D3D12API(const D3D12API& original) = delete;
 		D3D12API& operator=(const D3D12API& original) = delete;
+
+		const ComPtr<ID3D12Device8> GetDevicePtr() { return m_device; }
+		const ComPtr<IDXGIFactory7> GetFactoryPtr() { return m_factory; }
+
+		void GatherDREDOUTput();
 
 	private:
 		void GetAdapter(IDXGIAdapter4** ppAdapter, DXGI_GPU_PREFERENCE pref);

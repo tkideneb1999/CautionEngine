@@ -7,8 +7,12 @@
 
 #include "IEditorLayer.h"
 
+#include "Renderer/Renderer.h"
+
 #include "imgui.h"
 #include <d3d12.h>
+
+using namespace CautionEngine::Rendering;
 
 namespace Reckless
 {
@@ -48,6 +52,8 @@ namespace Reckless
 
 	private:
 		RecklessAppSpecification m_specification;
+
+		Renderer renderer;
 
 		bool m_running;
 		

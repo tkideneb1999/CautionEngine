@@ -9,6 +9,19 @@ namespace CautionEngine::Rendering
 {
 	D3D12API::D3D12API()
 	{
+#if _DEBUG
+		{
+			ComPtr<ID3D12Debug> debugController;
+			ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)), "Couldn't get Debug Interface");
+			debugController->EnableDebugLayer();
+
+			ComPtr<ID3D12DeviceRemovedExtendedDataSettings1> dredSettings;
+			ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&dredSettings)), "Couldn't get Debug Interface");
+			dredSettings->SetAutoBreadcrumbsEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
+			dredSettings->SetPageFaultEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
+		}
+#endif
+
 		ThrowIfFailed(
 			CreateDXGIFactory2(
 #if _DEBUG
@@ -21,15 +34,26 @@ namespace CautionEngine::Rendering
 
 		//TODO: Make GPU pref accessible
 		GetAdapter(&m_adapter, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE);
+
 		ThrowIfFailed(
 			D3D12CreateDevice(m_adapter.Get(), D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&m_device)),
 			"Device Creation Failed"
 			);
+#if _DEBUG
+		std::cout << "Graphics Device initialized!" << std::endl;
+#endif
+	}
 
-		m_cbv_srv_uav_descHeap = D3D12::DescriptorHeap(m_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 16, true);
-		m_dsv_descHeap = D3D12::DescriptorHeap(m_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 16, true);
-		m_rtv_descHeap = D3D12::DescriptorHeap(m_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 16, true);
-		m_sampler_descHeap = D3D12::DescriptorHeap(m_device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, 16, true);
+	void D3D12API::GatherDREDOUTput()
+	{
+		ComPtr<ID3D12DeviceRemovedExtendedData1> dredData;
+		ThrowIfFailed(m_device->QueryInterface(dredData.GetAddressOf()), "Query Interface Failed");
+
+		D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT1 dredOutput{};
+		D3D12_DRED_PAGE_FAULT_OUTPUT1 dredPageFaultOutput{};
+		dredData->GetAutoBreadcrumbsOutput1(&dredOutput);
+		dredData->GetPageFaultAllocationOutput1(&dredPageFaultOutput);
+		DebugBreak();
 	}
 
 	void D3D12API::GetAdapter(IDXGIAdapter4** ppAdapter, DXGI_GPU_PREFERENCE pref

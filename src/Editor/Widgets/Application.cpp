@@ -24,24 +24,8 @@ struct FrameContext
 	UINT64                          FenceValue;
 };
 
-// DX12 Globals
-static int const                    NUM_FRAMES_IN_FLIGHT = 3;
-static FrameContext                 g_frameContext[NUM_FRAMES_IN_FLIGHT] = {};
-static UINT                         g_frameIndex = 0;
-
+// DX12 Global
 static int const                    NUM_BACK_BUFFERS = 3;
-static ID3D12Device*                g_pd3dDevice = NULL;
-static ID3D12DescriptorHeap*        g_pd3dRtvDescHeap = NULL;
-static ID3D12DescriptorHeap*        g_pd3dSrvDescHeap = NULL;
-static ID3D12CommandQueue*          g_pd3dCommandQueue = NULL;
-static ID3D12GraphicsCommandList*   g_pd3dCommandList = NULL;
-static ID3D12Fence*                 g_fence = NULL;
-static HANDLE                       g_fenceEvent = NULL;
-static UINT64                       g_fenceLastSignaledValue = 0;
-static IDXGISwapChain3*             g_pSwapChain = NULL;
-static HANDLE                       g_hSwapChainWaitableObject = NULL;
-static ID3D12Resource*              g_mainRenderTargetResource[NUM_BACK_BUFFERS] = {};
-static D3D12_CPU_DESCRIPTOR_HANDLE  g_mainRenderTargetDescriptor[NUM_BACK_BUFFERS] = {};
 
 // TODO: implement setting up d3d devices
 static void SetupDX()
@@ -112,9 +96,19 @@ namespace Reckless {
 		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
+
+		renderer.BeginFrame();
+		ID3D12GraphicsCommandList6* curCommandList = renderer.GetCurrentCommandList();
+
+		ImGui::ShowDemoWindow();
+
 		// Layers -> Drawing
 		DrawEditorLayers();
 		ImGui::Render();
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), curCommandList);
+
+		renderer.EndFrame();
+		renderer.Render();
 
 		return true;
 	}
@@ -132,6 +126,9 @@ namespace Reckless {
 
 	LRESULT CALLBACK Application::AppProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 	{
+		extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND ig_hWnd, UINT ig_msg, WPARAM ig_wParam, LPARAM ig_lParam);
+		if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+			return true;
 		switch (msg)
 		{
 		case WM_CLOSE:
@@ -158,12 +155,22 @@ namespace Reckless {
 	void Application::Init()
 	{
 		// TODO: initialize dx12 related stuff here and imgui
+		renderer.InitDescriptorHeaps(1024, 32, 256, 256);
+
+		RECT rect;
+		if (!GetWindowRect(hWnd, &rect))
+			throw std::exception("Couldn't get window size");
+		
+		renderer.InitSwapChain(rect.right - rect.left, rect.bottom - rect.top, NUM_BACK_BUFFERS, hWnd);
+		renderer.InitCommandFrames();
+		renderer.InitFrameFence();
+		renderer.CreateRootSignature();
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 		//io.ConfigViewportsNoAutoMerge = true;
 		//io.ConfigViewportsNoTaskBarIcon = true;
 
@@ -173,14 +180,13 @@ namespace Reckless {
 
 		// Setting of the ImGui platform and renderer
 		ImGui_ImplWin32_Init(hWnd);
-		// DX12 Info
-		ImGui_ImplDX12_Init
-		(g_pd3dDevice
-			, NUM_FRAMES_IN_FLIGHT
-			, DXGI_FORMAT_R8G8B8A8_UNORM
-			, g_pd3dSrvDescHeap
-			, g_pd3dSrvDescHeap->GetCPUDescriptorHandleForHeapStart()
-			, g_pd3dSrvDescHeap->GetGPUDescriptorHandleForHeapStart()
+		D3D12::DescriptorHeapHandle font_descriptor_handle = renderer.cbv_srv_uav_descHeap.Allocate();
+		ImGui_ImplDX12_Init(
+			renderer.api.GetDevicePtr().Get(), 
+			NUM_BACK_BUFFERS, 
+			DXGI_FORMAT_R8G8B8A8_UNORM, //TODO: Make this always match definition in renderer
+			renderer.cbv_srv_uav_descHeap.GetHeapPtr().Get(), 
+			font_descriptor_handle.cpuHandle, font_descriptor_handle.gpuHandle
 		);
 	}
 	void Application::Shutdown()
@@ -189,6 +195,9 @@ namespace Reckless {
 		ImGui_ImplDX12_Shutdown();
 		ImGui_ImplWin32_Shutdown();
 		ImGui::DestroyContext();
+
+		// Wait for renderer to finish up
+		renderer.Shutdown();
 	}
 	void Application::DrawEditorLayers()
 	{

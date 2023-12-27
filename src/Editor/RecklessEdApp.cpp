@@ -3,6 +3,8 @@
 
 #include "Widgets/Application.h"
 
+#include "Renderer/D3D12API.h"
+
 // configs
 bool g_applicationRunning = true;
 const wchar_t CLASS_NAME[] = L"Reckless Editor Class";
