@@ -27,6 +27,13 @@ namespace CautionEngine::Rendering {
 			if(res == DXGI_ERROR_DEVICE_REMOVED)
 				api.GatherDREDOUTput();
 		}
+		CommandFrame& curFrame = m_commandFrames[m_curFrameIndex];
+		m_fenceValue++;
+		curFrame.fenceValue = m_fenceValue;
+		m_commandQueue->Signal(m_fence.Get(), m_fenceValue);
+
+
+		m_curFrameIndex = (m_curFrameIndex + 1) % numBackBuffers;
 		//m_currentFrame = m_swapChain->GetCurrentBackBufferIndex();
 	}
 
@@ -46,6 +53,7 @@ namespace CautionEngine::Rendering {
 			api.GetDevicePtr()->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&m_commandQueue)),
 			"Command Queue Creation Failed"
 			);
+		m_commandQueue->SetName(L"Renderer Command Queue");
 
 		// Init SwapChain
 		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
@@ -163,7 +171,8 @@ namespace CautionEngine::Rendering {
 		CommandFrame& curFrame = m_commandFrames[m_curFrameIndex];
 
 		// Check if Frame is finished Rendering here
-		if (m_fence->GetCompletedValue() < curFrame.fenceValue)
+		UINT64 completedFenceValue = m_fence->GetCompletedValue();
+		if (completedFenceValue < curFrame.fenceValue)
 		{
 			m_fence->SetEventOnCompletion(curFrame.fenceValue, m_fenceEvent);
 			WaitForSingleObject(m_fenceEvent, INFINITE);
@@ -213,14 +222,6 @@ namespace CautionEngine::Rendering {
 		// Execute Command List
 		ID3D12CommandList* ppCommandLists[] = { curCommandList.Get() };
 		m_commandQueue->ExecuteCommandLists(1, ppCommandLists);
-		
-		CommandFrame& curFrame = m_commandFrames[m_curFrameIndex];
-		m_fenceValue++;
-		curFrame.fenceValue = m_fenceValue;
-		m_commandQueue->Signal(m_fence.Get(), m_fenceValue);
-
-
-		m_curFrameIndex = (m_curFrameIndex + 1) % numBackBuffers;
 	}
 
 	void Renderer::CreateRootSignature()
@@ -253,11 +254,14 @@ namespace CautionEngine::Rendering {
 		for (int i = 0; i < numBackBuffers; i++)
 		{
 			CommandFrame& frame = m_commandFrames[i];
-			if (m_fence->GetCompletedValue() < frame.fenceValue)
+			UINT64 completedFenceValue = m_fence->GetCompletedValue();
+			if (completedFenceValue < frame.fenceValue)
 			{
 				m_fence->SetEventOnCompletion(frame.fenceValue, m_fenceEvent);
 				WaitForSingleObject(m_fenceEvent, INFINITE);
 			}
 		}
+
+		CloseHandle(m_fenceEvent);
 	}
 }
