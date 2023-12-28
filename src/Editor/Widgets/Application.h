@@ -12,6 +12,12 @@
 #include "imgui.h"
 #include <d3d12.h>
 
+///////////////////////////////
+// Temp Testing Setup
+#include "Renderer/Shader.h"
+
+///////////////////////////////
+
 using namespace CautionEngine::Rendering;
 
 namespace Reckless
@@ -72,5 +78,10 @@ namespace Reckless
 		void Init();
 		void Shutdown();
 		void DrawEditorLayers();
+
+		//////////////////////////////////////////////////////////////
+		// Temp Testing Setup
+		//Shader fallbackShader = Shader(L"D:\\projects\\CautionEngine\\src\\CautionEngine\\Shaders\\Fallback.hlsl");
+
 	};
 }
