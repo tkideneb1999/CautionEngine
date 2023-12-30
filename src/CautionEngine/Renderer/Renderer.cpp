@@ -251,6 +251,13 @@ namespace CautionEngine::Rendering {
 
 	void Renderer::Shutdown()
 	{
+		FlushGPU();
+
+		CloseHandle(m_fenceEvent);
+	}
+
+	void Renderer::FlushGPU()
+	{
 		for (int i = 0; i < numBackBuffers; i++)
 		{
 			CommandFrame& frame = m_commandFrames[i];
@@ -261,7 +268,35 @@ namespace CautionEngine::Rendering {
 				WaitForSingleObject(m_fenceEvent, INFINITE);
 			}
 		}
+		m_curFrameIndex = 0;
+	}
 
-		CloseHandle(m_fenceEvent);
+	void Renderer::Resize(int newWidth, int newHeight)
+	{
+		FlushGPU();
+		ReleaseSwapChainRenderTargets();
+		m_swapChain->ResizeBuffers(0, newWidth, newHeight, DXGI_FORMAT_UNKNOWN, 0);
+		CreateSwapChainRenderTargets();
+	}
+
+	void Renderer::CreateSwapChainRenderTargets()
+	{
+		for (int i = 0; i < numBackBuffers; i++)
+		{
+			RenderTarget& renderTarget = m_swapChainRenderTargets[i];
+			m_swapChain->GetBuffer(i, IID_PPV_ARGS(&renderTarget.resourceView));
+			api.GetDevicePtr()->CreateRenderTargetView(
+				renderTarget.resourceView.Get(), nullptr, renderTarget.descriptorHeapHandle.cpuHandle
+			);
+		}
+	}
+
+	void Renderer::ReleaseSwapChainRenderTargets()
+	{
+		for (int i = 0; i < numBackBuffers; i++)
+		{
+			RenderTarget& renderTarget = m_swapChainRenderTargets[i];
+			renderTarget.resourceView.Reset();
+		}
 	}
 }

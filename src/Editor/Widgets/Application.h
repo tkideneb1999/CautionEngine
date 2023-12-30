@@ -27,6 +27,15 @@ namespace Reckless
 		std::string AppName = "RecklessEd";
 	};
 
+	enum WINDOW_STATE
+	{
+		WINDOW_STATE_DEFAULT    = 0,
+		WINDOW_STATE_RESIZING   = 1,
+		WINDOW_STATE_MINIMIZED  = 2,
+		WINDOW_STATE_MAXIMIZED  = 3,
+		WINDOW_STATE_FULLSCREEN = 4,
+	};
+
 	class Application
 	{
 	public:
@@ -40,6 +49,11 @@ namespace Reckless
 
 		MSG currentMsg;
 		BOOL currentMsgResult;
+
+		unsigned int m_width = 0;
+		unsigned int m_height = 0;
+		
+		WINDOW_STATE applicationState = WINDOW_STATE_DEFAULT;
 
 	public:
 		Application(const wchar_t wndClassName[], const wchar_t windowName[], std::vector<std::string> args);
@@ -70,7 +84,10 @@ namespace Reckless
 
 		std::vector <std::shared_ptr<IEditorLayer>> m_editorLayers;
 
+		// Windows specific Message Handling
+		static LRESULT CALLBACK AppProcedureSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		static LRESULT CALLBACK AppProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		LRESULT HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		int HandleMessages();
 
 		// Window Functions
@@ -78,6 +95,9 @@ namespace Reckless
 		void Init();
 		void Shutdown();
 		void DrawEditorLayers();
+
+		void UpdateWindowSize();
+		void HandleLMB();
 
 		//////////////////////////////////////////////////////////////
 		// Temp Testing Setup

@@ -39,7 +39,7 @@ namespace CautionEngine::Rendering {
 		D3D12_VIEWPORT m_viewport = {};
 		D3D12_RECT m_scissorRect = {};
 
-		// Synchronization Objects: TODO
+		// Synchronization Objects
 		UINT m_curFrameIndex = 0;
 		HANDLE m_fenceEvent;
 		UINT64 m_fenceValue = 0;
@@ -60,6 +60,11 @@ namespace CautionEngine::Rendering {
 		void CreateRootSignature();
 		void CreateInitialPipelineState();
 		void Shutdown();
+		void FlushGPU();
+
+		void Resize(int newWidth, int newHeight);
+		void CreateSwapChainRenderTargets();
+		void ReleaseSwapChainRenderTargets();
 
 		ID3D12GraphicsCommandList6* GetCurrentCommandList();
 	};

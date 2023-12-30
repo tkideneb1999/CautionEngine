@@ -1,6 +1,7 @@
 #include "Application.h"
 
 #include <stdexcept>
+#include <iostream>
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -18,20 +19,8 @@
 #pragma comment(lib, "dxguid.lib")
 #endif
 
-struct FrameContext
-{
-	ID3D12CommandAllocator*         CommandAllocator;
-	UINT64                          FenceValue;
-};
-
 // DX12 Global
 static int const                    NUM_BACK_BUFFERS = 3;
-
-// TODO: implement setting up d3d devices
-static void SetupDX()
-{
-
-}
 
 namespace Reckless {
 	Application::Application(const wchar_t wndClassName[], const wchar_t wndName[], std::vector<std::string> lArgs)
@@ -40,7 +29,7 @@ namespace Reckless {
 		hInstance = GetModuleHandle(nullptr);
 
 		windowClass = { 0 };
-		windowClass.lpfnWndProc = AppProcedure;
+		windowClass.lpfnWndProc = AppProcedureSetup;
 		windowClass.hInstance = hInstance;
 		windowClass.lpszClassName = wndClassName;
 
@@ -57,12 +46,13 @@ namespace Reckless {
 			nullptr,
 			nullptr,
 			hInstance,
-			nullptr
+			this
 		);
 
 		if (hWnd == nullptr) {
 			throw std::runtime_error("Error Initializing Window");
 		}
+		UpdateWindowSize();
 
 		// Initialization
 		Init();
@@ -124,13 +114,36 @@ namespace Reckless {
 		return hInstance;
 	}
 
-	LRESULT CALLBACK Application::AppProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
+	LRESULT Application::AppProcedureSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		if (msg == WM_NCCREATE)
+		{
+			const CREATESTRUCTW* const pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
+			Application* const pApp = static_cast<Application*>(pCreate->lpCreateParams);
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pApp));
+			SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&Application::AppProcedure));
+			return pApp->HandleMessage(hWnd, msg, wParam, lParam);
+		}
+		return DefWindowProc(hWnd, msg, wParam, lParam);
+	}
+
+	LRESULT CALLBACK Application::AppProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND ig_hWnd, UINT ig_msg, WPARAM ig_wParam, LPARAM ig_lParam);
 		if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
 			return true;
+		Application* const pApp = reinterpret_cast<Application*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+		return pApp->HandleMessage(hWnd, msg, wParam, lParam);
+	}
+
+	LRESULT Application::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
 		switch (msg)
 		{
+		case WM_SIZE:
+			UpdateWindowSize();
+			renderer.Resize(m_width, m_height);
+			break;
 		case WM_CLOSE:
 			PostQuitMessage(0);
 			break;
@@ -152,6 +165,7 @@ namespace Reckless {
 		}
 		return 1;
 	}
+
 	void Application::Init()
 	{
 		// TODO: initialize dx12 related stuff here and imgui
@@ -161,7 +175,7 @@ namespace Reckless {
 		if (!GetClientRect(hWnd, &rect))
 			throw std::exception("Couldn't get window size");
 		
-		renderer.InitSwapChain(rect.right - rect.left, rect.bottom - rect.top, NUM_BACK_BUFFERS, hWnd);
+		renderer.InitSwapChain(m_width, m_height, NUM_BACK_BUFFERS, hWnd);
 		renderer.InitCommandFrames();
 		renderer.InitFrameFence();
 		renderer.CreateRootSignature();
@@ -189,6 +203,7 @@ namespace Reckless {
 			font_descriptor_handle.cpuHandle, font_descriptor_handle.gpuHandle
 		);
 	}
+
 	void Application::Shutdown()
 	{
 		// ImGui
@@ -199,11 +214,21 @@ namespace Reckless {
 		// Wait for renderer to finish up
 		renderer.Shutdown();
 	}
+
 	void Application::DrawEditorLayers()
 	{
 		for (auto& layer : m_editorLayers)
 		{
 			layer->DrawLayer();
 		}
+	}
+
+	void Application::UpdateWindowSize()
+	{
+		RECT rect;
+		if (!GetClientRect(hWnd, &rect))
+			throw std::exception("Couldn't get window size");
+		m_width = rect.right - rect.left;
+		m_height = rect.bottom - rect.top;
 	}
 }
