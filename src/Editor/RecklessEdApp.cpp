@@ -2,7 +2,7 @@
 #include <string>
 
 #include "Widgets/Application.h"
-#include "Widgets/AssetBrowser/AssetBrowser.h"
+#include "Widgets/RecklessEditors.h"
 
 #include <Renderer/D3D12API.h>
 
@@ -19,11 +19,15 @@ int main(int argc, char** argv)
 	{
 		args[i] = argv[i];
 	}
+	
+	Reckless::Application* editor = new Reckless::Application(CLASS_NAME, WINDOW_NAME, args);
 
 	// AssetBrowser Editor
-	Reckless::Application* editor = new Reckless::Application(CLASS_NAME, WINDOW_NAME, args);
 	std::shared_ptr<Reckless::AssetBrowserEditor> assetBrowser = std::make_shared<Reckless::AssetBrowserEditor>();
 	editor->AddEditorLayer(assetBrowser);
+
+	// Viewport
+	
 
 	while (g_applicationRunning)
 	{

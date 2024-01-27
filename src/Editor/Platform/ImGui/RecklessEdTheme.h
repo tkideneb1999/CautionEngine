@@ -3,16 +3,16 @@
 #include <imgui.h>
 #include <glm/glm.hpp>
 
-namespace Reckless::UI 
+namespace Reckless::UI
 {
-	namespace Colors 
+	namespace Colors
 	{
 		static inline float Convert_sRGB_FromLinear(float theLinearValue);
 		static inline float Convert_sRGB_ToLinear(float thesRGBValue);
 		ImVec4 ConvertFromSRGB(ImVec4 colour);
 		ImVec4 ConvertToSRGB(ImVec4 colour);
 
-		namespace Theme 
+		namespace Theme
 		{
 			constexpr auto accent = IM_COL32(236, 158, 36, 255);
 			constexpr auto highlight = IM_COL32(39, 185, 242, 255);

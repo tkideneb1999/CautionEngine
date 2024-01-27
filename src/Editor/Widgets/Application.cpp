@@ -1,5 +1,7 @@
 #include "Application.h"
 
+#include "../Platform/ImGui/RecklessEdTheme.h"
+
 #include <stdexcept>
 #include <iostream>
 
@@ -90,7 +92,9 @@ namespace Reckless {
 		renderer.BeginFrame();
 		ID3D12GraphicsCommandList6* curCommandList = renderer.GetCurrentCommandList();
 
-		ImGui::ShowDemoWindow();
+		// TODO: remove this entirely soon
+		//ImGui::ShowDemoWindow();
+		Reckless::UI::SetRecklessEdTheme();
 
 		// Layers -> Drawing
 		DrawEditorLayers();
@@ -190,7 +194,8 @@ namespace Reckless {
 
 		// Style
 		// TODO: implement the reckless editor style later here...
-		ImGui::StyleColorsDark();
+		/*ImGui::StyleColorsDark();*/
+
 
 		// Setting of the ImGui platform and renderer
 		ImGui_ImplWin32_Init(hWnd);
