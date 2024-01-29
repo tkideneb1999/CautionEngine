@@ -27,3 +27,4 @@ src/Editor/bin/
 src/Game/bin/
 
 thirdparty/usd_bin
+intermediate/
