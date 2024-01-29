@@ -7,8 +7,8 @@ project "RecklessEditor"
 	local buildname = "%{prj.name}_%{cfg.buildcfg}"
 	local solutionlocations = "../../solutions/%{prj.name}"
 
-    local builddir = (solutionlocations.. "/bin/" .. buildname)
-	local intermediate = (solutionlocations.. "/intermediate/" .. buildname)
+    local builddir = ("../../bin/")
+	local intermediate = ("../../intermediate/")
 
     language (lang)
     cppdialect (dialect)
@@ -44,10 +44,15 @@ project "RecklessEditor"
     links
     {
         "ImGui",
-        "CautionEngine",
+        (builddir.. "%{Library.caution_engine_lib}"),
         "%{Library.dx_12}",
         "%{Library.dx_compiler}",
         "%{Library.dx_gi}"
+    }
+
+    libdirs
+    {
+        builddir
     }
 
     filter "system:windows"

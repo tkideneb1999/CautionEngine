@@ -12,6 +12,9 @@ LibraryDirectories["usd_dir"] = "%{wks.location}/thirdparty/usd_bin/lib"
 
 -- Libraries (*.lib)
 Library = {}
+
+Library["caution_engine_lib"] = "CautionEngine.lib"
+
 Library["dx_12"] = "d3d12.lib"
 Library["dx_compiler"] = "d3dcompiler.lib"
 Library["dx_gi"] = "dxgi.lib"

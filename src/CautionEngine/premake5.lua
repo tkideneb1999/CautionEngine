@@ -1,13 +1,16 @@
 project "CautionEngine"
-    kind "StaticLib" -- Still not decided yet if we use .lib or .dll
+    -- StaticLib = .lib
+    -- SharedLib = .dll
+    kind "SharedLib" -- TODO: Still not decided yet if we use .lib or .dll
 
 	local lang = "C++"
 	local dialect = "C++20"
 	
 	local buildname = "%{prj.name}_%{cfg.buildcfg}"
-	local builddir = ("bin/" .. buildname)
-	local intermediate = ("intermediate/" .. buildname)
 	local solutionlocations = "../../solutions/%{prj.name}"
+
+    local builddir = ("../../bin/")
+	local intermediate = ("../../intermediate/")
 
     language (lang)
     cppdialect (dialect)
@@ -58,7 +61,8 @@ project "CautionEngine"
         runtime "Debug"
         defines 
         {
-            "DEBUG"
+            "DEBUG",
+            "CAUTION_SHARED"
         }
         symbols "On"
         inlining("Auto")
@@ -67,7 +71,8 @@ project "CautionEngine"
         runtime "Release"
         defines 
         {
-            "RELEASE"
+            "RELEASE",
+            "CAUTION_SHARED"
         }
         optimize "On"
         inlining("Auto")
