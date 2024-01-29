@@ -1,18 +1,20 @@
 #pragma once
 
-#include <vector>
+#include "../CautionDefinitions.h"
 
 #include "D3D12API.h"
 #include "D3D12DescriptorHeap.h"
 #include "RenderTarget.h"
 
+#include <vector>
+
 namespace CautionEngine::Rendering {
-	struct CommandFrame {
+	struct CAUTION_API CommandFrame {
 		ComPtr<ID3D12CommandAllocator> commandAllocator;
 		UINT64 fenceValue;
 	};
 
-	class Renderer {
+	class CAUTION_API Renderer {
 
 	public:
 		static D3D12API api;

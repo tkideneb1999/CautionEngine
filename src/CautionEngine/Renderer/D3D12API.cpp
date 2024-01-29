@@ -56,8 +56,7 @@ namespace CautionEngine::Rendering
 		DebugBreak();
 	}
 
-	void D3D12API::GetAdapter(IDXGIAdapter4** ppAdapter, DXGI_GPU_PREFERENCE pref
-	)
+	void D3D12API::GetAdapter(IDXGIAdapter4** ppAdapter, DXGI_GPU_PREFERENCE pref)
 	{
 		*ppAdapter = nullptr;
 		

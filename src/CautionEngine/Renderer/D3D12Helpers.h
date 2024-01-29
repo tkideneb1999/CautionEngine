@@ -1,12 +1,13 @@
 #pragma once
 
+#include "../CautionDefinitions.h"
 #include <exception>
 
 #include <wrl/client.h>
 
 using namespace Microsoft::WRL;
 
-static void ThrowIfFailed(HRESULT res, const char* msg)
+CAUTION_API inline void ThrowIfFailed(HRESULT res, const char* msg)
 {
 	if (!SUCCEEDED(res))
 	{

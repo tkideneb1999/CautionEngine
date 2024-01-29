@@ -1,10 +1,11 @@
 #pragma once
 
+#include "../CautionDefinitions.h"
 #include "D3D12DescriptorHeap.h"
 
 namespace CautionEngine::Rendering
 {
-	class RenderTarget
+	class CAUTION_API RenderTarget
 	{
 	public:
 		D3D12::DescriptorHeapHandle descriptorHeapHandle;

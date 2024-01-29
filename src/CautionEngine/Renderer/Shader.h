@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../CautionDefinitions.h"
+
 #include <d3d12.h>
 #include <d3dcompiler.h>
 #include "wrl/client.h"
@@ -8,7 +10,7 @@ using namespace Microsoft::WRL;
 
 namespace CautionEngine::Rendering
 {
-	class Shader
+	class CAUTION_API Shader
 	{
 	private:
 		const LPCWSTR m_filepath;

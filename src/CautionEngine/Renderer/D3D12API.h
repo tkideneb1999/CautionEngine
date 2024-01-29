@@ -1,16 +1,17 @@
 #pragma once
+#include "../CautionDefinitions.h"
+
+#include "D3D12DescriptorHeap.h"
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <wrl/client.h>
 
-#include "D3D12DescriptorHeap.h"
-
 using namespace Microsoft::WRL;
 
-namespace CautionEngine::Rendering 
+namespace CautionEngine::Rendering
 {
-	class D3D12API
+	class CAUTION_API D3D12API
 	{
 	private:
 		ComPtr<ID3D12Device8> m_device;

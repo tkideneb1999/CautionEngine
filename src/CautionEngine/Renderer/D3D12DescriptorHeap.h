@@ -1,19 +1,21 @@
 #pragma once
-#include <d3d12.h>
 
+#include "../CautionDefinitions.h"
+
+#include <d3d12.h>
 #include <wrl/client.h>
 
 using namespace Microsoft::WRL;
 
 namespace CautionEngine::Rendering::D3D12
 {
-	struct DescriptorHeapHandle 
+	struct CAUTION_API DescriptorHeapHandle
 	{
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle;
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle;
 	};
 
-	class DescriptorHeap
+	class CAUTION_API DescriptorHeap
 	{
 	private:
 		ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = {};
