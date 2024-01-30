@@ -44,6 +44,7 @@ project "RecklessEditor"
     links
     {
         "ImGui",
+        "CautionEngine",
         (builddir.. "%{Library.caution_engine_lib}"),
         "%{Library.dx_12}",
         "%{Library.dx_compiler}",
