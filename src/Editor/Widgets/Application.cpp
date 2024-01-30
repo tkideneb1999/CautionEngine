@@ -24,7 +24,8 @@
 // DX12 Global
 static int const                    NUM_BACK_BUFFERS = 3;
 
-namespace Reckless {
+namespace Reckless 
+{
 	Application::Application(const wchar_t wndClassName[], const wchar_t wndName[], std::vector<std::string> lArgs)
 		: args(lArgs)
 	{
@@ -89,8 +90,8 @@ namespace Reckless {
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 
-		renderer.BeginFrame();
-		ID3D12GraphicsCommandList6* curCommandList = renderer.GetCurrentCommandList();
+		m_renderer.BeginFrame();
+		ID3D12GraphicsCommandList6* curCommandList = m_renderer.GetCurrentCommandList();
 
 		// TODO: remove this entirely soon
 		//ImGui::ShowDemoWindow();
@@ -101,8 +102,8 @@ namespace Reckless {
 		ImGui::Render();
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), curCommandList);
 
-		renderer.EndFrame();
-		renderer.Render();
+		m_renderer.EndFrame();
+		m_renderer.Render();
 
 		return true;
 	}
@@ -146,7 +147,7 @@ namespace Reckless {
 		{
 		case WM_SIZE:
 			UpdateWindowSize();
-			renderer.Resize(m_width, m_height);
+			m_renderer.Resize(m_width, m_height);
 			break;
 		case WM_CLOSE:
 			PostQuitMessage(0);
@@ -173,16 +174,16 @@ namespace Reckless {
 	void Application::Init()
 	{
 		// TODO: initialize dx12 related stuff here and imgui
-		renderer.InitDescriptorHeaps(1024, 32, 256, 256);
+		m_renderer.InitDescriptorHeaps(1024, 32, 256, 256);
 
 		RECT rect;
 		if (!GetClientRect(hWnd, &rect))
 			throw std::exception("Couldn't get window size");
 		
-		renderer.InitSwapChain(m_width, m_height, NUM_BACK_BUFFERS, hWnd);
-		renderer.InitCommandFrames();
-		renderer.InitFrameFence();
-		renderer.CreateRootSignature();
+		m_renderer.InitSwapChain(m_width, m_height, NUM_BACK_BUFFERS, hWnd);
+		m_renderer.InitCommandFrames();
+		m_renderer.InitFrameFence();
+		m_renderer.CreateRootSignature();
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -199,12 +200,12 @@ namespace Reckless {
 
 		// Setting of the ImGui platform and renderer
 		ImGui_ImplWin32_Init(hWnd);
-		D3D12::DescriptorHeapHandle font_descriptor_handle = renderer.cbv_srv_uav_descHeap.Allocate();
+		D3D12::DescriptorHeapHandle font_descriptor_handle = m_renderer.cbv_srv_uav_descHeap.Allocate();
 		ImGui_ImplDX12_Init(
-			renderer.api.GetDevicePtr().Get(), 
+			m_renderer.api.GetDevicePtr().Get(), 
 			NUM_BACK_BUFFERS, 
 			DXGI_FORMAT_R8G8B8A8_UNORM, //TODO: Make this always match definition in renderer
-			renderer.cbv_srv_uav_descHeap.GetHeapPtr().Get(), 
+			m_renderer.cbv_srv_uav_descHeap.GetHeapPtr().Get(), 
 			font_descriptor_handle.cpuHandle, font_descriptor_handle.gpuHandle
 		);
 	}
@@ -217,7 +218,7 @@ namespace Reckless {
 		ImGui::DestroyContext();
 
 		// Wait for renderer to finish up
-		renderer.Shutdown();
+		m_renderer.Shutdown();
 	}
 
 	void Application::DrawEditorLayers()

@@ -73,7 +73,7 @@ namespace Reckless
 	private:
 		RecklessAppSpecification m_specification;
 
-		Renderer renderer;
+		Renderer m_renderer;
 
 		bool m_running;
 		

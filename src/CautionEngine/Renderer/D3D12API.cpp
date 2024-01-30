@@ -23,7 +23,8 @@ namespace CautionEngine::Rendering
 #endif
 
 		ThrowIfFailed(
-			CreateDXGIFactory2(
+			CreateDXGIFactory2( // TODO: benedikt -> you might want to initialize the DXGI factory outside of this project?
+				// https://gamedev.stackexchange.com/questions/128197/why-do-i-get-this-error-about-dllmain-when-using-d3d-from-within-a-dll
 #if _DEBUG
 				DXGI_CREATE_FACTORY_DEBUG,
 #endif
@@ -31,10 +32,9 @@ namespace CautionEngine::Rendering
 			),
 			"Creating Factory failed"
 		);
-
+		
 		//TODO: Make GPU pref accessible
 		GetAdapter(&m_adapter, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE);
-
 		ThrowIfFailed(
 			D3D12CreateDevice(m_adapter.Get(), D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&m_device)),
 			"Device Creation Failed"
@@ -61,7 +61,7 @@ namespace CautionEngine::Rendering
 		*ppAdapter = nullptr;
 		
 		ThrowIfFailed(
-			m_factory->EnumAdapterByGpuPreference(0, pref, IID_PPV_ARGS(ppAdapter)), 
+			m_factory->EnumAdapterByGpuPreference(0, pref, IID_PPV_ARGS(ppAdapter)),
 			"Couldn't find GPU Adapter"
 		);
 

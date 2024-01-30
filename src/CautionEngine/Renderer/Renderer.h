@@ -8,14 +8,16 @@
 
 #include <vector>
 
-namespace CautionEngine::Rendering {
-	struct CAUTION_API CommandFrame {
+namespace CautionEngine::Rendering 
+{
+	struct CAUTION_API CommandFrame
+	{
 		ComPtr<ID3D12CommandAllocator> commandAllocator;
 		UINT64 fenceValue;
 	};
 
-	class CAUTION_API Renderer {
-
+	class CAUTION_API Renderer
+	{
 	public:
 		static D3D12API api;
 
@@ -49,7 +51,7 @@ namespace CautionEngine::Rendering {
 
 	public:
 		Renderer();
-		~Renderer();
+		virtual ~Renderer() = default;
 
 		void Render();
 

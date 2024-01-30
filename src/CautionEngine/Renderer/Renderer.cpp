@@ -8,18 +8,10 @@ namespace CautionEngine::Rendering {
 
 	D3D12API Renderer::api = {};
 
-	Renderer::Renderer()
-	{
-		
-	}
-
-	Renderer::~Renderer()
-	{
-	}
+	Renderer::Renderer() { }
 
 	void Renderer::Render()
 	{
-		
 		// Present SwapChain
 		HRESULT res = m_swapChain->Present(1, 0);
 		if (!SUCCEEDED(res))

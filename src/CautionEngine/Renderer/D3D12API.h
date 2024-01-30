@@ -13,11 +13,6 @@ namespace CautionEngine::Rendering
 {
 	class CAUTION_API D3D12API
 	{
-	private:
-		ComPtr<ID3D12Device8> m_device;
-		ComPtr<IDXGIFactory7> m_factory;
-		ComPtr<IDXGIAdapter4> m_adapter;
-
 	public:
 		D3D12API();
 
@@ -31,6 +26,10 @@ namespace CautionEngine::Rendering
 		void GatherDREDOUTput();
 
 	private:
+		ComPtr<ID3D12Device8> m_device;
+		ComPtr<IDXGIFactory7> m_factory;
+		ComPtr<IDXGIAdapter4> m_adapter;
+
 		void GetAdapter(IDXGIAdapter4** ppAdapter, DXGI_GPU_PREFERENCE pref);
 	};
 }

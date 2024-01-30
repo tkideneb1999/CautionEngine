@@ -2,7 +2,6 @@
 
 #include "../CautionDefinitions.h"
 #include <exception>
-
 #include <wrl/client.h>
 
 using namespace Microsoft::WRL;
