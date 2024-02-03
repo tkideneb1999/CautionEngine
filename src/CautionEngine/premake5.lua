@@ -44,10 +44,13 @@ project "CautionEngine"
 
     includedirs
     {
-        "src/CautionEngine",
+        "../CautionEngine",
         "../../%{IncludeDirectories.glm}",
         "../../%{IncludeDirectories.usd}"
     }
+
+    pchheader "stdafx.h"
+    pchsource "stdafx.cpp"
 
     filter "system:windows"
         systemversion "latest"
