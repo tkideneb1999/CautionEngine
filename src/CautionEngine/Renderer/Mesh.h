@@ -1,5 +1,5 @@
 #pragma once
-#include "..\CautionDefinitions.h"
+#include <CautionDefinitions.h>
 
 #include <d3d12.h>
 

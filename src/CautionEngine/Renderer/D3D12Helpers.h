@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../CautionDefinitions.h"
+#include <CautionDefinitions.h>
+
 #include <exception>
 #include <wrl/client.h>
 

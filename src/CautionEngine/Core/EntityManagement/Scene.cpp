@@ -1,4 +1,7 @@
+#include "stdafx.h"
+
 #include "Scene.h"
+
 namespace CautionEngine::Core
 {
 	Scene::Scene()

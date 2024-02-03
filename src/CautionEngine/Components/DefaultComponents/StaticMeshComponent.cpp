@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "StaticMeshComponent.h"
 
 namespace CautionEngine::Components

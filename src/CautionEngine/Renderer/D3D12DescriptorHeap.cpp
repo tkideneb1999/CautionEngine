@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "D3D12DescriptorHeap.h"
 
 #include <sstream>

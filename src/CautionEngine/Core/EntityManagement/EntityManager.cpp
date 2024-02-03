@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "../Entity.h"
 #include "EntityManager.h"
 

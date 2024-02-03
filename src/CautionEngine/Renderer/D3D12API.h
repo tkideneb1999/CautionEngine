@@ -1,6 +1,5 @@
 #pragma once
-#include "../CautionDefinitions.h"
-
+#include <CautionDefinitions.h>
 #include "D3D12DescriptorHeap.h"
 
 #include <d3d12.h>
