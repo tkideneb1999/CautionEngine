@@ -6,6 +6,7 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <wrl/client.h>
+#include <exception>
 
 using namespace Microsoft::WRL;
 
@@ -20,12 +21,27 @@ namespace CautionEngine::Rendering
 		D3D12API(const D3D12API& original) = delete;
 		D3D12API& operator=(const D3D12API& original) = delete;
 
-		const ComPtr<ID3D12Device8> GetDevicePtr() { return m_device; }
-		const ComPtr<IDXGIFactory7> GetFactoryPtr() { return m_factory; }
+		const ComPtr<ID3D12Device8> GetDevicePtr() 
+		{ 
+			if (m_initialized)
+				return m_device; 
+			throw std::exception("D3D12 not initialized!");
+		}
+		const ComPtr<IDXGIFactory7> GetFactoryPtr() 
+		{ 
+			if(m_initialized)
+				return m_factory; 
+			throw std::exception("D3D12 not initialized!");
+		}
+
+		void Init();
 
 		void GatherDREDOUTput();
 
+		bool IsInitialized() { return m_initialized; }
+
 	private:
+		bool m_initialized = false;
 		ComPtr<ID3D12Device8> m_device;
 		ComPtr<IDXGIFactory7> m_factory;
 		ComPtr<IDXGIAdapter4> m_adapter;

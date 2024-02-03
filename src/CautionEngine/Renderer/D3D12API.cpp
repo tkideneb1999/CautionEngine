@@ -9,6 +9,12 @@ namespace CautionEngine::Rendering
 {
 	D3D12API::D3D12API()
 	{
+	}
+
+	void D3D12API::Init()
+	{
+		if (m_initialized)
+			return;
 #if _DEBUG
 		{
 			ComPtr<ID3D12Debug> debugController;
@@ -32,16 +38,17 @@ namespace CautionEngine::Rendering
 			),
 			"Creating Factory failed"
 		);
-		
+
 		//TODO: Make GPU pref accessible
 		GetAdapter(&m_adapter, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE);
 		ThrowIfFailed(
 			D3D12CreateDevice(m_adapter.Get(), D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&m_device)),
 			"Device Creation Failed"
-			);
+		);
 #if _DEBUG
 		std::cout << "Graphics Device initialized!" << std::endl;
 #endif
+		m_initialized = true;
 	}
 
 	void D3D12API::GatherDREDOUTput()
