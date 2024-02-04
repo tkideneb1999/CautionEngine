@@ -1,5 +1,7 @@
-project "Game"
-    kind "StaticLib"
+project "GameDLL"
+    -- StaticLib = .lib
+    -- SharedLib = .dll
+    kind "SharedLib"
 
 	local lang = "C++"
 	local dialect = "C++20"
@@ -7,8 +9,8 @@ project "Game"
 	local buildname = "%{prj.name}_%{cfg.buildcfg}"
     local solutionlocations = "../../solutions/%{prj.name}"
     
-    local builddir = (solutionlocations.. "/bin/" .. buildname)
-	local intermediate = (solutionlocations.. "/intermediate/" .. buildname)
+    local builddir = ("../../bin/")
+	local intermediate = ("../../intermediate/")
 
     language (lang)
     cppdialect (dialect)
@@ -27,9 +29,20 @@ project "Game"
     includedirs
     {
         "src/Game",
-        "src/CautionEngine",
+        "../../src/CautionEngine",
         "%{IncludeDirectories.ImGui}",
         "%{IncludeDirectories.usd}"
+    }
+
+    links
+    {
+        "CautionEngine",
+        (builddir.. "%{Library.caution_engine_lib}")
+    }
+
+    libdirs
+    {
+        builddir
     }
     
     filter "configurations:Debug"

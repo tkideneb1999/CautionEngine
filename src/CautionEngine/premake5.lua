@@ -1,7 +1,7 @@
 project "CautionEngine"
     -- StaticLib = .lib
     -- SharedLib = .dll
-    kind "SharedLib" -- TODO: Still not decided yet if we use .lib or .dll
+    kind "SharedLib"
 
 	local lang = "C++"
 	local dialect = "C++20"
