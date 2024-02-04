@@ -7,7 +7,7 @@
 
 namespace CautionEngine::Rendering {
 
-	D3D12API Renderer::api = {};
+	D3D12API Renderer::s_api = {};
 
 	Renderer::Renderer() { }
 
@@ -18,7 +18,7 @@ namespace CautionEngine::Rendering {
 		if (!SUCCEEDED(res))
 		{
 			if(res == DXGI_ERROR_DEVICE_REMOVED)
-				api.GatherDREDOUTput();
+				s_api.GatherDREDOUTput();
 		}
 		CommandFrame& curFrame = m_commandFrames[m_curFrameIndex];
 		m_fenceValue++;
@@ -43,7 +43,7 @@ namespace CautionEngine::Rendering {
 		commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 		commandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 		ThrowIfFailed(
-			api.GetDevicePtr()->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&m_commandQueue)),
+			s_api.GetDevicePtr()->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&m_commandQueue)),
 			"Command Queue Creation Failed"
 			);
 		m_commandQueue->SetName(L"Renderer Command Queue");
@@ -69,7 +69,7 @@ namespace CautionEngine::Rendering {
 
 		ComPtr<IDXGISwapChain1> i_swapChain;
 		ThrowIfFailed(
-			api.GetFactoryPtr()->CreateSwapChainForHwnd(m_commandQueue.Get(), hWnd, &swapChainDesc, &swapChainFullScreenDesc, nullptr, i_swapChain.GetAddressOf()),
+			s_api.GetFactoryPtr()->CreateSwapChainForHwnd(m_commandQueue.Get(), hWnd, &swapChainDesc, &swapChainFullScreenDesc, nullptr, i_swapChain.GetAddressOf()),
 			"Swap Chain Creation Failed"
 			);
 		ThrowIfFailed(i_swapChain.As(&m_swapChain), "Cast to Swap Chain Failed");
@@ -87,7 +87,7 @@ namespace CautionEngine::Rendering {
 			renderTarget->SetName((std::wstring(L"SwapChain Render Target ") + std::to_wstring(i)).c_str());
 			D3D12::DescriptorHeapHandle swapChainBufferHandle = rtv_descHeap.Allocate();
 			m_swapChainRenderTargets.push_back(RenderTarget(swapChainBufferHandle, renderTarget));
-			api.GetDevicePtr()->CreateRenderTargetView(
+			s_api.GetDevicePtr()->CreateRenderTargetView(
 				m_swapChainRenderTargets[i].resourceView.Get(), nullptr, m_swapChainRenderTargets[i].descriptorHeapHandle.cpuHandle
 			);
 		}
@@ -109,10 +109,10 @@ namespace CautionEngine::Rendering {
 
 	void Renderer::InitDescriptorHeaps(int cbv_srv_uav_count, int dsv_count, int rtv_count, int sampler_count)
 	{
-		cbv_srv_uav_descHeap = D3D12::DescriptorHeap(api.GetDevicePtr().Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, cbv_srv_uav_count, true);
-		dsv_descHeap = D3D12::DescriptorHeap(api.GetDevicePtr().Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, dsv_count, true);
-		rtv_descHeap = D3D12::DescriptorHeap(api.GetDevicePtr().Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, rtv_count, true);
-		sampler_descHeap = D3D12::DescriptorHeap(api.GetDevicePtr().Get(), D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, sampler_count, true);
+		cbv_srv_uav_descHeap = D3D12::DescriptorHeap(s_api.GetDevicePtr().Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, cbv_srv_uav_count, true);
+		dsv_descHeap = D3D12::DescriptorHeap(s_api.GetDevicePtr().Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, dsv_count, true);
+		rtv_descHeap = D3D12::DescriptorHeap(s_api.GetDevicePtr().Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, rtv_count, true);
+		sampler_descHeap = D3D12::DescriptorHeap(s_api.GetDevicePtr().Get(), D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, sampler_count, true);
 	}
 
 	void Renderer::InitCommandFrames()
@@ -128,14 +128,14 @@ namespace CautionEngine::Rendering {
 			m_commandFrames[i].fenceValue = 0;
 			
 			ThrowIfFailed(
-				api.GetDevicePtr()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&(m_commandFrames[i].commandAllocator))),
+				s_api.GetDevicePtr()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&(m_commandFrames[i].commandAllocator))),
 				"Command Allocator Creation Failed"
 			);
 
 			// TODO: Remove this
 			m_commandLists.push_back(ComPtr<ID3D12GraphicsCommandList6>());
 			ThrowIfFailed(
-				api.GetDevicePtr()->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&(m_commandLists[i]))),
+				s_api.GetDevicePtr()->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&(m_commandLists[i]))),
 				"Command List Creation Failed"
 			);
 		}
@@ -149,7 +149,7 @@ namespace CautionEngine::Rendering {
 	void Renderer::InitFrameFence()
 	{
 		ThrowIfFailed(
-			api.GetDevicePtr()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)),
+			s_api.GetDevicePtr()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)),
 			"Fence creation failed"
 		);
 		m_fenceEvent = CreateEvent(nullptr, false, false, nullptr);
@@ -232,7 +232,7 @@ namespace CautionEngine::Rendering {
 		HRESULT res = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error);
 		ThrowIfFailed(res, "Root Signature Serialization failed");
 		ThrowIfFailed(
-			api.GetDevicePtr()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)),
+			s_api.GetDevicePtr()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)),
 			"Couldn't create Root Signature"
 		);
 	}
@@ -278,7 +278,7 @@ namespace CautionEngine::Rendering {
 		{
 			RenderTarget& renderTarget = m_swapChainRenderTargets[i];
 			m_swapChain->GetBuffer(i, IID_PPV_ARGS(&renderTarget.resourceView));
-			api.GetDevicePtr()->CreateRenderTargetView(
+			s_api.GetDevicePtr()->CreateRenderTargetView(
 				renderTarget.resourceView.Get(), nullptr, renderTarget.descriptorHeapHandle.cpuHandle
 			);
 		}

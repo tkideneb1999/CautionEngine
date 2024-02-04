@@ -19,7 +19,7 @@ namespace CautionEngine::Rendering
 	class CAUTION_API Renderer
 	{
 	public:
-		static D3D12API api;
+		static D3D12API s_api;
 
 		D3D12::DescriptorHeap cbv_srv_uav_descHeap;
 		D3D12::DescriptorHeap rtv_descHeap;
