@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Core/ObjectID.h"
+#include <Core/ObjectID.h>
 
 class Entity;
 

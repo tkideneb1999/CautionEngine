@@ -2,7 +2,7 @@
 
 #include "ObjectID.h"
 
-namespace CautionEngine::Core 
+namespace CautionEngine::Core
 {
 	class BaseObject
 	{

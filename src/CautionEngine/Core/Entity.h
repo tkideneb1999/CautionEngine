@@ -2,15 +2,17 @@
 
 #include "BaseObject.h"
 
+#include <Components/Component.h>
+
 #include <string>
 #include <vector>
 
 struct ObjectID;
+// !Namespaces..
+using namespace CautionEngine::Components;
 
 namespace CautionEngine::Core
 {
-	class Component;
-	/*class BaseObject;*/
 	class Entity : public BaseObject
 	{
 	public:
@@ -19,7 +21,7 @@ namespace CautionEngine::Core
 
 		inline const char* GetName() const { return m_name.c_str(); }
 
-		__forceinline void AddComponent(Component* component)
+		void AddComponent(std::shared_ptr<Component> component)
 		{
 			// TODO: do more later...
 			m_components.push_back(component);
@@ -38,6 +40,6 @@ namespace CautionEngine::Core
 
 	private:
 		std::string m_name;
-		std::vector<Component*> m_components;
+		std::vector<std::shared_ptr<Component>> m_components;
 	};
 }
