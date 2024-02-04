@@ -93,12 +93,15 @@ namespace Reckless
 		m_renderer.BeginFrame();
 		ID3D12GraphicsCommandList6* curCommandList = m_renderer.GetCurrentCommandList();
 
-		// TODO: remove this entirely soon
-		//ImGui::ShowDemoWindow();
+		// Style
 		Reckless::UI::SetRecklessEdTheme();
 
+		// TODO: johne -> make a proper window that will support docking
+		// Docking
+		ImGui::DockSpace(ImGui::GetID("MyDockspace")); // ID is from the demo...
 		// Layers -> Drawing
 		DrawEditorLayers();
+
 		ImGui::Render();
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), curCommandList);
 
@@ -187,16 +190,16 @@ namespace Reckless
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
+		
+		// IO
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 		//io.ConfigViewportsNoAutoMerge = true;
 		//io.ConfigViewportsNoTaskBarIcon = true;
 
-		// Style
-		// TODO: implement the reckless editor style later here...
-		/*ImGui::StyleColorsDark();*/
-
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Docking...
+		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // TODO: benedikt -> you might be interested in this feature of dear imgui
 
 		// Setting of the ImGui platform and renderer
 		ImGui_ImplWin32_Init(hWnd);
