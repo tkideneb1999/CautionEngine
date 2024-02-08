@@ -1,6 +1,7 @@
 #pragma once
+#include <CautionDefinitions.h>
 
-struct ObjectID
+struct CAUTION_API ObjectID
 {
 	ObjectID() {}
 
@@ -8,5 +9,5 @@ struct ObjectID
 	{
 		// TODO: implement...
 		return ObjectID();
-	}
+	} 
 };
