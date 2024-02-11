@@ -18,6 +18,9 @@ namespace CautionEngine::Rendering
 		ComPtr<ID3DBlob> m_vertexShader;
 		ComPtr<ID3DBlob> m_pixelShader;
 
+		ComPtr<ID3D12PipelineState> m_pso;
+		ComPtr<ID3D12RootSignature> m_rootSignature;
+
 #if _DEBUG
 		static const UINT m_compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #else
@@ -32,5 +35,6 @@ namespace CautionEngine::Rendering
 
 	private:
 		bool CompileShader(const char* Function, const char* targetShaderModel, ID3DBlob** ppCompiledShader);
+		bool CreateRootSignature();
 	};
 }
