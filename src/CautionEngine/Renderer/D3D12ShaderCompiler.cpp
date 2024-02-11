@@ -34,12 +34,14 @@ namespace CautionEngine::Rendering {
 		shaderSource.Size = encodingSource->GetBufferSize();
 		shaderSource.Encoding = DXC_CP_ACP;
 		// Generate Args
+		std::wstring shaderModel = GetShaderModel(stage, model);
 		std::vector<LPCWSTR> args = {
 			filepath, // Filepath for debugging
 			L"-E", GetShaderEntryPoint(stage),
-			L"-T", GetShaderModel(stage, model).c_str(), // Shader Model (TODO Check if Get Shader Model works)
+			L"-T", shaderModel.c_str(), // Shader Model (TODO Check if Get Shader Model works)
 #if _DEBUG
-			L"-Zs", // Debug Information
+			L"-Zi", // Debug Information
+			L"-Od", // Disable Optimizations
 #endif
 		};
 
@@ -53,6 +55,13 @@ namespace CautionEngine::Rendering {
 			IID_PPV_ARGS(&results)
 		);
 
-		return false;
+		ComPtr<IDxcBlobUtf8> errors = nullptr;
+		results->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&errors), nullptr);
+		if (errors != nullptr && errors->GetStringLength() != 0)
+		{
+			wprintf(L"Warnings & Errors:\n%S\n", errors->GetStringPointer());
+			return false;
+		}
+		return true;
 	}
 }
