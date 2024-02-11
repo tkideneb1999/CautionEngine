@@ -8,3 +8,6 @@
 [submodule "thirdparty/imguizmo"]
 	path = thirdparty/imguizmo
 	url = https://github.com/AlsonEntuna/ImGuizmo
+[submodule "thirdparty/libraries"]
+	path = thirdparty/libraries
+	url = https://github.com/AlsonEntuna/CautionEngineThirdParty
