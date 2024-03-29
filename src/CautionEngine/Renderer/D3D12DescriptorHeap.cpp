@@ -11,7 +11,7 @@ namespace CautionEngine::Rendering::D3D12
 {
 	DescriptorHeap::DescriptorHeap(
 		ID3D12Device* pDevice, D3D12_DESCRIPTOR_HEAP_TYPE type, UINT numDescriptors, bool isShaderVisible
-	)
+	) : m_isShaderVisible(isShaderVisible)
 	{
 		if (type == D3D12_DESCRIPTOR_HEAP_TYPE_DSV || type == D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
 			isShaderVisible = false;
@@ -36,7 +36,6 @@ namespace CautionEngine::Rendering::D3D12
 		m_incrementSize = pDevice->GetDescriptorHandleIncrementSize(type);
 		m_cpuStartHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		m_gpuStartHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-
 		m_maxDescriptors = numDescriptors;
 	}
 

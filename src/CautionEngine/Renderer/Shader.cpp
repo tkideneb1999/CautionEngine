@@ -5,40 +5,47 @@
 #include <sstream>
 #include <iostream>
 
+#include "PipelineStateObject.h"
+
 namespace CautionEngine::Rendering
 {
-	Shader::Shader(const LPCWSTR shaderFilepath)
-		:m_filepath(shaderFilepath)
+	void Shader::Serialize()
 	{
-		Compile();
+		//TODO: Serialize ShaderBytecode
+		//TODO: Serialize RootSignature
+		//TODO: Serialize Bindings (Textures, Samplers)
 	}
 
-	void Shader::Compile()
+	void Shader::Deserialize()
 	{
-		CompileShader("VSMain", "vs_5_0", &m_vertexShader);
-		CompileShader("PSMain", "ps_5_0", &m_pixelShader);
-		std::wcout << "Successfully compiled Shader:\n    " << m_filepath << std::endl;
+		//TODO: Load ShaderByteCode
+
 	}
 
-	bool Shader::CompileShader(const char* function, const char* targetShaderModel, ID3DBlob** ppCompiledShader)
+	bool Shader::GetStageShaderCode(const void** ppBuffer, size_t* pLength, ShaderStage stage)
 	{
-		ComPtr<ID3DBlob> errorMessageBlob;
-		HRESULT res = D3DCompileFromFile(
-			m_filepath, nullptr, nullptr, function, targetShaderModel, m_compileFlags, 0, ppCompiledShader, &errorMessageBlob
-		);
-		if (res == E_FAIL)
-		{
-			char* errorMessageStart = (char*)errorMessageBlob->GetBufferPointer();
-			SIZE_T errorMessageSize = errorMessageBlob->GetBufferSize();
-			std::stringstream errorMessageStream{};
-			for (SIZE_T i = 0; i < errorMessageSize; i++)
-			{
-				char* currentCharPtr = errorMessageStart + i;
-				errorMessageStream << *currentCharPtr;
-			}
-			std::cout << errorMessageStream.str() << std::endl;
-			throw std::exception("Couldn't compile Shader");
-		}
+		if (m_stageShaders[stage] == nullptr)
+			return false;
+		*ppBuffer = m_stageShaders[stage]->GetBufferPointer();
+		*pLength = m_stageShaders[stage]->GetBufferSize();
 		return true;
+	}
+
+	bool Shader::SetShaderStageInPSODesc(D3D12_SHADER_BYTECODE* pByteCodeStructure, ShaderStage stage)
+	{
+		if (m_stageShaders[stage] == nullptr)
+			return false;
+		pByteCodeStructure->pShaderBytecode = m_stageShaders[stage]->GetBufferPointer();
+		pByteCodeStructure->BytecodeLength = m_stageShaders[stage]->GetBufferSize();
+		return true;
+	}
+
+	Shader::Shader(const LPCWSTR shaderFilepath)
+		:m_filepath(shaderFilepath), m_rootParameterIndexMap()
+	{
+		m_vsInputs = std::vector<ShaderInput>();
+		for (int i = 0; i < SHADER_STAGE_COUNT; i++) {
+			m_stageShaders[i] = ComPtr<ID3DBlob>();
+		}
 	}
 }

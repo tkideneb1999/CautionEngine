@@ -1,6 +1,5 @@
 #pragma once
 
-#include <map>
 #include <exception>
 #include <string>
 #include <wrl/client.h>
@@ -8,28 +7,15 @@
 #include <dxcapi.h>
 #include <d3d12shader.h>
 
+#include "Shader.h"
+#include "ShaderData.h"
+
 using namespace Microsoft::WRL;
 
 namespace CautionEngine::Rendering {
-	enum CAUTION_API ShaderStage {
-		SHADER_STAGE_VERTEX = 0,
-		SHADER_STAGE_HULL = 1,
-		SHADER_STAGE_DOMAIN = 2,
-		SHADER_STAGE_GEOMETRY = 3,
-		SHADER_STAGE_PIXEL = 4,
-	};
 
-	enum CAUTION_API ShaderModel {
-		SHADER_MODEL_6_0 = 0,
-		SHADER_MODEL_6_1 = 1,
-		SHADER_MODEL_6_2 = 2,
-		SHADER_MODEL_6_3 = 3,
-		SHADER_MODEL_6_4 = 4,
-		SHADER_MODEL_6_5 = 5,
-		SHADER_MODEL_6_6 = 6,
-	};
-
-	class CAUTION_API D3D12ShaderCompiler {
+	class D3D12ShaderCompiler 
+	{
 	private:
 		static LPCWSTR GetShaderEntryPoint(ShaderStage stage) {
 			switch (stage)
@@ -104,9 +90,28 @@ namespace CautionEngine::Rendering {
 			return shaderModelStr;
 		}
 
+		static bool GetShaderVarType(const D3D_SHADER_VARIABLE_TYPE* dxcType, ShaderVariableTypes* engineType);
+
+		ComPtr<IDxcCompiler3> m_compiler;
+		ComPtr<IDxcIncludeHandler> m_includeHandler;
+		ComPtr<IDxcUtils> m_utils;
+
+		ComPtr<ID3D12ShaderReflection> m_reflectionData[SHADER_STAGE_COUNT];
+
+		Shader* m_pShader;
+		DxcBuffer m_shaderSource;
+
+		bool CompileStage(ShaderStage stage);
+		bool GenerateShaderData();
+
+		DXGI_FORMAT GetInputElementFormat(D3D12_SIGNATURE_PARAMETER_DESC* reflectionData);
+
 	public:
 		D3D12ShaderCompiler() = delete;
+		D3D12ShaderCompiler(Shader* shader);
 
-		static bool CompileShader(LPCWSTR filepath, ShaderStage stage, ShaderModel model);
+		bool Compile();
+
+		Shader* GetShader() { return m_pShader; }
 	};
 }

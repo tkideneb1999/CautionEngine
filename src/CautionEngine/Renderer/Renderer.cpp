@@ -33,8 +33,10 @@ namespace CautionEngine::Rendering {
 	void Renderer::InitSwapChain(int width, int height, int frameCount, HWND hWnd)
 	{
 		//Check if RTV Descriptor Heap is initialized
-		if (!rtv_descHeap.Initialized())
+#if _DEBUG
+		if (!descriptorManager.GetRTVHeap()->Initialized())
 			throw std::exception("RTV Descriptor Heap not initialized");
+#endif
 
 		numBackBuffers = frameCount;
 
@@ -85,7 +87,7 @@ namespace CautionEngine::Rendering {
 			ComPtr<ID3D12Resource> renderTarget;
 			m_swapChain->GetBuffer(i, IID_PPV_ARGS(&renderTarget));
 			renderTarget->SetName((std::wstring(L"SwapChain Render Target ") + std::to_wstring(i)).c_str());
-			D3D12::DescriptorHeapHandle swapChainBufferHandle = rtv_descHeap.Allocate();
+			D3D12::DescriptorHeapHandle swapChainBufferHandle = descriptorManager.AllocateRTV();
 			m_swapChainRenderTargets.push_back(RenderTarget(swapChainBufferHandle, renderTarget));
 			s_api.GetDevicePtr()->CreateRenderTargetView(
 				m_swapChainRenderTargets[i].resourceView.Get(), nullptr, m_swapChainRenderTargets[i].descriptorHeapHandle.cpuHandle
@@ -109,10 +111,7 @@ namespace CautionEngine::Rendering {
 
 	void Renderer::InitDescriptorHeaps(int cbv_srv_uav_count, int dsv_count, int rtv_count, int sampler_count)
 	{
-		cbv_srv_uav_descHeap = D3D12::DescriptorHeap(s_api.GetDevicePtr().Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, cbv_srv_uav_count, true);
-		dsv_descHeap = D3D12::DescriptorHeap(s_api.GetDevicePtr().Get(), D3D12_DESCRIPTOR_HEAP_TYPE_DSV, dsv_count, true);
-		rtv_descHeap = D3D12::DescriptorHeap(s_api.GetDevicePtr().Get(), D3D12_DESCRIPTOR_HEAP_TYPE_RTV, rtv_count, true);
-		sampler_descHeap = D3D12::DescriptorHeap(s_api.GetDevicePtr().Get(), D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, sampler_count, true);
+		descriptorManager.Init(&s_api, cbv_srv_uav_count, dsv_count, rtv_count, sampler_count);
 	}
 
 	void Renderer::InitCommandFrames()
@@ -144,6 +143,16 @@ namespace CautionEngine::Rendering {
 	ID3D12GraphicsCommandList6* Renderer::GetCurrentCommandList()
 	{
 		return m_commandLists[m_curFrameIndex].Get();
+	}
+
+	DXGI_FORMAT Renderer::GetRTVFormat()
+	{
+		if (m_swapChainRTFormat != DXGI_FORMAT_UNKNOWN)
+			return m_swapChainRTFormat;
+		DXGI_SWAP_CHAIN_DESC desc;
+		m_swapChain->GetDesc(&desc);
+		m_swapChainRTFormat = m_swapChainRTFormat;
+		return m_swapChainRTFormat;
 	}
 
 	void Renderer::InitFrameFence()
@@ -184,9 +193,8 @@ namespace CautionEngine::Rendering {
 		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		curCommandList->ResourceBarrier(1, &barrier);
 
-		ID3D12DescriptorHeap* ppShaderVisibleHeaps[] = {cbv_srv_uav_descHeap.GetHeapPtr().Get(), sampler_descHeap.GetHeapPtr().Get()};
+		descriptorManager.SetShaderVisibleDescriptorHeaps(curCommandList.Get());
 
-		curCommandList->SetDescriptorHeaps(_countof(ppShaderVisibleHeaps), ppShaderVisibleHeaps);
 		curCommandList->SetGraphicsRootSignature(m_rootSignature.Get());
 		curCommandList->RSSetViewports(1, &m_viewport);
 		curCommandList->RSSetScissorRects(1, &m_scissorRect);

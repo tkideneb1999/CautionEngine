@@ -3,7 +3,7 @@
 #include <CautionDefinitions.h>
 
 #include "D3D12API.h"
-#include "D3D12DescriptorHeap.h"
+#include "DescriptorManager.h"
 #include "RenderTarget.h"
 
 #include <vector>
@@ -21,10 +21,7 @@ namespace CautionEngine::Rendering
 	public:
 		static D3D12API s_api;
 
-		D3D12::DescriptorHeap cbv_srv_uav_descHeap;
-		D3D12::DescriptorHeap rtv_descHeap;
-		D3D12::DescriptorHeap dsv_descHeap;
-		D3D12::DescriptorHeap sampler_descHeap;
+		DescriptorManager descriptorManager;
 
 		unsigned int numBackBuffers;
 
@@ -32,7 +29,9 @@ namespace CautionEngine::Rendering
 		std::vector<RenderTarget> m_swapChainRenderTargets;
 
 		ComPtr<ID3D12CommandQueue> m_commandQueue;
+
 		ComPtr<IDXGISwapChain4> m_swapChain;
+		DXGI_FORMAT m_swapChainRTFormat = DXGI_FORMAT_UNKNOWN;
 
 		std::vector<CommandFrame> m_commandFrames;
 		// TODO: Possibility for multiple command lists per Command Frame
@@ -70,6 +69,7 @@ namespace CautionEngine::Rendering
 		void CreateSwapChainRenderTargets();
 		void ReleaseSwapChainRenderTargets();
 
-		ID3D12GraphicsCommandList6* GetCurrentCommandList();
+		ID3D12GraphicsCommandList6* GetCurrentCommandList(); // TODO: Wrap Command List somehow
+		DXGI_FORMAT GetRTVFormat();
 	};
 }
