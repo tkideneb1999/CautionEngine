@@ -5,6 +5,7 @@ IncludeDirectories["ImGui_backends"] = "thirdparty/imgui/backends"
 IncludeDirectories["usd"] = "thirdparty/usd/bin/include"
 IncludeDirectories["ImGuizmo"] = "thirdparty/imguizmo"
 IncludeDirectories["glm"] = "thirdparty/glm"
+IncludeDirectories["json"] = "thirdparty/libraries/json"
 
 -- Librarian Additional Directories
 LibraryDirectories = {}

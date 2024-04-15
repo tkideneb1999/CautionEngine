@@ -46,7 +46,8 @@ project "CautionEngine"
     {
         "../CautionEngine",
         "../../%{IncludeDirectories.glm}",
-        "../../%{IncludeDirectories.usd}"
+        "../../%{IncludeDirectories.usd}",
+        "../../%{IncludeDirectories.json}"
     }
 
     pchheader "stdafx.h"

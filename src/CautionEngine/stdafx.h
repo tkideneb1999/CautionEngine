@@ -47,3 +47,6 @@
 #include <string>
 #include <wrl.h>
 #include <shellapi.h>
+
+// Thirdparty Libraries
+#include <json.hpp>
