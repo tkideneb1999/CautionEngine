@@ -24,7 +24,7 @@
 // DX12 Global
 static int const                    NUM_BACK_BUFFERS = 3;
 
-namespace Reckless 
+namespace Reckless
 {
 	Application::Application(const wchar_t wndClassName[], const wchar_t wndName[], std::vector<std::string> lArgs)
 		: args(lArgs)
@@ -67,48 +67,6 @@ namespace Reckless
 	Application::~Application()
 	{
 		Shutdown();
-	}
-
-	bool Application::Update()
-	{
-		// Handle Messages
-		if (HandleMessages() != 1) 
-		{
-			// Do Shutdown here
-			return false;
-		}
-		// TODO: More Update Code
-
-		for (auto editorLayers : m_editorLayers)
-		{
-			// TODO: we need to pass in the parameter of the timestamp here...
-			editorLayers->Update();
-		}
-
-		// Rendering, ImGuiContext
-		ImGui_ImplDX12_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
-
-		m_renderer.BeginFrame();
-		ID3D12GraphicsCommandList6* curCommandList = m_renderer.GetCurrentCommandList();
-
-		// Style
-		Reckless::UI::SetRecklessEdTheme();
-
-		// TODO: johne -> make a proper window that will support docking
-		// Docking
-		ImGui::DockSpace(ImGui::GetID("MyDockspace")); // ID is from the demo...
-		// Layers -> Drawing
-		DrawEditorLayers();
-
-		ImGui::Render();
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), curCommandList);
-
-		m_renderer.EndFrame();
-		m_renderer.Render();
-
-		return true;
 	}
 
 	float Application::GetTimeStamp()
@@ -193,13 +151,37 @@ namespace Reckless
 		
 		// IO
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		// Enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		// Enable Gamepad Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 		//io.ConfigViewportsNoAutoMerge = true;
 		//io.ConfigViewportsNoTaskBarIcon = true;
 
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Docking...
-		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // TODO: benedikt -> you might be interested in this feature of dear imgui
+		// Docking
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // TODO: benedikt -> you might be interested in this feature of dear imgui
+
+		//// Menu
+		//io.ConfigFlags |= ImGuiWindowFlags_MenuBar;
+
+		// Reckless Style
+		Reckless::UI::SetRecklessEdTheme();
+
+		// ImGui Styling
+		ImGuiStyle& style = ImGui::GetStyle();
+		style.WindowPadding = ImVec2(10.0f, 10.0f);
+		style.FramePadding = ImVec2(8.0f, 6.0f);
+		style.ItemSpacing = ImVec2(6.0f, 6.0f);
+		style.FrameRounding = 8.0f;
+		style.WindowTitleAlign = ImVec2(1.f, 1.f);
+		style.WindowMinSize.y = 1080.f;
+
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			style.WindowRounding = 0.0f;
+			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		}
 
 		// Setting of the ImGui platform and renderer
 		ImGui_ImplWin32_Init(hWnd);
@@ -211,6 +193,87 @@ namespace Reckless
 			m_renderer.cbv_srv_uav_descHeap.GetHeapPtr().Get(), 
 			font_descriptor_handle.cpuHandle, font_descriptor_handle.gpuHandle
 		);
+	}
+
+	bool Application::Update()
+	{
+		ImGuiIO& io = ImGui::GetIO();
+
+		// Handle Messages
+		if (HandleMessages() != 1)
+		{
+			// Do Shutdown here
+			return false;
+		}
+		// TODO: More Update Code
+
+		for (auto& const pEditorLayers : m_editorLayers)
+		{
+			// TODO: we need to pass in the parameter of the timestamp here...
+			pEditorLayers->Update();
+		}
+
+		// Rendering, ImGuiContext
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+
+		ID3D12GraphicsCommandList6* curCommandList = m_renderer.GetCurrentCommandList();
+
+		ImGui::NewFrame();
+
+		{
+			m_renderer.BeginFrame();
+			
+
+			ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse;
+
+			ImGuiViewport* viewport = ImGui::GetMainViewport();
+			ImGui::SetNextWindowPos(viewport->Pos);
+			ImGui::SetNextWindowSize(viewport->Size);
+			ImGui::SetNextWindowViewport(viewport->ID);
+		/*	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);*/
+
+			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+			window_flags |= ImGuiWindowFlags_MenuBar;
+
+			/*ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.0f, 6.0f));
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 3.0f);*/
+
+			//ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			//ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+
+			//ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f });
+
+			ImGui::Begin("DockSpaceWindow", nullptr, window_flags);
+
+			// TODO: johne -> make a proper window that will support docking
+			// Docking
+			ImGuiIO& io = ImGui::GetIO();
+			ImGuiStyle& style = ImGui::GetStyle();
+			style.WindowMinSize.x = 1080.f;
+			ImGui::DockSpace(ImGui::GetID("MyDockspace"));
+
+			// Layers -> Drawing
+			DrawEditorLayers();
+
+			ImGui::End();
+		}
+
+		ImGui::Render();
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), curCommandList);
+
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+		}
+
+		m_renderer.EndFrame();
+		m_renderer.Render();
+
+		return true;
 	}
 
 	void Application::Shutdown()
