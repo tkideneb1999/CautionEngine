@@ -75,9 +75,9 @@ namespace Reckless
 		return 0.0f;
 	}
 
-	HINSTANCE Application::GetInstance() const
+	const HINSTANCE* Application::GetInstance() const
 	{
-		return hInstance;
+		return &hInstance;
 	}
 
 	LRESULT Application::AppProcedureSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
