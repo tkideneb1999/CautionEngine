@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <typeinfo>
 
 #include "IEditorLayer.h"
 
@@ -61,13 +62,27 @@ namespace Reckless
 
 		bool Update();
 		float GetTimeStamp();
-		HINSTANCE GetInstance() const;
+		const HINSTANCE* GetInstance() const;
 
 		// Layer functions
 		void AddEditorLayer(const std::shared_ptr<IEditorLayer> layer) 
 		{
 			m_editorLayers.emplace_back(layer);
 			layer->OnEditorLayerAttach();
+		}
+
+		template<typename T>
+		std::shared_ptr<T> GetEditorLayer()
+		{
+			for (const auto& pLayer : m_editorLayers)
+			{
+				if (std::shared_ptr<T> ptr = std::dynamic_pointer_cast<T>(pLayer))
+				{
+					if (ptr)
+						return ptr;
+				}
+			}
+			return nullptr;
 		}
 
 	private:

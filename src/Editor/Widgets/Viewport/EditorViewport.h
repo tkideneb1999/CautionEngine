@@ -10,4 +10,6 @@ namespace Reckless
 		virtual void OnEditorLayerAttach() override;
 		virtual void DrawLayer() override;
 	};
+
+	DECLARE_SHARED_POINTERS(EditorViewport)
 }

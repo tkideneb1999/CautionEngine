@@ -1,10 +1,13 @@
 #pragma once
 
+#include<Platform/CautionPlatform.h>
+
 namespace Reckless
 {
 	class IEditorLayer
 	{
 	public:
+		IEditorLayer() = default;
 		virtual ~IEditorLayer() = default;
 
 		virtual void OnEditorLayerAttach() { }

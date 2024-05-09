@@ -35,6 +35,9 @@
 #include <variant>
 #include <cstring>
 
+// CautionCommon
+#include <Platform/CautionPlatform.h>
+
 // # DX and Platform
 #include <windows.h>
 

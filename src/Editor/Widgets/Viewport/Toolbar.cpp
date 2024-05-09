@@ -6,6 +6,7 @@ namespace Reckless
 	void Toolbar::OnEditorLayerAttach()
 	{
 	}
+
 	void Toolbar::DrawLayer()
 	{
 		ImGui::BeginMenuBar();

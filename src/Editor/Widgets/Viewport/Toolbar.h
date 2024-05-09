@@ -18,4 +18,6 @@ namespace Reckless
 	public:
 		void AddMenu(const char* name, const std::function<void()>& callback);
 	};
+
+DECLARE_SHARED_POINTERS(Toolbar)
 }
