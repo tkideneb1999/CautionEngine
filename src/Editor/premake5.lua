@@ -20,8 +20,15 @@ project "RecklessEditor"
     
     files 
     {
+        -- source
         "**.h", 
         "**.cpp",
+        "**.inl",
+
+        -- common
+        "../CautionCommon/**.h",
+        "../CautionCommon/**.cpp",
+        "../CautionCommon/**.inl",
 
         -- imguizmo
         "../../thirdparty/imguizmo/ImGuizmo.h",
@@ -34,7 +41,8 @@ project "RecklessEditor"
 
     includedirs
     {
-        "../../src/CautionEngine",
+        "../CautionEngine",
+        "../CautionCommon",
         "../../%{IncludeDirectories.ImGui}",
         "../../%{IncludeDirectories.ImGui_backends}",
         "../../%{IncludeDirectories.ImGuizmo}",

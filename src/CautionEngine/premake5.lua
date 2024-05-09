@@ -22,9 +22,15 @@ project "CautionEngine"
     
     files 
     {
+        -- source
         "**.h", 
         "**.cpp",
         "**.inl",
+
+        -- common
+        "../CautionCommon/**.h",
+        "../CautionCommon/**.cpp",
+        "../CautionCommon/**.inl",
 
         -- glm
         "../../thirdparty/glm/glm/**.hpp",
@@ -45,6 +51,7 @@ project "CautionEngine"
     includedirs
     {
         "../CautionEngine",
+        "../CautionCommon",
         "../../%{IncludeDirectories.glm}",
         "../../%{IncludeDirectories.usd}",
         "../../%{IncludeDirectories.json}"
