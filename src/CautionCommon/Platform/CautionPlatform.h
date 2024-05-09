@@ -1,3 +1,5 @@
+#pragma once
+
 #include <memory>
 
 #define DECLARE_SHARED_POINTERS(name)                   \

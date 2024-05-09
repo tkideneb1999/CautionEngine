@@ -1,15 +1,10 @@
+#include "stdafx.h"
+
 #include "Widgets/Application.h"
 #include "Widgets/RecklessEditors.h"
 
 // CautionEngine
 #include <Renderer/D3D12API.h>
-
-// CautionCommon
-#include <Platform/CautionPlatform.h>
-
-// STL
-#include <vector>
-#include <string>
 
 // configs
 bool g_applicationRunning = true;
