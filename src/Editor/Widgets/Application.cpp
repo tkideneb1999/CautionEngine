@@ -2,15 +2,17 @@
 
 #include "../Platform/ImGui/RecklessEdTheme.h"
 
-#include <stdexcept>
-#include <iostream>
 
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "backends/imgui_impl_dx12.h"
 #include "backends/imgui_impl_win32.h"
 
-#include <dxgi1_4.h>
+#include <dxgi1_6.h>
+#include <wrl/client.h>
+
+#include <stdexcept>
+#include <iostream>
 
 #ifdef _DEBUG
 #define DX12_ENABLE_DEBUG_LAYER
@@ -24,9 +26,9 @@
 // DX12 Global
 static int const                    NUM_BACK_BUFFERS = 3;
 
-namespace Reckless 
+namespace Reckless
 {
-	Application::Application(const wchar_t wndClassName[], const wchar_t wndName[], std::vector<std::string> lArgs)
+	CWinApplication::CWinApplication(const wchar_t wndClassName[], const wchar_t wndName[], std::vector<std::string> lArgs)
 		: args(lArgs)
 	{
 		hInstance = GetModuleHandle(nullptr);
@@ -58,93 +60,51 @@ namespace Reckless
 		UpdateWindowSize();
 
 		// Initialization
-		Init();
+		Initialize();
 
 		// Showing of the window
 		ShowWindow(hWnd, SW_SHOW);
 	}
 
-	Application::~Application()
+	CWinApplication::~CWinApplication()
 	{
 		Shutdown();
 	}
 
-	bool Application::Update()
-	{
-		// Handle Messages
-		if (HandleMessages() != 1) 
-		{
-			// Do Shutdown here
-			return false;
-		}
-		// TODO: More Update Code
-
-		for (auto editorLayers : m_editorLayers)
-		{
-			// TODO: we need to pass in the parameter of the timestamp here...
-			editorLayers->Update();
-		}
-
-		// Rendering, ImGuiContext
-		ImGui_ImplDX12_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
-
-		m_renderer.BeginFrame();
-		ID3D12GraphicsCommandList6* curCommandList = m_renderer.GetCurrentCommandList();
-
-		// Style
-		Reckless::UI::SetRecklessEdTheme();
-
-		// TODO: johne -> make a proper window that will support docking
-		// Docking
-		ImGui::DockSpace(ImGui::GetID("MyDockspace")); // ID is from the demo...
-		// Layers -> Drawing
-		DrawEditorLayers();
-
-		ImGui::Render();
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), curCommandList);
-
-		m_renderer.EndFrame();
-		m_renderer.Render();
-
-		return true;
-	}
-
-	float Application::GetTimeStamp()
+	float CWinApplication::GetTimeStamp()
 	{
 		// TODO: implement, we might need to look for dx12 related timestamps/frequency here...
 		return 0.0f;
 	}
 
-	HINSTANCE Application::GetInstance() const
+	const HINSTANCE* CWinApplication::GetInstance() const
 	{
-		return hInstance;
+		return &hInstance;
 	}
 
-	LRESULT Application::AppProcedureSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	LRESULT CWinApplication::AppProcedureSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (msg == WM_NCCREATE)
 		{
 			const CREATESTRUCTW* const pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
-			Application* const pApp = static_cast<Application*>(pCreate->lpCreateParams);
+			CWinApplication* const pApp = static_cast<CWinApplication*>(pCreate->lpCreateParams);
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pApp));
-			SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&Application::AppProcedure));
+			SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&CWinApplication::AppProcedure));
 			return pApp->HandleMessage(hWnd, msg, wParam, lParam);
 		}
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 
-	LRESULT CALLBACK Application::AppProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	LRESULT CALLBACK CWinApplication::AppProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND ig_hWnd, UINT ig_msg, WPARAM ig_wParam, LPARAM ig_lParam);
 		if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
 			return true;
-		Application* const pApp = reinterpret_cast<Application*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+		CWinApplication* const pApp = reinterpret_cast<CWinApplication*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 		return pApp->HandleMessage(hWnd, msg, wParam, lParam);
 	}
 
-	LRESULT Application::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	LRESULT CWinApplication::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		switch (msg)
 		{
@@ -159,11 +119,11 @@ namespace Reckless
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 
-	int Application::HandleMessages()
+	int CWinApplication::HandleMessages()
 	{
 		while (PeekMessage(&currentMsg, nullptr, 0, 0, PM_REMOVE)) 
 		{
-			if (currentMsg.message == WM_QUIT) 
+			if (currentMsg.message == WM_QUIT)
 			{
 				return 0;
 			}
@@ -174,7 +134,7 @@ namespace Reckless
 		return 1;
 	}
 
-	void Application::Init()
+	void CWinApplication::Initialize()
 	{
 		// TODO: initialize dx12 related stuff here and imgui
 		m_renderer.InitDescriptorHeaps(1024, 32, 256, 256);
@@ -188,36 +148,159 @@ namespace Reckless
 		m_renderer.InitFrameFence();
 		m_renderer.CreateRootSignature();
 
-		ShaderManager shaderManager = ShaderManager();
-		shaderManager.CreateShader(L"F:\\projects\\CautionEngine\\src\\CautionEngine\\Shaders\\Fallback.hlsl");
-
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		
 		// IO
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		// Enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		// Enable Gamepad Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 		//io.ConfigViewportsNoAutoMerge = true;
 		//io.ConfigViewportsNoTaskBarIcon = true;
 
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Docking...
-		//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // TODO: benedikt -> you might be interested in this feature of dear imgui
+		// Docking
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // TODO: benedikt -> you might be interested in this feature of dear imgui
+
+		// Menu
+		io.ConfigFlags |= ImGuiWindowFlags_MenuBar;
+
+		// Reckless Style
+		Reckless::UI::SetRecklessEdTheme();
+
+		// ImGui Styling
+		ImGuiStyle& style = ImGui::GetStyle();
+		style.WindowPadding = ImVec2(10.0f, 10.0f);
+		style.FramePadding = ImVec2(8.0f, 6.0f);
+		style.ItemSpacing = ImVec2(6.0f, 6.0f);
+		style.FrameRounding = 8.0f;
+		style.WindowTitleAlign = ImVec2(1.f, 1.f);
+		style.WindowMinSize.y = 1080.f;
+
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			style.WindowRounding = 0.0f;
+			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		}
 
 		// Setting of the ImGui platform and renderer
 		ImGui_ImplWin32_Init(hWnd);
-		D3D12::DescriptorHeapHandle font_descriptor_handle = m_renderer.descriptorManager.AllocateCbvSrvUav();
+		D3D12::DescriptorHeapHandle font_descriptor_handle = m_renderer.cbv_srv_uav_descHeap.Allocate();
 		ImGui_ImplDX12_Init(
 			m_renderer.s_api.GetDevicePtr().Get(), 
 			NUM_BACK_BUFFERS, 
 			DXGI_FORMAT_R8G8B8A8_UNORM, //TODO: Make this always match definition in renderer
-			m_renderer.descriptorManager.GetCbvSrvUavHeap()->GetHeapPtr().Get(),
+			m_renderer.cbv_srv_uav_descHeap.GetHeapPtr().Get(), 
 			font_descriptor_handle.cpuHandle, font_descriptor_handle.gpuHandle
 		);
 	}
 
-	void Application::Shutdown()
+	void CWinApplication::Run()
 	{
+		m_running = true;
+
+		while (IsWindow(hWnd) && m_running)
+			Update();
+	}
+
+	void CWinApplication::Close()
+	{
+		m_running = false;
+	}
+
+	bool CWinApplication::Update()
+	{
+		ImGuiIO& io = ImGui::GetIO();
+
+		// Handle Messages
+		if (HandleMessages() != 1)
+		{
+			// Do Shutdown here
+			return false;
+		}
+		// TODO: More Update Code
+
+		for (auto& const pEditorLayers : m_editorLayers)
+		{
+			// TODO: we need to pass in the parameter of the timestamp here...
+			pEditorLayers->Update();
+		}
+
+		// Rendering, ImGuiContext
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+
+		ID3D12GraphicsCommandList6* curCommandList = m_renderer.GetCurrentCommandList();
+
+		ImGui::NewFrame();
+
+		{
+			m_renderer.BeginFrame();
+			
+
+			ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse;
+
+			ImGuiViewport* viewport = ImGui::GetMainViewport();
+			ImGui::SetNextWindowPos(viewport->Pos);
+			ImGui::SetNextWindowSize(viewport->Size);
+			ImGui::SetNextWindowViewport(viewport->ID);
+		/*	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);*/
+
+			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+			window_flags |= ImGuiWindowFlags_MenuBar;
+
+			/*ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.0f, 6.0f));
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 3.0f);*/
+
+			//ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			//ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+
+			//ImGui::PushStyleColor(ImGuiCol_MenuBarBg, ImVec4{ 0.0f, 0.0f, 0.0f, 0.0f });
+
+			ImGui::Begin("DockSpaceWindow", nullptr, window_flags);
+
+			// Docking
+			ImGuiIO& io = ImGui::GetIO();
+			ImGuiStyle& style = ImGui::GetStyle();
+			style.WindowMinSize.x = 1080.f;
+			ImGui::DockSpace(ImGui::GetID("MyDockspace"));
+
+			// Layers -> Drawing
+			DrawEditorLayers();
+
+			ImGui::End();
+		}
+
+		ImGui::Render();
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), curCommandList);
+
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+		}
+
+		m_renderer.EndFrame();
+		m_renderer.Render();
+
+		return true;
+	}
+
+	void CWinApplication::Shutdown()
+	{
+		m_running = false;
+
+		for (const auto& layer : m_editorLayers)
+		{
+			layer->OnEditorLayerDetach();
+		}
+
+		m_editorLayers.clear();
+
 		// ImGui
 		ImGui_ImplDX12_Shutdown();
 		ImGui_ImplWin32_Shutdown();
@@ -227,15 +310,15 @@ namespace Reckless
 		m_renderer.Shutdown();
 	}
 
-	void Application::DrawEditorLayers()
+	void CWinApplication::DrawEditorLayers()
 	{
-		for (auto& layer : m_editorLayers)
+		for (const auto& layer : m_editorLayers)
 		{
 			layer->DrawLayer();
 		}
 	}
 
-	void Application::UpdateWindowSize()
+	void CWinApplication::UpdateWindowSize()
 	{
 		RECT rect;
 		if (!GetClientRect(hWnd, &rect))

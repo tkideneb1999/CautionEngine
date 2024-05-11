@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <typeinfo>
 
 #include "IEditorLayer.h"
 
@@ -14,7 +15,7 @@
 
 ///////////////////////////////
 // Temp Testing Setup
-#include "Renderer/ShaderManager.h"
+#include "Renderer/Shader.h"
 
 ///////////////////////////////
 
@@ -22,7 +23,7 @@ using namespace CautionEngine::Rendering;
 
 namespace Reckless
 {
-	struct RecklessAppSpecification
+	struct SRecklessAppSpecification
 	{
 		std::string AppName = "RecklessEd";
 	};
@@ -36,7 +37,7 @@ namespace Reckless
 		WINDOW_STATE_FULLSCREEN = 4,
 	};
 
-	class Application
+	class CWinApplication
 	{
 	public:
 		HWND hWnd;
@@ -56,26 +57,48 @@ namespace Reckless
 		WINDOW_STATE applicationState = WINDOW_STATE_DEFAULT;
 
 	public:
-		Application(const wchar_t wndClassName[], const wchar_t windowName[], std::vector<std::string> args);
-		~Application();
+		CWinApplication(const wchar_t wndClassName[], const wchar_t windowName[], std::vector<std::string> args);
+		~CWinApplication();
 
-		bool Update();
-		float GetTimeStamp();
-		HINSTANCE GetInstance() const;
+		//! \brief Starts the Application main loop
+		void             Run();
+		//! \brief Shuts down the application, ends the main loop
+		void             Close();
+		
+		float            GetTimeStamp();
+		const HINSTANCE* GetInstance() const;
 
-		// Layer functions
+
+		//! \brief Adds an EditorLayer to the current Application
 		void AddEditorLayer(const std::shared_ptr<IEditorLayer> layer) 
 		{
 			m_editorLayers.emplace_back(layer);
 			layer->OnEditorLayerAttach();
 		}
 
+		//! \brief Tries to get a registered layer from the Editor
+		//! \returns A shared pointer to the layer
+		template<typename T>
+		std::shared_ptr<T> GetEditorLayer()
+		{
+			for (const auto& pLayer : m_editorLayers)
+			{
+				if (std::shared_ptr<T> ptr = std::dynamic_pointer_cast<T>(pLayer))
+				{
+					if (ptr)
+						return ptr;
+				}
+			}
+			return nullptr;
+		}
+
+		//! \brief Gets the Renderer of the Engine
+		Renderer* GetRenderer() { return &m_renderer; }
+
 	private:
-		RecklessAppSpecification m_specification;
-
-		Renderer m_renderer;
-
-		bool m_running;
+		Renderer                  m_renderer;
+		bool                      m_running;
+		SRecklessAppSpecification m_specification;
 		
 		// Timestamps
 		float m_timeStamp = 0.f;
@@ -87,17 +110,17 @@ namespace Reckless
 		// Windows specific Message Handling
 		static LRESULT CALLBACK AppProcedureSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		static LRESULT CALLBACK AppProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-		LRESULT HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-		int HandleMessages();
+		LRESULT                 HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		int                     HandleMessages();
 
 		// Window Functions
 		// TODO: this will be useful in the future
-		void Init();
-		void Shutdown();
+		void Initialize();
 		void DrawEditorLayers();
-
+		void Shutdown();
+		bool Update();
 		void UpdateWindowSize();
-		void HandleLMB();
+
 
 		//////////////////////////////////////////////////////////////
 		// Temp Testing Setup

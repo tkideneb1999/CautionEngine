@@ -1,15 +1,19 @@
-#include <vector>
-#include <string>
+#include "stdafx.h"
 
-#include "Widgets/Application.h"
-#include "Widgets/RecklessEditors.h"
+// Reckless
+#include "RecklessEdCoreApi.h"
 
+// CautionEngine
 #include <Renderer/D3D12API.h>
 
 // configs
 bool g_applicationRunning = true;
 const wchar_t CLASS_NAME[] = L"Reckless Editor Class";
-const wchar_t WINDOW_NAME[] = L"Reckless Editor";
+const wchar_t WINDOW_NAME[] = L"RecklessEd";
+
+using namespace Reckless;
+
+extern CWinApplication* s_recklessEditor;
 
 
 int main(int argc, char** argv)
@@ -19,25 +23,36 @@ int main(int argc, char** argv)
 	{
 		args[i] = argv[i];
 	}
-	
+
 	// API needs to be initialized separately, because Engine is a DLL
 	// https://gamedev.stackexchange.com/questions/128197/why-do-i-get-this-error-about-dllmain-when-using-d3d-from-within-a-dll
 	CautionEngine::Rendering::Renderer::s_api.Init();
-	Reckless::Application* editor = new Reckless::Application(CLASS_NAME, WINDOW_NAME, args);
+	// TODO: make proper initialization of the RecklessApplication
+	s_recklessEditor = new CWinApplication(CLASS_NAME, WINDOW_NAME, args);
 
 	// AssetBrowser Editor
-	std::shared_ptr<Reckless::AssetBrowserEditor> assetBrowser = std::make_shared<Reckless::AssetBrowserEditor>();
-	editor->AddEditorLayer(assetBrowser);
+	CAssetBrowserEditorSharedPtr pAssetBrowserLayer = std::make_shared<CAssetBrowserEditor>();
+	GetRecklessEditor()->AddEditorLayer(pAssetBrowserLayer);
 
 	// Viewport
+	CEditorViewportSharedPtr pViewportLayer = std::make_shared<CEditorViewport>();
+	GetRecklessEditor()->AddEditorLayer(pViewportLayer);
+
+	// Toolbar
+	CMainEditorToolbarSharedPtr pToolbar = std::make_shared<CMainEditorToolbar>();
+	GetRecklessEditor()->AddEditorLayer(pToolbar);
 	
 
-	while (g_applicationRunning)
-	{
-		if (!editor->Update())
-			return 0;
-	}
+	// TEST
+	CMainEditorToolbarSharedPtr sample = GetRecklessEditor()->GetEditorLayer<CMainEditorToolbar>();
+	sample->AddToToolsMenu("MyTest Menu", [] 
+		{
+			GetRecklessEditor()->Close();
+		});
 
-	delete editor;
+	s_recklessEditor->Run();
+	// TODO: benedikt -> properly shutdown the DXGIFactory7*
+	//CautionEngine::Rendering::Renderer::s_api.GetFactoryPtr()->Release();
+	delete s_recklessEditor;
 	return 0;
 }
