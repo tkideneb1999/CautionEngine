@@ -4,6 +4,7 @@ workspace "CautionEngine"
 	architecture "x64"
 	location "solutions"
 	startproject "RecklessEditor"
+	editorintegration "On"
 	
 	configurations
 	{ 
