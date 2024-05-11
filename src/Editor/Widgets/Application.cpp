@@ -7,7 +7,9 @@
 #include "imgui_internal.h"
 #include "backends/imgui_impl_dx12.h"
 #include "backends/imgui_impl_win32.h"
-#include <dxgi1_4.h>
+
+#include <dxgi1_6.h>
+#include <wrl/client.h>
 
 #include <stdexcept>
 #include <iostream>
@@ -121,7 +123,7 @@ namespace Reckless
 	{
 		while (PeekMessage(&currentMsg, nullptr, 0, 0, PM_REMOVE)) 
 		{
-			if (currentMsg.message == WM_QUIT) 
+			if (currentMsg.message == WM_QUIT)
 			{
 				return 0;
 			}
@@ -195,6 +197,19 @@ namespace Reckless
 		);
 	}
 
+	void CWinApplication::Run()
+	{
+		m_running = true;
+
+		while (IsWindow(hWnd) && m_running)
+			Update();
+	}
+
+	void CWinApplication::Close()
+	{
+		m_running = false;
+	}
+
 	bool CWinApplication::Update()
 	{
 		ImGuiIO& io = ImGui::GetIO();
@@ -248,7 +263,6 @@ namespace Reckless
 
 			ImGui::Begin("DockSpaceWindow", nullptr, window_flags);
 
-			// TODO: johne -> make a proper window that will support docking
 			// Docking
 			ImGuiIO& io = ImGui::GetIO();
 			ImGuiStyle& style = ImGui::GetStyle();
@@ -278,6 +292,15 @@ namespace Reckless
 
 	void CWinApplication::Shutdown()
 	{
+		m_running = false;
+
+		for (const auto& layer : m_editorLayers)
+		{
+			layer->OnEditorLayerDetach();
+		}
+
+		m_editorLayers.clear();
+
 		// ImGui
 		ImGui_ImplDX12_Shutdown();
 		ImGui_ImplWin32_Shutdown();
@@ -289,7 +312,7 @@ namespace Reckless
 
 	void CWinApplication::DrawEditorLayers()
 	{
-		for (auto& layer : m_editorLayers)
+		for (const auto& layer : m_editorLayers)
 		{
 			layer->DrawLayer();
 		}

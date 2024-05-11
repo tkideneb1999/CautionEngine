@@ -47,16 +47,12 @@ int main(int argc, char** argv)
 	CMainEditorToolbarSharedPtr sample = GetRecklessEditor()->GetEditorLayer<CMainEditorToolbar>();
 	sample->AddToToolsMenu("MyTest Menu", [] 
 		{
-			//GetRecklessEditor()->
+			GetRecklessEditor()->Close();
 		});
-	
 
-	while (g_applicationRunning)
-	{
-		if (!s_recklessEditor->Update())
-			return 0;
-	}
-
+	s_recklessEditor->Run();
+	// TODO: benedikt -> properly shutdown the DXGIFactory7*
+	//CautionEngine::Rendering::Renderer::s_api.GetFactoryPtr()->Release();
 	delete s_recklessEditor;
 	return 0;
 }

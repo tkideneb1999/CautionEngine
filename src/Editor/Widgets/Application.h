@@ -60,9 +60,14 @@ namespace Reckless
 		CWinApplication(const wchar_t wndClassName[], const wchar_t windowName[], std::vector<std::string> args);
 		~CWinApplication();
 
-		bool Update();
-		float GetTimeStamp();
+		//! \brief Starts the Application main loop
+		void             Run();
+		//! \brief Shuts down the application, ends the main loop
+		void             Close();
+		
+		float            GetTimeStamp();
 		const HINSTANCE* GetInstance() const;
+
 
 		//! \brief Adds an EditorLayer to the current Application
 		void AddEditorLayer(const std::shared_ptr<IEditorLayer> layer) 
@@ -105,17 +110,17 @@ namespace Reckless
 		// Windows specific Message Handling
 		static LRESULT CALLBACK AppProcedureSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		static LRESULT CALLBACK AppProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-		LRESULT HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-		int HandleMessages();
+		LRESULT                 HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		int                     HandleMessages();
 
 		// Window Functions
 		// TODO: this will be useful in the future
 		void Initialize();
-		void Shutdown();
 		void DrawEditorLayers();
-
+		void Shutdown();
+		bool Update();
 		void UpdateWindowSize();
-		void HandleLMB();
+
 
 		//////////////////////////////////////////////////////////////
 		// Temp Testing Setup

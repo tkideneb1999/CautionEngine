@@ -1,4 +1,5 @@
 #include "MainEditorToolbar.h"
+
 namespace Reckless
 {
 	void CMainEditorToolbar::OnEditorLayerAttach()
@@ -14,7 +15,7 @@ namespace Reckless
 			{ }
 			if (ImGui::MenuItem("Exit"))
 			{
-				
+				/*GetRecklessEditor()->Shutdown();*/
 			}
 			ImGui::EndMenu();
 		}
@@ -25,7 +26,8 @@ namespace Reckless
 			{
 				if (ImGui::MenuItem(subMenu.first.c_str()))
 				{
-					// call back
+					// Menu callback/command
+					subMenu.second();
 				}
 			}
 
