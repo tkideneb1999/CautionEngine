@@ -2,15 +2,15 @@
 
 #include "../Platform/ImGui/RecklessEdTheme.h"
 
-#include <stdexcept>
-#include <iostream>
 
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "backends/imgui_impl_dx12.h"
 #include "backends/imgui_impl_win32.h"
-
 #include <dxgi1_4.h>
+
+#include <stdexcept>
+#include <iostream>
 
 #ifdef _DEBUG
 #define DX12_ENABLE_DEBUG_LAYER
@@ -26,7 +26,7 @@ static int const                    NUM_BACK_BUFFERS = 3;
 
 namespace Reckless
 {
-	Application::Application(const wchar_t wndClassName[], const wchar_t wndName[], std::vector<std::string> lArgs)
+	CWinApplication::CWinApplication(const wchar_t wndClassName[], const wchar_t wndName[], std::vector<std::string> lArgs)
 		: args(lArgs)
 	{
 		hInstance = GetModuleHandle(nullptr);
@@ -58,51 +58,51 @@ namespace Reckless
 		UpdateWindowSize();
 
 		// Initialization
-		Init();
+		Initialize();
 
 		// Showing of the window
 		ShowWindow(hWnd, SW_SHOW);
 	}
 
-	Application::~Application()
+	CWinApplication::~CWinApplication()
 	{
 		Shutdown();
 	}
 
-	float Application::GetTimeStamp()
+	float CWinApplication::GetTimeStamp()
 	{
 		// TODO: implement, we might need to look for dx12 related timestamps/frequency here...
 		return 0.0f;
 	}
 
-	const HINSTANCE* Application::GetInstance() const
+	const HINSTANCE* CWinApplication::GetInstance() const
 	{
 		return &hInstance;
 	}
 
-	LRESULT Application::AppProcedureSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	LRESULT CWinApplication::AppProcedureSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (msg == WM_NCCREATE)
 		{
 			const CREATESTRUCTW* const pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
-			Application* const pApp = static_cast<Application*>(pCreate->lpCreateParams);
+			CWinApplication* const pApp = static_cast<CWinApplication*>(pCreate->lpCreateParams);
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pApp));
-			SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&Application::AppProcedure));
+			SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&CWinApplication::AppProcedure));
 			return pApp->HandleMessage(hWnd, msg, wParam, lParam);
 		}
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 
-	LRESULT CALLBACK Application::AppProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	LRESULT CALLBACK CWinApplication::AppProcedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND ig_hWnd, UINT ig_msg, WPARAM ig_wParam, LPARAM ig_lParam);
 		if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
 			return true;
-		Application* const pApp = reinterpret_cast<Application*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+		CWinApplication* const pApp = reinterpret_cast<CWinApplication*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 		return pApp->HandleMessage(hWnd, msg, wParam, lParam);
 	}
 
-	LRESULT Application::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	LRESULT CWinApplication::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		switch (msg)
 		{
@@ -117,7 +117,7 @@ namespace Reckless
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 
-	int Application::HandleMessages()
+	int CWinApplication::HandleMessages()
 	{
 		while (PeekMessage(&currentMsg, nullptr, 0, 0, PM_REMOVE)) 
 		{
@@ -132,7 +132,7 @@ namespace Reckless
 		return 1;
 	}
 
-	void Application::Init()
+	void CWinApplication::Initialize()
 	{
 		// TODO: initialize dx12 related stuff here and imgui
 		m_renderer.InitDescriptorHeaps(1024, 32, 256, 256);
@@ -162,8 +162,8 @@ namespace Reckless
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // TODO: benedikt -> you might be interested in this feature of dear imgui
 
-		//// Menu
-		//io.ConfigFlags |= ImGuiWindowFlags_MenuBar;
+		// Menu
+		io.ConfigFlags |= ImGuiWindowFlags_MenuBar;
 
 		// Reckless Style
 		Reckless::UI::SetRecklessEdTheme();
@@ -195,7 +195,7 @@ namespace Reckless
 		);
 	}
 
-	bool Application::Update()
+	bool CWinApplication::Update()
 	{
 		ImGuiIO& io = ImGui::GetIO();
 
@@ -276,7 +276,7 @@ namespace Reckless
 		return true;
 	}
 
-	void Application::Shutdown()
+	void CWinApplication::Shutdown()
 	{
 		// ImGui
 		ImGui_ImplDX12_Shutdown();
@@ -287,7 +287,7 @@ namespace Reckless
 		m_renderer.Shutdown();
 	}
 
-	void Application::DrawEditorLayers()
+	void CWinApplication::DrawEditorLayers()
 	{
 		for (auto& layer : m_editorLayers)
 		{
@@ -295,7 +295,7 @@ namespace Reckless
 		}
 	}
 
-	void Application::UpdateWindowSize()
+	void CWinApplication::UpdateWindowSize()
 	{
 		RECT rect;
 		if (!GetClientRect(hWnd, &rect))

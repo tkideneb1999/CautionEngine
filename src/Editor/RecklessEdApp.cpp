@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
-#include "Widgets/Application.h"
-#include "Widgets/RecklessEditors.h"
+// Reckless
+#include "RecklessEdCoreApi.h"
 
 // CautionEngine
 #include <Renderer/D3D12API.h>
@@ -9,9 +9,12 @@
 // configs
 bool g_applicationRunning = true;
 const wchar_t CLASS_NAME[] = L"Reckless Editor Class";
-const wchar_t WINDOW_NAME[] = L"Reckless Editor";
+const wchar_t WINDOW_NAME[] = L"RecklessEd";
 
-// TODO: johne -> make global editor getter
+using namespace Reckless;
+
+extern CWinApplication* s_recklessEditor;
+
 
 int main(int argc, char** argv)
 {
@@ -20,37 +23,40 @@ int main(int argc, char** argv)
 	{
 		args[i] = argv[i];
 	}
-	
-	using namespace Reckless;
+
 	// API needs to be initialized separately, because Engine is a DLL
 	// https://gamedev.stackexchange.com/questions/128197/why-do-i-get-this-error-about-dllmain-when-using-d3d-from-within-a-dll
 	CautionEngine::Rendering::Renderer::s_api.Init();
-	Application* const pRecklesssEd = new Application(CLASS_NAME, WINDOW_NAME, args);
+	// TODO: make proper initialization of the RecklessApplication
+	s_recklessEditor = new CWinApplication(CLASS_NAME, WINDOW_NAME, args);
 
 	// AssetBrowser Editor
-	AssetBrowserEditorSharedPtr pAssetBrowserLayer = std::make_shared<AssetBrowserEditor>();
-	pRecklesssEd->AddEditorLayer(pAssetBrowserLayer);
+	CAssetBrowserEditorSharedPtr pAssetBrowserLayer = std::make_shared<CAssetBrowserEditor>();
+	GetRecklessEditor()->AddEditorLayer(pAssetBrowserLayer);
 
 	// Viewport
-	EditorViewportSharedPtr pViewportLayer = std::make_shared<EditorViewport>();
-	pRecklesssEd->AddEditorLayer(pViewportLayer);
+	CEditorViewportSharedPtr pViewportLayer = std::make_shared<CEditorViewport>();
+	GetRecklessEditor()->AddEditorLayer(pViewportLayer);
 
 	// Toolbar
-	ToolbarSharedPtr pToolbar = std::make_shared<Toolbar>();
-	pRecklesssEd->AddEditorLayer(pToolbar);
+	CMainEditorToolbarSharedPtr pToolbar = std::make_shared<CMainEditorToolbar>();
+	GetRecklessEditor()->AddEditorLayer(pToolbar);
 	
 
 	// TEST
-	ToolbarSharedPtr sample = pRecklesssEd->GetEditorLayer<Toolbar>();
-	sample->AddMenu("test", [] {});
+	CMainEditorToolbarSharedPtr sample = GetRecklessEditor()->GetEditorLayer<CMainEditorToolbar>();
+	sample->AddToToolsMenu("MyTest Menu", [] 
+		{
+			//GetRecklessEditor()->
+		});
 	
 
 	while (g_applicationRunning)
 	{
-		if (!pRecklesssEd->Update())
+		if (!s_recklessEditor->Update())
 			return 0;
 	}
 
-	delete pRecklesssEd;
+	delete s_recklessEditor;
 	return 0;
 }

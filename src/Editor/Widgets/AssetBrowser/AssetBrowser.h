@@ -1,15 +1,15 @@
 #pragma once
 
-#include "../IEditorLayer.h"
+#include "IEditorLayer.h"
 
 namespace Reckless
 {
-	class AssetBrowserEditor : public IEditorLayer
+	class CAssetBrowserEditor : public IEditorLayer
 	{
 	public:
 		virtual void OnEditorLayerAttach() override;
 		virtual void DrawLayer() override;
 	};
 
-DECLARE_SHARED_POINTERS(AssetBrowserEditor)
+DECLARE_SHARED_POINTERS(CAssetBrowserEditor)
 }

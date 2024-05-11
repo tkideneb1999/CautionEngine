@@ -2,6 +2,6 @@
 
 // Reckless Editor includes...
 #include "Viewport/EditorViewport.h"
-#include "Viewport/Toolbar.h"
+#include "Viewport/MainEditorToolbar.h"
 
 #include "AssetBrowser/AssetBrowser.h"

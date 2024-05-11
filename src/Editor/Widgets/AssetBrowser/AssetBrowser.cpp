@@ -1,14 +1,13 @@
 #include "AssetBrowser.h"
 
-#include "imgui.h"
-
 namespace Reckless
 {
-	void AssetBrowserEditor::OnEditorLayerAttach()
+	void CAssetBrowserEditor::OnEditorLayerAttach()
 	{
 
 	}
-	void AssetBrowserEditor::DrawLayer()
+
+	void CAssetBrowserEditor::DrawLayer()
 	{
 		ImGui::Begin("Asset Browser");
 

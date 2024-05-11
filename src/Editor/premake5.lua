@@ -42,7 +42,8 @@ project "RecklessEditor"
     includedirs
     {
         -- Editor
-        "/..",
+        "/",
+        "Widgets",
         "../CautionEngine",
         "../CautionCommon",
         "../../%{IncludeDirectories.ImGui}",

@@ -1,6 +1,8 @@
 #pragma once
 
-#include<Platform/CautionPlatform.h>
+#include <Platform/CautionPlatform.h>
+
+#include "imgui.h"
 
 namespace Reckless
 {

@@ -23,7 +23,7 @@ using namespace CautionEngine::Rendering;
 
 namespace Reckless
 {
-	struct RecklessAppSpecification
+	struct SRecklessAppSpecification
 	{
 		std::string AppName = "RecklessEd";
 	};
@@ -37,7 +37,7 @@ namespace Reckless
 		WINDOW_STATE_FULLSCREEN = 4,
 	};
 
-	class Application
+	class CWinApplication
 	{
 	public:
 		HWND hWnd;
@@ -57,20 +57,22 @@ namespace Reckless
 		WINDOW_STATE applicationState = WINDOW_STATE_DEFAULT;
 
 	public:
-		Application(const wchar_t wndClassName[], const wchar_t windowName[], std::vector<std::string> args);
-		~Application();
+		CWinApplication(const wchar_t wndClassName[], const wchar_t windowName[], std::vector<std::string> args);
+		~CWinApplication();
 
 		bool Update();
 		float GetTimeStamp();
 		const HINSTANCE* GetInstance() const;
 
-		// Layer functions
+		//! \brief Adds an EditorLayer to the current Application
 		void AddEditorLayer(const std::shared_ptr<IEditorLayer> layer) 
 		{
 			m_editorLayers.emplace_back(layer);
 			layer->OnEditorLayerAttach();
 		}
 
+		//! \brief Tries to get a registered layer from the Editor
+		//! \returns A shared pointer to the layer
 		template<typename T>
 		std::shared_ptr<T> GetEditorLayer()
 		{
@@ -85,12 +87,13 @@ namespace Reckless
 			return nullptr;
 		}
 
+		//! \brief Gets the Renderer of the Engine
+		Renderer* GetRenderer() { return &m_renderer; }
+
 	private:
-		RecklessAppSpecification m_specification;
-
-		Renderer m_renderer;
-
-		bool m_running;
+		Renderer                  m_renderer;
+		bool                      m_running;
+		SRecklessAppSpecification m_specification;
 		
 		// Timestamps
 		float m_timeStamp = 0.f;
@@ -107,7 +110,7 @@ namespace Reckless
 
 		// Window Functions
 		// TODO: this will be useful in the future
-		void Init();
+		void Initialize();
 		void Shutdown();
 		void DrawEditorLayers();
 
