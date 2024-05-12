@@ -42,6 +42,7 @@ project "CautionEngine"
         "%{Library.dx_12}",
         "%{Library.dx_compiler}",
         "%{Library.dx_gi}",
+		"%{Library.dx_dxcompiler}",
         "../../%{Library.usd_utils}",
         "../../%{Library.usd_imaging}",
         "../../%{Library.usd_geom}",

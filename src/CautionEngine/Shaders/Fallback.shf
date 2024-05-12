@@ -1,0 +1,12 @@
+# FillMode: Solid, Wireframe
+FillMode=Solid
+# CullMode: Back, Front, None
+CullMode=Back
+ConservativeRaster=True
+# TopologyType: Triangle, Line, Point, Patch
+TopologyType=Triangle
+IndependentBlendEnable=False
+BlendState=
+{
+	
+}

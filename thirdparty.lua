@@ -19,6 +19,7 @@ Library["caution_engine_lib"] = "CautionEngine.lib"
 Library["dx_12"] = "d3d12.lib"
 Library["dx_compiler"] = "d3dcompiler.lib"
 Library["dx_gi"] = "dxgi.lib"
+Library["dx_dxcompiler"] = "dxcompiler.lib"
 
 Library["usd_imaging"] = "thirdparty/usd/bin/lib/usd_usdImaging.lib"
 Library["usd_utils"] = "thirdparty/usd/bin/lib/usd_usdUtils.lib"

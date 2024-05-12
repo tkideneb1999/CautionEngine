@@ -25,6 +25,7 @@ namespace CautionEngine::Rendering::D3D12
 
 		UINT m_maxDescriptors = 0;
 		UINT m_allocatedDescriptors = 0;
+		bool m_isShaderVisible = false;
 
 	public:
 		DescriptorHeap()
@@ -38,5 +39,6 @@ namespace CautionEngine::Rendering::D3D12
 		const ComPtr<ID3D12DescriptorHeap> GetHeapPtr() { return m_DescriptorHeap; }
 
 		bool Initialized() { return m_DescriptorHeap.Get() != nullptr; }
+		bool IsShaderVisible() { return m_isShaderVisible; }
 	};
 }

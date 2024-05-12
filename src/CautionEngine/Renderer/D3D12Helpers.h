@@ -3,14 +3,23 @@
 #include <CautionDefinitions.h>
 
 #include <exception>
+#include <string>
 #include <wrl/client.h>
 
 using namespace Microsoft::WRL;
 
-CAUTION_API inline void ThrowIfFailed(HRESULT res, const char* msg)
+namespace CautionEngine::Rendering
 {
-	if (!SUCCEEDED(res))
+	CAUTION_API inline void ThrowIfFailed(HRESULT res, const char* msg)
 	{
-		throw std::exception(msg);
+		if (!SUCCEEDED(res))
+		{
+			throw std::exception(msg);
+		}
+	}
+
+	inline std::string GetErrorMessageFromBlob(ID3DBlob* errorBlob)
+	{
+		return std::string((const char*)errorBlob->GetBufferPointer(), errorBlob->GetBufferSize());
 	}
 }
