@@ -34,6 +34,7 @@ namespace CautionEngine::Rendering
 		}
 
 		void Init();
+		void Shutdown();
 
 		void GatherDREDOUTput();
 

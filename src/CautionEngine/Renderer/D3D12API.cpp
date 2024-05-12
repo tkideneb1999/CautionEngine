@@ -53,6 +53,12 @@ namespace CautionEngine::Rendering
 		m_initialized = true;
 	}
 
+	void D3D12API::Shutdown()
+	{
+		m_device->Release();
+		m_factory->Release();
+	}
+
 	void D3D12API::GatherDREDOUTput()
 	{
 		ComPtr<ID3D12DeviceRemovedExtendedData1> dredData;

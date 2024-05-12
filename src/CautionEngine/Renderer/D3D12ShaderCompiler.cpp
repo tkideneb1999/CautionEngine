@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "D3D12Helpers.h"
-#include "ShaderHeaderFileReader.h"
 
 namespace CautionEngine::Rendering {
 	bool D3D12ShaderCompiler::GenerateShaderData()
@@ -297,7 +296,6 @@ namespace CautionEngine::Rendering {
 	bool D3D12ShaderCompiler::Compile()
 	{
 		PSOInfo psoInfo;
-		ShaderHeaderFile::ReadFile(m_pShader->GetFilepath(), &psoInfo);
 
 		// Load Shader
 		ComPtr<IDxcBlobEncoding> encodingSource = nullptr;

@@ -187,12 +187,13 @@ namespace Reckless
 
 		// Setting of the ImGui platform and renderer
 		ImGui_ImplWin32_Init(hWnd);
-		D3D12::DescriptorHeapHandle font_descriptor_handle = m_renderer.cbv_srv_uav_descHeap.Allocate();
+		DescriptorManager* descriptorManager = &m_renderer.descriptorManager;
+		D3D12::DescriptorHeapHandle font_descriptor_handle = descriptorManager->GetCbvSrvUavHeap()->Allocate();
 		ImGui_ImplDX12_Init(
 			m_renderer.s_api.GetDevicePtr().Get(), 
 			NUM_BACK_BUFFERS, 
 			DXGI_FORMAT_R8G8B8A8_UNORM, //TODO: Make this always match definition in renderer
-			m_renderer.cbv_srv_uav_descHeap.GetHeapPtr().Get(), 
+			descriptorManager->GetCbvSrvUavHeap()->GetHeapPtr().Get(),
 			font_descriptor_handle.cpuHandle, font_descriptor_handle.gpuHandle
 		);
 	}

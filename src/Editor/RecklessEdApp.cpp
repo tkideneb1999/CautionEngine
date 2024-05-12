@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 
 	s_recklessEditor->Run();
 	// TODO: benedikt -> properly shutdown the DXGIFactory7*
-	//CautionEngine::Rendering::Renderer::s_api.GetFactoryPtr()->Release();
+	CautionEngine::Rendering::Renderer::s_api.Shutdown();
 	delete s_recklessEditor;
 	return 0;
 }
