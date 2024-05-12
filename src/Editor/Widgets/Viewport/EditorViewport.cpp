@@ -1,13 +1,11 @@
 #include "EditorViewport.h"
 
-#include "imgui.h"
-
 namespace Reckless
 {
-	void EditorViewport::OnEditorLayerAttach()
+	void CEditorViewport::OnEditorLayerAttach()
 	{
 	}
-	void EditorViewport::DrawLayer()
+	void CEditorViewport::Update()
 	{
 		ImGui::Begin("Viewport");
 		ImGui::End();

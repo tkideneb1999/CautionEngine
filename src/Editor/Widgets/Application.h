@@ -116,7 +116,7 @@ namespace Reckless
 		// Window Functions
 		// TODO: this will be useful in the future
 		void Initialize();
-		void DrawEditorLayers();
+		void UpdateEditorLayers();
 		void Shutdown();
 		bool Update();
 		void UpdateWindowSize();

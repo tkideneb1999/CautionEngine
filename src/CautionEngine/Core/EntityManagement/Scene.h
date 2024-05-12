@@ -13,7 +13,7 @@ namespace CautionEngine::Core
 		void Render();
 		void Destroy();
 
-		__forceinline std::vector<Entity*> GetEntities()
+		__forceinline std::vector<Entity*> GetEntities() const
 		{
 			return m_entities;
 		}

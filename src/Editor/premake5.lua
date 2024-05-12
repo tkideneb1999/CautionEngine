@@ -41,12 +41,16 @@ project "RecklessEditor"
 
     includedirs
     {
+        -- Editor
+        "/",
+        "Widgets",
         "../CautionEngine",
         "../CautionCommon",
         "../../%{IncludeDirectories.ImGui}",
         "../../%{IncludeDirectories.ImGui_backends}",
         "../../%{IncludeDirectories.ImGuizmo}",
-        "../../%{IncludeDirectories.glm}"
+        "../../%{IncludeDirectories.glm}",
+        "../../%{IncludeDirectories.json}"
     }
 
     links
