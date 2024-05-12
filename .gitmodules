@@ -11,6 +11,3 @@
 [submodule "thirdparty/libraries"]
 	path = thirdparty/libraries
 	url = https://github.com/AlsonEntuna/CautionEngineThirdParty
-[submodule "engine/assets"]
-	path = assets
-	url = https://github.com/AlsonEntuna/CautionEngineAssets
