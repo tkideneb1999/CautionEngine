@@ -15,7 +15,6 @@ namespace Reckless
 		virtual void OnEditorLayerAttach() { }
 		virtual void OnEditorLayerDetach() { }
 
-		virtual void DrawLayer() = 0;
-		virtual void Update() { }
+		virtual void Update() = 0;
 	};
 }

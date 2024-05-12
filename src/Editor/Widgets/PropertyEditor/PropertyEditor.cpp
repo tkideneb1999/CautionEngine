@@ -1,5 +1,5 @@
 #include "PropertyEditor.h"
 
-void Reckless::CProperyEditor::DrawLayer()
+void Reckless::CProperyEditor::Update()
 {
 }

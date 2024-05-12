@@ -7,7 +7,7 @@ namespace Reckless
 
 	}
 
-	void CAssetBrowserEditor::DrawLayer()
+	void CAssetBrowserEditor::Update()
 	{
 		ImGui::Begin("Asset Browser");
 

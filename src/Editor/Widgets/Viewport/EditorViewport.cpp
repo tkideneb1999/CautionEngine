@@ -5,7 +5,7 @@ namespace Reckless
 	void CEditorViewport::OnEditorLayerAttach()
 	{
 	}
-	void CEditorViewport::DrawLayer()
+	void CEditorViewport::Update()
 	{
 		ImGui::Begin("Viewport");
 		ImGui::End();

@@ -10,7 +10,7 @@ namespace Reckless
 
 
 		// Inherited via IEditorLayer
-		void DrawLayer() override;
+		void Update() override;
 
 	};
 

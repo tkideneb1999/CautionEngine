@@ -6,7 +6,7 @@ namespace Reckless
 	{
 	}
 
-	void CMainEditorToolbar::DrawLayer()
+	void CMainEditorToolbar::Update()
 	{
 		ImGui::BeginMenuBar();
 		if (ImGui::BeginMenu("File"))

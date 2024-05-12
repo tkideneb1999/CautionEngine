@@ -8,7 +8,7 @@ namespace Reckless
 	{
 	public:
 		virtual void OnEditorLayerAttach() override;
-		virtual void DrawLayer() override;
+		virtual void Update() override;
 	};
 
 DECLARE_SHARED_POINTERS(CAssetBrowserEditor)

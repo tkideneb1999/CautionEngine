@@ -15,7 +15,7 @@ namespace Reckless
 	{
 	public:
 		virtual void OnEditorLayerAttach() override;
-		virtual void DrawLayer() override;
+		virtual void Update() override;
 
 	public:
 		void AddToToolsMenu(const char* name, const std::function<void()>& callback);

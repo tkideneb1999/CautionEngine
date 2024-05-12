@@ -220,13 +220,6 @@ namespace Reckless
 			// Do Shutdown here
 			return false;
 		}
-		// TODO: More Update Code
-
-		for (auto& const pEditorLayers : m_editorLayers)
-		{
-			// TODO: we need to pass in the parameter of the timestamp here...
-			pEditorLayers->Update();
-		}
 
 		// Rendering, ImGuiContext
 		ImGui_ImplDX12_NewFrame();
@@ -270,7 +263,7 @@ namespace Reckless
 			ImGui::DockSpace(ImGui::GetID("MyDockspace"));
 
 			// Layers -> Drawing
-			DrawEditorLayers();
+			UpdateEditorLayers();
 
 			ImGui::End();
 		}
@@ -310,11 +303,11 @@ namespace Reckless
 		m_renderer.Shutdown();
 	}
 
-	void CWinApplication::DrawEditorLayers()
+	void CWinApplication::UpdateEditorLayers()
 	{
 		for (const auto& layer : m_editorLayers)
 		{
-			layer->DrawLayer();
+			layer->Update();
 		}
 	}
 
