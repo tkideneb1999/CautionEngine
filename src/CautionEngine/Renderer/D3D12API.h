@@ -15,6 +15,7 @@ namespace CautionEngine::Rendering
 	{
 	public:
 		D3D12API();
+		~D3D12API() { }
 
 		// Disable Copying
 		D3D12API(const D3D12API& original) = delete;

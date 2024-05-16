@@ -25,7 +25,7 @@ namespace CautionEngine::Rendering::D3D12
 		report << "Failed to Create Descriptor Heap for type: " << type << std::endl;
 #endif
 		
-		ThrowIfFailed(
+		THROW_IF_FAILED(
 			pDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_DescriptorHeap)),
 #if _DEBUG
 			report.str().c_str()

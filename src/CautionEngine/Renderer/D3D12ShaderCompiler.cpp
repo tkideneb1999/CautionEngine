@@ -275,15 +275,15 @@ namespace CautionEngine::Rendering {
 		m_pShader = shader;
 		m_shaderSource = DxcBuffer();
 
-		ThrowIfFailed(
+		THROW_IF_FAILED(
 			DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&m_compiler)),
 			"Compiler creation failed!"
 		);
-		ThrowIfFailed(
+		THROW_IF_FAILED(
 			DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&m_utils)),
 			"Couldn't create Utils!"
 		);
-		ThrowIfFailed(
+		THROW_IF_FAILED(
 			m_utils->CreateDefaultIncludeHandler(&m_includeHandler),
 			"Couldn't create Include Handler"
 		);

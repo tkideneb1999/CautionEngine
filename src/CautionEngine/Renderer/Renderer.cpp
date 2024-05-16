@@ -44,7 +44,7 @@ namespace CautionEngine::Rendering {
 		D3D12_COMMAND_QUEUE_DESC commandQueueDesc = {};
 		commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 		commandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-		ThrowIfFailed(
+		THROW_IF_FAILED(
 			s_api.GetDevicePtr()->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&m_commandQueue)),
 			"Command Queue Creation Failed"
 			);
@@ -70,11 +70,11 @@ namespace CautionEngine::Rendering {
 		swapChainFullScreenDesc.Windowed = true;
 
 		ComPtr<IDXGISwapChain1> i_swapChain;
-		ThrowIfFailed(
+		THROW_IF_FAILED(
 			s_api.GetFactoryPtr()->CreateSwapChainForHwnd(m_commandQueue.Get(), hWnd, &swapChainDesc, &swapChainFullScreenDesc, nullptr, i_swapChain.GetAddressOf()),
 			"Swap Chain Creation Failed"
 			);
-		ThrowIfFailed(i_swapChain.As(&m_swapChain), "Cast to Swap Chain Failed");
+		THROW_IF_FAILED(i_swapChain.As(&m_swapChain), "Cast to Swap Chain Failed");
 
 		//m_currentFrame = m_swapChain->GetCurrentBackBufferIndex();
 
@@ -126,14 +126,14 @@ namespace CautionEngine::Rendering {
 			m_commandFrames.push_back(CommandFrame());
 			m_commandFrames[i].fenceValue = 0;
 			
-			ThrowIfFailed(
+			THROW_IF_FAILED(
 				s_api.GetDevicePtr()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&(m_commandFrames[i].commandAllocator))),
 				"Command Allocator Creation Failed"
 			);
 
 			// TODO: Remove this
 			m_commandLists.push_back(ComPtr<ID3D12GraphicsCommandList6>());
-			ThrowIfFailed(
+			THROW_IF_FAILED(
 				s_api.GetDevicePtr()->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&(m_commandLists[i]))),
 				"Command List Creation Failed"
 			);
@@ -157,14 +157,14 @@ namespace CautionEngine::Rendering {
 
 	void Renderer::InitFrameFence()
 	{
-		ThrowIfFailed(
+		THROW_IF_FAILED(
 			s_api.GetDevicePtr()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)),
 			"Fence creation failed"
 		);
 		m_fenceEvent = CreateEvent(nullptr, false, false, nullptr);
 		if (m_fenceEvent == nullptr)
 		{
-			ThrowIfFailed(HRESULT_FROM_WIN32(GetLastError()), "Fence Event Creation Failed");
+			THROW_IF_FAILED(HRESULT_FROM_WIN32(GetLastError()), "Fence Event Creation Failed");
 		}
 	}
 
@@ -238,8 +238,8 @@ namespace CautionEngine::Rendering {
 		ComPtr<ID3DBlob> error;
 
 		HRESULT res = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error);
-		ThrowIfFailed(res, "Root Signature Serialization failed");
-		ThrowIfFailed(
+		THROW_IF_FAILED(res, "Root Signature Serialization failed");
+		THROW_IF_FAILED(
 			s_api.GetDevicePtr()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)),
 			"Couldn't create Root Signature"
 		);

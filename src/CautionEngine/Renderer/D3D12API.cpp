@@ -20,17 +20,17 @@ namespace CautionEngine::Rendering
 #if _DEBUG
 		{
 			ComPtr<ID3D12Debug> debugController;
-			ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)), "Couldn't get Debug Interface");
+			THROW_IF_FAILED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)), "Couldn't get Debug Interface");
 			debugController->EnableDebugLayer();
 
 			ComPtr<ID3D12DeviceRemovedExtendedDataSettings1> dredSettings;
-			ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&dredSettings)), "Couldn't get Debug Interface");
+			THROW_IF_FAILED(D3D12GetDebugInterface(IID_PPV_ARGS(&dredSettings)), "Couldn't get Debug Interface");
 			dredSettings->SetAutoBreadcrumbsEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
 			dredSettings->SetPageFaultEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
 		}
 #endif
 
-		ThrowIfFailed(
+		THROW_IF_FAILED(
 			CreateDXGIFactory2( // TODO: benedikt -> you might want to initialize the DXGI factory outside of this project?
 				// https://gamedev.stackexchange.com/questions/128197/why-do-i-get-this-error-about-dllmain-when-using-d3d-from-within-a-dll
 #if _DEBUG
@@ -43,7 +43,7 @@ namespace CautionEngine::Rendering
 
 		//TODO: Make GPU pref accessible
 		GetAdapter(&m_adapter, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE);
-		ThrowIfFailed(
+		THROW_IF_FAILED(
 			D3D12CreateDevice(m_adapter.Get(), D3D_FEATURE_LEVEL_12_1, IID_PPV_ARGS(&m_device)),
 			"Device Creation Failed"
 		);
@@ -62,7 +62,7 @@ namespace CautionEngine::Rendering
 	void D3D12API::GatherDREDOUTput()
 	{
 		ComPtr<ID3D12DeviceRemovedExtendedData1> dredData;
-		ThrowIfFailed(m_device->QueryInterface(dredData.GetAddressOf()), "Query Interface Failed");
+		THROW_IF_FAILED(m_device->QueryInterface(dredData.GetAddressOf()), "Query Interface Failed");
 
 		D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT1 dredOutput{};
 		D3D12_DRED_PAGE_FAULT_OUTPUT1 dredPageFaultOutput{};
@@ -75,7 +75,7 @@ namespace CautionEngine::Rendering
 	{
 		*ppAdapter = nullptr;
 		
-		ThrowIfFailed(
+		THROW_IF_FAILED(
 			m_factory->EnumAdapterByGpuPreference(0, pref, IID_PPV_ARGS(ppAdapter)),
 			"Couldn't find GPU Adapter"
 		);

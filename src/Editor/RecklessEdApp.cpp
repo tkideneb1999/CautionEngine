@@ -7,7 +7,6 @@
 #include <Renderer/D3D12API.h>
 
 // configs
-bool g_applicationRunning = true;
 const wchar_t CLASS_NAME[] = L"Reckless Editor Class";
 const wchar_t WINDOW_NAME[] = L"RecklessEd";
 
@@ -54,5 +53,6 @@ int main(int argc, char** argv)
 	// TODO: benedikt -> properly shutdown the DXGIFactory7*
 	CautionEngine::Rendering::Renderer::s_api.Shutdown();
 	delete s_recklessEditor;
+	//CautionEngine::Rendering::Renderer::s_api.Shutdown();
 	return 0;
 }
