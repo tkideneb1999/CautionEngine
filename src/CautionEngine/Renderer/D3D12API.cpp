@@ -13,6 +13,11 @@ namespace CautionEngine::Rendering
 	{
 	}
 
+	D3D12API::~D3D12API()
+	{
+		Shutdown();
+	}
+
 	void D3D12API::Init()
 	{
 		if (m_initialized)

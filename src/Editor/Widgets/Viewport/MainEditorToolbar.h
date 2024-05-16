@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include "IEditorLayer.h"
 
@@ -18,11 +18,13 @@ namespace Reckless
 		virtual void Update() override;
 
 	public:
+		// ! \brief Adds a custom tool menu
+		// ! \param Function callback that will be invoked when the menu is executed
 		void AddToToolsMenu(const char* name, const std::function<void()>& callback);
 
 	private:
-		using TMenuActionMap = std::pair<std::string, std::function<void()>>;
-		std::vector<TMenuActionMap> m_dynamicMenus;
+		using TPairMenuAction = std::pair<std::string, std::function<void()>>;
+		std::vector<TPairMenuAction> m_dynamicMenus;
 	};
 
 DECLARE_SHARED_POINTERS(CMainEditorToolbar)

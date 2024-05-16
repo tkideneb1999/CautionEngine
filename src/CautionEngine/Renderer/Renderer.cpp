@@ -5,7 +5,8 @@
 
 #include "D3D12Helpers.h"
 
-namespace CautionEngine::Rendering {
+namespace CautionEngine::Rendering 
+{
 
 	D3D12API Renderer::s_api = {};
 

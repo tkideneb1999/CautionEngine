@@ -296,11 +296,17 @@ namespace Reckless
 		m_editorLayers.clear();
 
 		// ImGui
-		ImGui_ImplDX12_Shutdown();
-		ImGui_ImplWin32_Shutdown();
-		ImGui::DestroyContext();
+		if (ImGui::GetCurrentContext())
+		{
+			ImGui_ImplDX12_Shutdown();
+			ImGui_ImplWin32_Shutdown();
+			ImGui::DestroyContext();
+		}
 
 		// Wait for renderer to finish up
+		using namespace CautionEngine::Rendering;
+
+		//Renderer::s_api.Shutdown();
 		m_renderer.Shutdown();
 	}
 
