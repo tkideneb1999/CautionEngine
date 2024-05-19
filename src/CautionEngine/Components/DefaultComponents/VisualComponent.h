@@ -4,12 +4,11 @@
 
 namespace CautionEngine::Components
 {
-	class CAUTION_API CTransformComponent : public CEntityComponent
+	class CVisualComponent : public CEntityComponent
 	{
-	public: 
-		// TODO: benedikt -> your math library here?
-		CTransformComponent();
-		~CTransformComponent();
+	public:
+		CVisualComponent();
+		~CVisualComponent();
 
 		// Inherited via CEntityComponent
 		void Serialize() override;

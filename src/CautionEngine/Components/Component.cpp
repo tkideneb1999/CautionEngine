@@ -3,17 +3,11 @@
 
 namespace  CautionEngine::Components
 {
-	void Component::Register()
+	void CEntityComponent::Register()
 	{
 
 	}
-	void Component::Unregister()
-	{
-	}
-	void Component::Update()
-	{
-	}
-	void Component::Destroy()
+	void CEntityComponent::Unregister()
 	{
 	}
 }

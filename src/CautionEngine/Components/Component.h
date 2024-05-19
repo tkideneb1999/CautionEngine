@@ -1,30 +1,34 @@
 #pragma once
 
 #include <Core/ObjectID.h>
+#include <CautionDefinitions.h>
 
-class Entity;
+class CEntity;
 
 namespace CautionEngine::Components
 {
-	class Component
+	class CAUTION_API CEntityComponent
 	{
 	public:
-		Component() = default;
+		CEntityComponent() = default;
 
-		void Register();
-		void Unregister();
+		virtual void Register();
+		virtual void Unregister();
 
-		void Update();
-		void Destroy();
+		virtual void Update() { }
+		virtual void Destroy() { }
 
-		const ObjectID& GetID() const { return m_id; }
+		virtual void Serialize() = 0;
+		virtual void Deserialize() = 0;
 
-		Entity* GetEntityOwner() const { return m_owner; }
-		inline void SetOwner(Entity* owner) { m_owner = owner; }
+		const CObjectID& GetID() const { return m_id; }
+
+		CEntity* GetEntityOwner() const { return m_pOwner; }
+		inline void SetOwner(CEntity* owner) { m_pOwner = owner; }
 	protected:
-		friend Entity;
-		ObjectID m_componentId;
-		ObjectID m_id;
-		Entity* m_owner;
+		friend CEntity;
+		CObjectID         m_componentId;
+		CObjectID         m_id;
+		CEntity*          m_pOwner;
 	};
 }

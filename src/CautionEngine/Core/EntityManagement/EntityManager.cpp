@@ -5,7 +5,7 @@
 
 namespace CautionEngine::Core
 {
-	void EntityManager::AddEntity(Entity* entity)
+	void EntityManager::AddEntity(CEntity* entity)
 	{
 
 	}

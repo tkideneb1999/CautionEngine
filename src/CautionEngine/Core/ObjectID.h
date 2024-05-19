@@ -1,13 +1,14 @@
 #pragma once
+#include "stdafx.h"
 #include <CautionDefinitions.h>
 
-struct CAUTION_API ObjectID
+struct CAUTION_API CObjectID
 {
-	ObjectID() {}
+	CObjectID() {}
 
-	static ObjectID Generate()
+	static CObjectID Generate()
 	{
 		// TODO: implement...
-		return ObjectID();
+		return CObjectID();
 	} 
 };
