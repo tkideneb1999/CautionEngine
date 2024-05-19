@@ -12,6 +12,3 @@
 	path = thirdparty/libraries
 	url = https://github.com/AlsonEntuna/CautionEngineThirdParty
 	branch = master
-[submodule "engine/assets"]
-	path = assets
-	url = https://github.com/AlsonEntuna/CautionEngineAssets
