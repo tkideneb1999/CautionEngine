@@ -6,10 +6,11 @@ namespace CautionEngine::Core
 {
 	// NOTE: this is probably where we would need to investigate how to integrate the USD API
 	class CEntity;
-	class Scene {
+	class CScene 
+	{
 	public:
-		Scene();
-		Scene(const char* name);
+		CScene();
+		CScene(const char* name);
 		
 		void Render();
 		void Destroy();
@@ -18,6 +19,9 @@ namespace CautionEngine::Core
 		{
 			return m_entities;
 		}
+
+		void AddEntity(CEntity* pEntity);
+
 	private:
 		std::string m_sceneName;
 		std::vector<CEntity*> m_entities;

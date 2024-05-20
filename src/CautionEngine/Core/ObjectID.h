@@ -3,7 +3,7 @@
 #include "stdafx.h"
 #include <CautionDefinitions.h>
 
-struct CObjectID
+struct CAUTION_API CObjectID
 {
 	CObjectID() {}
 

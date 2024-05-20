@@ -22,5 +22,13 @@ namespace CautionEngine::Components
 	{
 	}
 
+	void CTransformComponent::Update()
+	{
+	}
+
+	void CTransformComponent::Destroy()
+	{
+	}
+
 }
 

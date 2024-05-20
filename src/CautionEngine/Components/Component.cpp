@@ -3,6 +3,9 @@
 
 namespace  CautionEngine::Components
 {
+	CEntityComponent::CEntityComponent()
+	{
+	}
 	void CEntityComponent::Register()
 	{
 

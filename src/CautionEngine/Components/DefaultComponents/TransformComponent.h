@@ -14,5 +14,8 @@ namespace CautionEngine::Components
 		// Inherited via CEntityComponent
 		void Serialize() override;
 		void Deserialize() override;
+		void Update() override;
+		void Destroy() override;
+		
 	};
 }

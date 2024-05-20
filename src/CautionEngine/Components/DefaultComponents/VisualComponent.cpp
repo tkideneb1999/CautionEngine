@@ -18,4 +18,10 @@ namespace CautionEngine::Components
 	void CVisualComponent::Deserialize()
 	{
 	}
+	void CVisualComponent::Update()
+	{
+	}
+	void CVisualComponent::Destroy()
+	{
+	}
 }
