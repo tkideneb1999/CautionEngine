@@ -1,8 +1,9 @@
 #pragma once
+
 #include "stdafx.h"
 #include <CautionDefinitions.h>
 
-struct CAUTION_API CObjectID
+struct CObjectID
 {
 	CObjectID() {}
 
@@ -11,4 +12,10 @@ struct CAUTION_API CObjectID
 		// TODO: implement...
 		return CObjectID();
 	} 
+
+	static CObjectID FromString(const char* strId)
+	{
+		// TODO: implement...
+		return CObjectID();
+	}
 };

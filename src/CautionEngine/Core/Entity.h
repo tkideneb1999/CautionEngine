@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 
-struct CObjectID;
 // !Namespaces..
 using namespace CautionEngine::Components;
 

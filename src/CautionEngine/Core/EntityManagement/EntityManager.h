@@ -3,22 +3,26 @@
 #include <string>
 #include <vector>
 
-namespace CautionEngine::Core
+struct CObjectID;
+
+namespace CautionEngine
 {
-	class CEntity;
-	class CObjectID;
-	
-	class EntityManager
+	namespace Core
 	{
-	public:
-		EntityManager() = default;
+		class CEntity;
 
-		void AddEntity(CEntity* entity);
+		class CAUTION_API CEntityManager
+		{
+		public:
+			CEntityManager() = default;
 
-		CEntity* GetEntity(CObjectID entityId);
-		CEntity* GetEntity(std::string_view entityName);
+			void AddEntity(CEntity* entity);
 
-	private:
-		std::vector<CEntity*> m_entities;
-	};
+			CEntity* GetEntity(CObjectID entityId);
+			CEntity* GetEntity(std::string_view entityName);
+
+		private:
+			std::vector<CEntity*> m_entities;
+		};
+	}
 }
