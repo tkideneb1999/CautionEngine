@@ -68,6 +68,14 @@ project "CautionEngine"
             "WINDOWS",
             "WIN32"
         }
+
+        postbuildcommands
+        {
+            "{COPYFILE} %[../../%{Paths.dxcompiler_bin_x64}/dxcompiler.dll] %[../../bin/dxcompiler.dll]",
+            "{COPYFILE} %[../../%{Paths.dxcompiler_bin_x64}/dxcompiler.dll] %[../../bin/dxil.dll]"
+        }
+
+        postbuildmessage "Copying directx dependencies..."
     
     filter "configurations:Debug"
         runtime "Debug"
