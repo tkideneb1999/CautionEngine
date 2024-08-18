@@ -18,7 +18,7 @@ extern CWinApplication* s_recklessEditor;
 int main(int argc, char** argv)
 {
 	std::vector<std::string> args(argc);
-	for (int i = 0; i < argc; i++) 
+	for (int i = 0; i < argc; i++)
 	{
 		args[i] = argv[i];
 	}
@@ -40,14 +40,10 @@ int main(int argc, char** argv)
 	// Toolbar
 	CMainEditorToolbarSharedPtr pToolbar = std::make_shared<CMainEditorToolbar>();
 	GetRecklessEditor()->AddEditorLayer(pToolbar);
-	
 
-	// TEST
-	CMainEditorToolbarSharedPtr sample = GetRecklessEditor()->GetEditorLayer<CMainEditorToolbar>();
-	sample->AddToToolsMenu("MyTest Menu", [] 
-		{
-			GetRecklessEditor()->Close();
-		});
+	// Properties
+	CProperyEditorSharedPtr pProperties = std::make_shared<CProperyEditor>();
+	GetRecklessEditor()->AddEditorLayer(pProperties);
 
 	s_recklessEditor->Run();
 	delete s_recklessEditor;
