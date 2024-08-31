@@ -4,14 +4,20 @@
 
 namespace CautionEngine::Core
 {
-	Scene::Scene()
-		: Scene("new_scene")
+	CScene::CScene()
+		: CScene("new_scene")
 	{
 		// TODO: initializations
 	}
 
-	Scene::Scene(const char* name)
+	CScene::CScene(const char* name)
 		: m_sceneName(name)
+	{
+	}
+	void CScene::Render()
+	{
+	}
+	void CScene::Destroy()
 	{
 	}
 }

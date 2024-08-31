@@ -1,3 +1,5 @@
+////// Caution Engine PCH //////
+
 #pragma once
 
 #ifndef WIN32_LEAN_AND_MEAN
@@ -54,3 +56,9 @@
 // Thirdparty Libraries
 #include <json.hpp>
 #include <glm/glm.hpp>
+
+
+// STL
+#include <vector>
+#include <string>
+#include <memory>

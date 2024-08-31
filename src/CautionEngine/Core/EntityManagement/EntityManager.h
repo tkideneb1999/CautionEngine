@@ -8,10 +8,10 @@ namespace CautionEngine::Core
 	class CEntity;
 	class CObjectID;
 	
-	class EntityManager
+	class CEntityManager
 	{
 	public:
-		EntityManager() = default;
+		CEntityManager() = default;
 
 		void AddEntity(CEntity* entity);
 

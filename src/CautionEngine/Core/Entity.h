@@ -4,16 +4,13 @@
 
 #include <Components/Component.h>
 
-#include <string>
-#include <vector>
-
 struct CObjectID;
 // !Namespaces..
 using namespace CautionEngine::Components;
 
 namespace CautionEngine::Core
 {
-	class CEntity : public CObject
+	class CAUTION_API CEntity : public CObject
 	{
 	public:
 		CEntity();

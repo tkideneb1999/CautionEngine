@@ -3,8 +3,6 @@
 #include "IEditorLayer.h"
 
 #include <functional>
-#include <map>
-#include <string>
 
 namespace Reckless
 {

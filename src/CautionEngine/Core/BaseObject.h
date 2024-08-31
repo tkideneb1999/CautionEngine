@@ -4,7 +4,7 @@
 
 namespace CautionEngine::Core
 {
-	class CObject
+	class CAUTION_API CObject
 	{
 	public:
 		CObject() = default;

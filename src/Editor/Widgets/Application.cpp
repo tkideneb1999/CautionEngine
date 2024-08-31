@@ -196,6 +196,10 @@ namespace Reckless
 			descriptorManager->GetCbvSrvUavHeap()->GetHeapPtr().Get(),
 			font_descriptor_handle.cpuHandle, font_descriptor_handle.gpuHandle
 		);
+
+
+		// Initialize Engine Core Systems
+		// TODO: ////
 	}
 
 	void CWinApplication::Run()

@@ -10,5 +10,10 @@ struct CAUTION_API CObjectID
 	{
 		// TODO: implement...
 		return CObjectID();
-	} 
+	}
+
+	static CObjectID FromString(const std::string& objectIdStr)
+	{
+		return CObjectID();
+	}
 };
