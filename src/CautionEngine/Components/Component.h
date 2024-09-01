@@ -7,7 +7,7 @@ class CEntity;
 
 namespace CautionEngine::Components
 {
-	class CAUTION_API CEntityComponent
+	class CAUTION_CLASS CEntityComponent
 	{
 	public:
 		CEntityComponent() = default;

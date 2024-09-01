@@ -10,7 +10,7 @@ using namespace Microsoft::WRL;
 
 namespace CautionEngine::Rendering
 {
-	CAUTION_API inline void THROW_IF_FAILED(HRESULT res, const char* msg)
+	CAUTION_CLASS inline void THROW_IF_FAILED(HRESULT res, const char* msg)
 	{
 		if (!SUCCEEDED(res))
 		{

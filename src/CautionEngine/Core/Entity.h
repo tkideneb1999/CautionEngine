@@ -10,7 +10,7 @@ using namespace CautionEngine::Components;
 
 namespace CautionEngine::Core
 {
-	class CAUTION_API CEntity : public CObject
+	class CAUTION_CLASS CEntity : public CObject
 	{
 	public:
 		CEntity();

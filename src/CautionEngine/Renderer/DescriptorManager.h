@@ -8,7 +8,7 @@
 namespace CautionEngine::Rendering
 {
 
-	class CAUTION_API DescriptorManager
+	class CAUTION_CLASS DescriptorManager
 	{
 	private:
 		D3D12::DescriptorHeap m_cbv_srv_uav_descHeap;

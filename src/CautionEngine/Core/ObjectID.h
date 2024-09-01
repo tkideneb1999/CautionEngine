@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include <CautionDefinitions.h>
 
-struct CAUTION_API CObjectID
+struct CAUTION_CLASS CObjectID
 {
 	CObjectID() {}
 

@@ -8,7 +8,7 @@ namespace CautionEngine::Rendering
 	// forward declaration from RenderTargetManager.h
 	class RenderTargetManager;
 
-	class CAUTION_API RenderTarget
+	class CAUTION_CLASS RenderTarget
 	{
 		friend class RenderTargetManager;
 	public:

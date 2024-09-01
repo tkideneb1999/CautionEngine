@@ -9,13 +9,13 @@ using namespace Microsoft::WRL;
 
 namespace CautionEngine::Rendering::D3D12
 {
-	struct CAUTION_API DescriptorHeapHandle
+	struct CAUTION_CLASS DescriptorHeapHandle
 	{
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle;
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle;
 	};
 
-	class CAUTION_API DescriptorHeap
+	class CAUTION_CLASS DescriptorHeap
 	{
 	private:
 		ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = {};

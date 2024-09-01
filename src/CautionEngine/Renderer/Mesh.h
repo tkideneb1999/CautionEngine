@@ -5,7 +5,7 @@
 
 namespace CautionEngine::Rendering
 {
-	class CAUTION_API Mesh
+	class CAUTION_CLASS Mesh
 	{
 
 	};
