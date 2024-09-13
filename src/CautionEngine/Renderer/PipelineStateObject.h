@@ -23,6 +23,9 @@ namespace CautionEngine::Rendering
 		// RTV Formats
 
 
+		// Depth & Stencil Behaviour
+
+
 		// Rasterizer State
 		ShaderFillMode m_fillMode = SHADER_FILL_SOLID;
 		ShaderCullMode m_cullMode = SHADER_CULL_BACK;

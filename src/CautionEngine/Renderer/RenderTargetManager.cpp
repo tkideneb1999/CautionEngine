@@ -23,7 +23,7 @@ namespace CautionEngine::Rendering
 			D3D12_RENDER_TARGET_VIEW_DESC desc = {};
 			desc.Format = (DXGI_FORMAT)format;
 
-			Renderer::s_api.GetDevicePtr()->CreateRenderTargetView(
+			D3D12API::Get()->GetDevicePtr()->CreateRenderTargetView(
 				rt.resourceView.Get(), &desc, rt.descriptorHeapHandle.cpuHandle
 			);
 		}

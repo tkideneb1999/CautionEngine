@@ -190,7 +190,7 @@ namespace Reckless
 		DescriptorManager* descriptorManager = &m_renderer.descriptorManager;
 		D3D12::DescriptorHeapHandle font_descriptor_handle = descriptorManager->GetCbvSrvUavHeap()->Allocate();
 		ImGui_ImplDX12_Init(
-			m_renderer.s_api.GetDevicePtr().Get(), 
+			m_renderer.GetD3D12DevicePtr(),
 			NUM_BACK_BUFFERS, 
 			DXGI_FORMAT_R8G8B8A8_UNORM, //TODO: Make this always match definition in renderer
 			descriptorManager->GetCbvSrvUavHeap()->GetHeapPtr().Get(),

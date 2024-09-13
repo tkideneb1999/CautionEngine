@@ -35,6 +35,7 @@ namespace CautionEngine::Rendering
 
 	public:
 		Shader() = delete;
+		Shader(const Shader& other) = delete;
 		CAUTION_API Shader(const LPCWSTR shaderFilepath);
 
 		CAUTION_API void Serialize();

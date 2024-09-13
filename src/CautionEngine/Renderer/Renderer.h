@@ -5,6 +5,7 @@
 #include "D3D12API.h"
 #include "DescriptorManager.h"
 #include "RenderTarget.h"
+#include "ShaderManager.h"
 
 #include <vector>
 
@@ -19,7 +20,7 @@ namespace CautionEngine::Rendering
 	class CAUTION_API Renderer
 	{
 	public:
-		static D3D12API s_api;
+		D3D12API* const pD3D12API;
 
 		DescriptorManager descriptorManager;
 
@@ -48,12 +49,16 @@ namespace CautionEngine::Rendering
 		UINT64 m_fenceValue = 0;
 		ComPtr<ID3D12Fence> m_fence;
 
+		ShaderManager m_shaderManager;
+
 	public:
 		Renderer();
 		virtual ~Renderer() = default;
 
 		void Render();
 
+		static void InitD3D12API() { D3D12API::Get()->Init(); }
+		static ID3D12Device* GetD3D12DevicePtr() { return D3D12API::Get()->GetDevicePtr().Get(); }
 		void InitSwapChain(int width, int height, int frameCount, HWND hWnd);
 		void InitDescriptorHeaps(int cbv_srv_uav_count, int dsv_count, int rtv_count, int sampler_count);
 		void InitCommandFrames();

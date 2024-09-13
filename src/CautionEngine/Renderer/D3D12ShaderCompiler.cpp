@@ -20,7 +20,8 @@ namespace CautionEngine::Rendering {
 
 		// Get Vertex Shader Inputs
 		D3D12_SHADER_DESC* vsShaderDesc = &shaderDescs[SHADER_STAGE_VERTEX];
-		m_pShader->m_InputElementDescs = std::vector<D3D12_INPUT_ELEMENT_DESC>(vsShaderDesc->InputParameters);
+		m_pShader->m_InputElementDescs = std::vector<D3D12_INPUT_ELEMENT_DESC>();
+		m_pShader->m_InputElementDescs.reserve(vsShaderDesc->InputParameters);
 
 		m_pShader->m_vsInputs = std::vector<ShaderInput>(vsShaderDesc->InputParameters);
 		for (unsigned int i = 0; i < vsShaderDesc->InputParameters; i++) {
@@ -188,18 +189,6 @@ namespace CautionEngine::Rendering {
 		{
 			std::cout << "Root Signature Serialization failed:\n" << GetErrorMessageFromBlob(errors.Get()) << std::endl;
 		}
-
-		// Generate PSO
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-		m_pShader->SetShaderStageInPSODesc(&psoDesc.VS, SHADER_STAGE_VERTEX);
-		m_pShader->SetShaderStageInPSODesc(&psoDesc.HS, SHADER_STAGE_HULL);
-		m_pShader->SetShaderStageInPSODesc(&psoDesc.DS, SHADER_STAGE_DOMAIN);
-		m_pShader->SetShaderStageInPSODesc(&psoDesc.GS, SHADER_STAGE_GEOMETRY);
-		m_pShader->SetShaderStageInPSODesc(&psoDesc.PS, SHADER_STAGE_PIXEL);
-
-		// TODO: Add Input layout here
-		psoDesc.InputLayout.NumElements = m_pShader->m_InputElementDescs.size();
-		psoDesc.InputLayout.pInputElementDescs = m_pShader->m_InputElementDescs.data();
 				
 		return true;
 	}
@@ -295,8 +284,6 @@ namespace CautionEngine::Rendering {
 
 	bool D3D12ShaderCompiler::Compile()
 	{
-		PSOInfo psoInfo;
-
 		// Load Shader
 		ComPtr<IDxcBlobEncoding> encodingSource = nullptr;
 		m_utils->LoadFile(m_pShader->GetFilepath(), nullptr, &encodingSource);

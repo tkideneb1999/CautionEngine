@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 
 	// API needs to be initialized separately, because Engine is a DLL
 	// https://gamedev.stackexchange.com/questions/128197/why-do-i-get-this-error-about-dllmain-when-using-d3d-from-within-a-dll
-	CautionEngine::Rendering::Renderer::s_api.Init();
+	CautionEngine::Rendering::Renderer::InitD3D12API();
 	// TODO: make proper initialization of the RecklessApplication
 	s_recklessEditor = new CWinApplication(CLASS_NAME, WINDOW_NAME, args);
 

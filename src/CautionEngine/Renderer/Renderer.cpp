@@ -5,12 +5,16 @@
 
 #include "D3D12Helpers.h"
 
+//TEMP
+#include "PipelineStateObject.h"
+
 namespace CautionEngine::Rendering 
 {
 
-	D3D12API Renderer::s_api = {};
-
-	Renderer::Renderer() { }
+	Renderer::Renderer()
+		: m_shaderManager()
+		, pD3D12API(D3D12API::Get())
+	{ }
 
 	void Renderer::Render()
 	{
@@ -19,7 +23,7 @@ namespace CautionEngine::Rendering
 		if (!SUCCEEDED(res))
 		{
 			if(res == DXGI_ERROR_DEVICE_REMOVED)
-				s_api.GatherDREDOUTput();
+				pD3D12API->GatherDREDOUTput();
 		}
 		CommandFrame& curFrame = m_commandFrames[m_curFrameIndex];
 		m_fenceValue++;
@@ -46,7 +50,7 @@ namespace CautionEngine::Rendering
 		commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 		commandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 		THROW_IF_FAILED(
-			s_api.GetDevicePtr()->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&m_commandQueue)),
+			pD3D12API->GetDevicePtr()->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&m_commandQueue)),
 			"Command Queue Creation Failed"
 			);
 		m_commandQueue->SetName(L"Renderer Command Queue");
@@ -72,7 +76,7 @@ namespace CautionEngine::Rendering
 
 		ComPtr<IDXGISwapChain1> i_swapChain;
 		THROW_IF_FAILED(
-			s_api.GetFactoryPtr()->CreateSwapChainForHwnd(m_commandQueue.Get(), hWnd, &swapChainDesc, &swapChainFullScreenDesc, nullptr, i_swapChain.GetAddressOf()),
+			pD3D12API->GetFactoryPtr()->CreateSwapChainForHwnd(m_commandQueue.Get(), hWnd, &swapChainDesc, &swapChainFullScreenDesc, nullptr, i_swapChain.GetAddressOf()),
 			"Swap Chain Creation Failed"
 			);
 		THROW_IF_FAILED(i_swapChain.As(&m_swapChain), "Cast to Swap Chain Failed");
@@ -90,7 +94,7 @@ namespace CautionEngine::Rendering
 			renderTarget->SetName((std::wstring(L"SwapChain Render Target ") + std::to_wstring(i)).c_str());
 			D3D12::DescriptorHeapHandle swapChainBufferHandle = descriptorManager.AllocateRTV();
 			m_swapChainRenderTargets.push_back(RenderTarget(swapChainBufferHandle, renderTarget));
-			s_api.GetDevicePtr()->CreateRenderTargetView(
+			pD3D12API->GetDevicePtr()->CreateRenderTargetView(
 				m_swapChainRenderTargets[i].resourceView.Get(), nullptr, m_swapChainRenderTargets[i].descriptorHeapHandle.cpuHandle
 			);
 		}
@@ -112,7 +116,7 @@ namespace CautionEngine::Rendering
 
 	void Renderer::InitDescriptorHeaps(int cbv_srv_uav_count, int dsv_count, int rtv_count, int sampler_count)
 	{
-		descriptorManager.Init(&s_api, cbv_srv_uav_count, dsv_count, rtv_count, sampler_count);
+		descriptorManager.Init(pD3D12API, cbv_srv_uav_count, dsv_count, rtv_count, sampler_count);
 	}
 
 	void Renderer::InitCommandFrames()
@@ -128,14 +132,14 @@ namespace CautionEngine::Rendering
 			m_commandFrames[i].fenceValue = 0;
 			
 			THROW_IF_FAILED(
-				s_api.GetDevicePtr()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&(m_commandFrames[i].commandAllocator))),
+				pD3D12API->GetDevicePtr()->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&(m_commandFrames[i].commandAllocator))),
 				"Command Allocator Creation Failed"
 			);
 
 			// TODO: Remove this
 			m_commandLists.push_back(ComPtr<ID3D12GraphicsCommandList6>());
 			THROW_IF_FAILED(
-				s_api.GetDevicePtr()->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&(m_commandLists[i]))),
+				pD3D12API->GetDevicePtr()->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&(m_commandLists[i]))),
 				"Command List Creation Failed"
 			);
 		}
@@ -159,7 +163,7 @@ namespace CautionEngine::Rendering
 	void Renderer::InitFrameFence()
 	{
 		THROW_IF_FAILED(
-			s_api.GetDevicePtr()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)),
+			pD3D12API->GetDevicePtr()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence)),
 			"Fence creation failed"
 		);
 		m_fenceEvent = CreateEvent(nullptr, false, false, nullptr);
@@ -241,9 +245,16 @@ namespace CautionEngine::Rendering
 		HRESULT res = D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error);
 		THROW_IF_FAILED(res, "Root Signature Serialization failed");
 		THROW_IF_FAILED(
-			s_api.GetDevicePtr()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)),
+			pD3D12API->GetDevicePtr()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)),
 			"Couldn't create Root Signature"
 		);
+
+		// TEMP: Shader Manager
+		std::string shaderPath = "F:\\projects\\CautionEngine\\src\\CautionEngine\\Shaders\\Fallback.hlsl";
+		Shader* pTestShader = m_shaderManager.CreateShader(shaderPath);
+		PipelineStateObject pso = {};
+		pso.SetShader(pTestShader);
+		pso.Generate();
 	}
 
 	void Renderer::CreateInitialPipelineState()
@@ -287,7 +298,7 @@ namespace CautionEngine::Rendering
 		{
 			RenderTarget& renderTarget = m_swapChainRenderTargets[i];
 			m_swapChain->GetBuffer(i, IID_PPV_ARGS(&renderTarget.resourceView));
-			s_api.GetDevicePtr()->CreateRenderTargetView(
+			pD3D12API->GetDevicePtr()->CreateRenderTargetView(
 				renderTarget.resourceView.Get(), nullptr, renderTarget.descriptorHeapHandle.cpuHandle
 			);
 		}

@@ -9,6 +9,8 @@
 
 namespace CautionEngine::Rendering
 {
+	D3D12API g_d3d12API = {};
+
 	D3D12API::D3D12API()
 	{
 	}
@@ -16,6 +18,11 @@ namespace CautionEngine::Rendering
 	D3D12API::~D3D12API()
 	{
 		Shutdown();
+	}
+
+	D3D12API* const D3D12API::Get()
+	{
+		return &g_d3d12API;
 	}
 
 	void D3D12API::Init()
@@ -60,8 +67,9 @@ namespace CautionEngine::Rendering
 
 	void D3D12API::Shutdown()
 	{
-		m_device->Release();
-		m_factory->Release();
+		m_device.Reset();
+		m_factory.Reset();
+		
 	}
 
 	void D3D12API::GatherDREDOUTput()

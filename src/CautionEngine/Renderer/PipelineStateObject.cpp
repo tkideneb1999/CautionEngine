@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "PipelineStateObject.h"
+#include "D3D12API.h"
+#include "D3D12Helpers.h"
 
 #include <exception>
 
@@ -68,7 +70,11 @@ namespace CautionEngine::Rendering {
 		// - SampleDesc (Multi Sample)
 		
 		// - DepthStencil State TODO
-		
+		psoDesc.DepthStencilState.DepthEnable = false; // TODO: Make this available
+		//psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+		//psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+
+		psoDesc.DepthStencilState.StencilEnable = false; // TODO: Make this optional
 		
 		// - StreamOutput (for readback from GPU, can be ignored for now)
 
@@ -90,6 +96,10 @@ namespace CautionEngine::Rendering {
 			psoDesc.RasterizerState.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
 		// - Topology type
 		psoDesc.PrimitiveTopologyType = (D3D12_PRIMITIVE_TOPOLOGY_TYPE)m_topologyType;
-
+		D3D12API* const pApi = D3D12API::Get();
+		THROW_IF_FAILED(
+			pApi->GetDevicePtr()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_d3d12Pso)),
+			"Failed to create PSO"
+		);
 	}
 }

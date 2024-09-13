@@ -133,14 +133,4 @@ namespace CautionEngine::Rendering {
 		ShaderLogicOpType logicOp = SHADER_LOGIC_OP_CLEAR;
 		UINT8 RenderTargetWriteMask = 0;
 	};
-
-	struct PSOInfo
-	{
-		ShaderFillMode fillMode = SHADER_FILL_SOLID;
-		ShaderCullMode cullMode = SHADER_CULL_BACK;
-		ShaderTopologyType topologyType = SHADER_TOPOLOGY_TRIANGLE;
-		bool useConservativeRaster = false;
-		bool useIndependentBlend = false;
-		BlendInfo blendInfos[8];
-	};
 }

@@ -21,6 +21,8 @@ namespace CautionEngine::Rendering
 		D3D12API(const D3D12API& original) = delete;
 		D3D12API& operator=(const D3D12API& original) = delete;
 
+		static D3D12API* const Get();
+
 		const ComPtr<ID3D12Device8> GetDevicePtr()
 		{ 
 			if (m_initialized)
