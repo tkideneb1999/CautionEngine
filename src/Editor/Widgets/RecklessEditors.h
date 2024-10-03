@@ -5,3 +5,4 @@
 #include "Viewport/MainEditorToolbar.h"
 
 #include "AssetBrowser/AssetBrowser.h"
+#include "PropertyEditor/PropertyEditor.h"

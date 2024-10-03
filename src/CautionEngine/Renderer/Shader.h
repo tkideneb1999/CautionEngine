@@ -37,16 +37,16 @@ namespace CautionEngine::Rendering
 	public:
 		Shader() = delete;
 		Shader(const Shader& other) = delete;
-		CAUTION_API Shader(const LPCWSTR shaderFilepath);
+		CAUTION_CLASS Shader(const LPCWSTR shaderFilepath);
 
-		CAUTION_API void Serialize();
-		CAUTION_API void Deserialize();
+		CAUTION_CLASS void Serialize();
+		CAUTION_CLASS void Deserialize();
 
 		bool GetStageShaderCode(const void** ppBuffer, size_t* pLength, ShaderStage stage);
 		ID3D12RootSignature* GetRootSignature() { return m_rootSignature.Get(); }
 		const std::vector<D3D12_INPUT_ELEMENT_DESC>* GetInputLayoutDescs() { return &m_InputElementDescs; }
 
-		CAUTION_API const LPCWSTR GetFilepath() { return m_filepath; }
+		CAUTION_CLASS const LPCWSTR GetFilepath() { return m_filepath; }
 
 	private:
 		bool SetShaderStageInPSODesc(D3D12_SHADER_BYTECODE* pByteCodeStructure, ShaderStage stage);

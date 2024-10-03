@@ -1,13 +1,19 @@
 #pragma once
+#include "stdafx.h"
 #include <CautionDefinitions.h>
 
-struct CAUTION_API ObjectID
+struct CAUTION_CLASS CObjectID
 {
-	ObjectID() {}
+	CObjectID() {}
 
-	static ObjectID Generate()
+	static CObjectID Generate()
 	{
 		// TODO: implement...
-		return ObjectID();
-	} 
+		return CObjectID();
+	}
+
+	static CObjectID FromString(const std::string& objectIdStr)
+	{
+		return CObjectID();
+	}
 };

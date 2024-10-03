@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "AssetBrowser.h"
 
 namespace Reckless

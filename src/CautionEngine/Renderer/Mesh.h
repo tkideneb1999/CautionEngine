@@ -6,14 +6,14 @@
 
 namespace CautionEngine::Rendering
 {
-	class CAUTION_API Vertex
+	class CAUTION_CLASS Vertex
 	{
 	public:
 		glm::vec4 position;
 		glm::vec4 color;
 	};
 
-	class CAUTION_API Mesh
+	class CAUTION_CLASS Mesh
 	{
 	public:
 		Mesh();

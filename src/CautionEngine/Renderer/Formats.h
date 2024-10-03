@@ -5,7 +5,7 @@
 
 namespace CautionEngine::Rendering
 {
-	enum CAUTION_API RenderFormat
+	enum CAUTION_CLASS RenderFormat
 	{
 		RENDER_FORMAT_UNKOWN = DXGI_FORMAT_UNKNOWN,
 

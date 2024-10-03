@@ -11,7 +11,7 @@ using namespace Microsoft::WRL;
 
 namespace CautionEngine::Rendering
 {
-	class CAUTION_API D3D12API
+	class CAUTION_CLASS D3D12API
 	{
 	public:
 		D3D12API();

@@ -4,7 +4,7 @@
 #include <d3d12.h>
 
 namespace CautionEngine::Rendering {
-	enum CAUTION_API ShaderVariableTypes {
+	enum CAUTION_CLASS ShaderVariableTypes {
 		SHADER_VAR_TYPE_NONE = 0,
 		SHADER_VAR_TYPE_UINT = 1,
 		SHADER_VAR_TYPE_INT = 2,
@@ -12,7 +12,7 @@ namespace CautionEngine::Rendering {
 		SHADER_VAR_TYPE_BOOL = 4,
 	};
 
-	enum CAUTION_API ShaderStage {
+	enum CAUTION_CLASS ShaderStage {
 		SHADER_STAGE_VERTEX = 0,
 		SHADER_STAGE_HULL = 1,
 		SHADER_STAGE_DOMAIN = 2,
@@ -21,7 +21,7 @@ namespace CautionEngine::Rendering {
 		SHADER_STAGE_COUNT,
 	};
 
-	enum CAUTION_API ShaderModel {
+	enum CAUTION_CLASS ShaderModel {
 		SHADER_MODEL_6_0 = 0,
 		SHADER_MODEL_6_1 = 1,
 		SHADER_MODEL_6_2 = 2,
@@ -31,7 +31,7 @@ namespace CautionEngine::Rendering {
 		SHADER_MODEL_6_6 = 6,
 	};
 
-	enum CAUTION_API ShaderInputSemantic {
+	enum CAUTION_CLASS ShaderInputSemantic {
 		SHADER_INPUT_NONE,
 		SHADER_INPUT_POSITION,
 		SHADER_INPUT_NORMAL,
@@ -41,25 +41,25 @@ namespace CautionEngine::Rendering {
 		SHADER_INPUT_TEXCOORD,
 	};
 
-	enum CAUTION_API ShaderFillMode {
+	enum CAUTION_CLASS ShaderFillMode {
 		SHADER_FILL_WIREFRAME = D3D12_FILL_MODE_WIREFRAME,
 		SHADER_FILL_SOLID = D3D12_FILL_MODE_SOLID,
 	};
 
-	enum CAUTION_API ShaderCullMode {
+	enum CAUTION_CLASS ShaderCullMode {
 		SHADER_CULL_NONE = D3D12_CULL_MODE_NONE,
 		SHADER_CULL_FRONT = D3D12_CULL_MODE_FRONT,
 		SHADER_CULL_BACK = D3D12_CULL_MODE_BACK,
 	};
 
-	enum CAUTION_API ShaderTopologyType{
+	enum CAUTION_CLASS ShaderTopologyType{
 		SHADER_TOPOLOGY_POINT = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT,
 		SHADER_TOPOLOGY_LINE = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE,
 		SHADER_TOPOLOGY_TRIANGLE = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
 		SHADER_TOPOLOGY_PATCH = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH,
 	};
 
-	enum CAUTION_API ShaderBlendType {
+	enum CAUTION_CLASS ShaderBlendType {
 		SHADER_BLEND_ZERO = D3D12_BLEND_ZERO,
 		SHADER_BLEND_ONE = D3D12_BLEND_ONE,
 		SHADER_BLEND_SRC_COLOR = D3D12_BLEND_SRC_COLOR,
@@ -79,7 +79,7 @@ namespace CautionEngine::Rendering {
 		SHADER_BLEND_INV_SRC1_ALPHA = D3D12_BLEND_INV_SRC1_ALPHA,
 	};
 
-	enum CAUTION_API ShaderBlendOpType {
+	enum CAUTION_CLASS ShaderBlendOpType {
 		SHADER_BLEND_OP_ADD = D3D12_BLEND_OP_ADD,
 		SHADER_BLEND_OP_SUBTRACT = D3D12_BLEND_OP_SUBTRACT,
 		SHADER_BLEND_OP_REV_SUBTRACT = D3D12_BLEND_OP_REV_SUBTRACT,
@@ -87,7 +87,7 @@ namespace CautionEngine::Rendering {
 		SHADER_BLEND_OP_MAX = D3D12_BLEND_OP_MAX,
 	};
 
-	enum CAUTION_API ShaderLogicOpType {
+	enum CAUTION_CLASS ShaderLogicOpType {
 		SHADER_LOGIC_OP_CLEAR = D3D12_LOGIC_OP_CLEAR,
 		SHADER_LOGIC_OP_SET = D3D12_LOGIC_OP_SET,
 		SHADER_LOGIC_OP_COPY = D3D12_LOGIC_OP_COPY,
@@ -121,12 +121,12 @@ namespace CautionEngine::Rendering {
 		unsigned short int amount;
 	};
 
-	struct CAUTION_API ShaderConstantBuffer {
+	struct CAUTION_CLASS ShaderConstantBuffer {
 		const char* name;
 		D3D12_ROOT_PARAMETER1 rootData;
 	};
 
-	struct CAUTION_API BlendInfo {
+	struct CAUTION_CLASS BlendInfo {
 		bool useBlend = false;
 		bool useLogicalOp = false;
 

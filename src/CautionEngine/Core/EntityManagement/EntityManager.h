@@ -5,16 +5,20 @@
 
 namespace CautionEngine::Core
 {
-	class Entity;
-	/*class BaseObject;*/
-	class EntityManager
+	class CEntity;
+	class CObjectID;
+	
+	class CEntityManager
 	{
 	public:
-		EntityManager() = default;
+		CEntityManager() = default;
 
-		void AddEntity(Entity* entity);
+		void AddEntity(CEntity* entity);
+
+		CEntity* GetEntity(CObjectID entityId);
+		CEntity* GetEntity(std::string_view entityName);
 
 	private:
-		std::vector<Entity*> m_entities;
+		std::vector<CEntity*> m_entities;
 	};
 }

@@ -14,13 +14,13 @@
 
 namespace CautionEngine::Rendering 
 {
-	struct CAUTION_API CommandFrame
+	struct CAUTION_CLASS CommandFrame
 	{
 		ComPtr<ID3D12CommandAllocator> commandAllocator;
 		UINT64 fenceValue;
 	};
 
-	class CAUTION_API Renderer
+	class CAUTION_CLASS Renderer
 	{
 	public:
 		D3D12API* const pD3D12API;

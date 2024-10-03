@@ -7,9 +7,14 @@ IncludeDirectories["ImGuizmo"] = "thirdparty/imguizmo"
 IncludeDirectories["glm"] = "thirdparty/glm"
 IncludeDirectories["json"] = "thirdparty/libraries/json"
 
+-- Paths
+Paths = {}
+Paths["dxcompiler_bin_x64"] = "thirdparty/libraries/dxcompiler/bin/x64"
+
 -- Librarian Additional Directories
 LibraryDirectories = {}
 LibraryDirectories["usd_dir"] = "%{wks.location}/thirdparty/usd/bin/lib"
+LibraryDirectories["dxcompiler"] = "%{wks.location}/thirdparty/libraries/dxcompiler/lib"
 
 -- Libraries (*.lib)
 Library = {}

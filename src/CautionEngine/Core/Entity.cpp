@@ -8,21 +8,37 @@
 
 namespace CautionEngine::Core
 {
-	Entity::Entity()
+	CEntity::CEntity()
 		: m_name("EMPTY_ENTITY")
 	{
 		// Default Component
-		AddComponent(std::make_shared<Components::TransformComponent>());
+		AddComponent(std::make_shared<Components::CTransformComponent>());
 	}
 
-	Entity::Entity(const char* name)
+	CEntity::CEntity(const char* name)
 		: m_name(name)
 	{
 	}
-	void Entity::RemoveComponent(Component* component)
+
+	bool CEntity::RemoveComponent(CEntityComponent* pComponentToRemove)
 	{
+		for (auto& pComponent : m_components)
+		{
+			if (pComponent.get() == pComponentToRemove)
+			{
+				std::vector<std::shared_ptr<CEntityComponent>>::iterator compIter = std::find(m_components.begin(), m_components.end(), pComponent);
+				if (compIter == m_components.end())
+					return false;
+
+				// Removes the element
+				m_components.erase(compIter);
+				return true;
+			}
+		}
+		return false;
 	}
-	void Entity::Destroy()
+
+	void CEntity::Destroy()
 	{
 		for (const auto& component : m_components)
 		{
@@ -30,7 +46,7 @@ namespace CautionEngine::Core
 		}
 	}
 
-	Component* Entity::GetComponentByID(const ObjectID* id)
+	CEntityComponent* CEntity::GetComponentByID(const CObjectID* id)
 	{
 		return nullptr;
 	}

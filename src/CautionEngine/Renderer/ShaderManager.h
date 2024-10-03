@@ -7,7 +7,7 @@
 
 namespace CautionEngine::Rendering {
 
-	class CAUTION_API ShaderManager 
+	class CAUTION_CLASS ShaderManager 
 	{
 	private:
 		std::hash<std::string_view> m_hash;

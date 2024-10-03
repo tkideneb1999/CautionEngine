@@ -4,14 +4,22 @@
 
 namespace CautionEngine::Components
 {
-	TransformComponent::TransformComponent()
+	CTransformComponent::CTransformComponent()
 	{
 
 	}
 
-	TransformComponent::~TransformComponent()
+	CTransformComponent::~CTransformComponent()
 	{
 
+	}
+
+	void CTransformComponent::Serialize()
+	{
+	}
+
+	void CTransformComponent::Deserialize()
+	{
 	}
 
 }
