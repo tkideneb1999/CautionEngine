@@ -5,9 +5,6 @@
 
 #include "D3D12Helpers.h"
 
-//TEMP
-#include "PipelineStateObject.h"
-
 namespace CautionEngine::Rendering 
 {
 
@@ -248,13 +245,6 @@ namespace CautionEngine::Rendering
 			pD3D12API->GetDevicePtr()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)),
 			"Couldn't create Root Signature"
 		);
-
-		// TEMP: Shader Manager
-		std::string shaderPath = "F:\\projects\\CautionEngine\\src\\CautionEngine\\Shaders\\Fallback.hlsl";
-		Shader* pTestShader = m_shaderManager.CreateShader(shaderPath);
-		PipelineStateObject pso = {};
-		pso.SetShader(pTestShader);
-		pso.Generate();
 	}
 
 	void Renderer::CreateInitialPipelineState()

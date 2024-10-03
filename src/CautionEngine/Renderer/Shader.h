@@ -29,6 +29,7 @@ namespace CautionEngine::Rendering
 
 		std::vector<ShaderInput> m_vsInputs;
 		std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputElementDescs;
+		std::vector<std::string> m_semanticNames;
 
 		// Used for validation
 		std::vector<D3D12ConstantBufferLayout> m_bufferLayouts;

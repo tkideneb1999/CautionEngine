@@ -19,6 +19,7 @@ namespace CautionEngine::Rendering
 		Shader* m_pShader = nullptr;
 
 		ShaderTopologyType m_topologyType = SHADER_TOPOLOGY_TRIANGLE;
+		D3D12_PRIMITIVE_TOPOLOGY m_IATopologyType = D3D12_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
 		// RTV Formats
 
@@ -28,7 +29,7 @@ namespace CautionEngine::Rendering
 
 		// Rasterizer State
 		ShaderFillMode m_fillMode = SHADER_FILL_SOLID;
-		ShaderCullMode m_cullMode = SHADER_CULL_BACK;
+		ShaderCullMode m_cullMode = SHADER_CULL_NONE;
 		bool m_doConservativeRaster = true;
 
 		//Blend State
@@ -48,7 +49,7 @@ namespace CautionEngine::Rendering
 		void SetShader(Shader* pShader) { m_pShader = pShader; }
 		const Shader* const GetShader() const { return m_pShader; }
 
-		void SetTopologyType(ShaderTopologyType type) { m_topologyType = type; }
+		void SetTopologyType(ShaderTopologyType type);
 		ShaderTopologyType GetTopologyType() { return m_topologyType; }
 
 		void SetFillMode(ShaderFillMode fillMode) { m_fillMode = fillMode; }
@@ -57,8 +58,10 @@ namespace CautionEngine::Rendering
 		void SetCullMode(ShaderCullMode cullMode) { m_cullMode = cullMode; }
 		ShaderCullMode GetCullMode() { return m_cullMode; }
 
-		void SetDoConservativeRaster(bool doConservativeRaster) { m_doConservativeRaster = true; }
+		void SetDoConservativeRaster(bool doConservativeRaster) { m_doConservativeRaster = doConservativeRaster; }
 		bool GetDoConservativeRaster() { return m_doConservativeRaster; }
 
+		void SetState(ID3D12GraphicsCommandList* pCommandList);
+		ID3D12PipelineState* GetD3D12PipelineState() const { return m_d3d12Pso.Get(); }
 	};
 }

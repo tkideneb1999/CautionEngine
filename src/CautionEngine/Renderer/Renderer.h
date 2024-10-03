@@ -9,6 +9,9 @@
 
 #include <vector>
 
+#include "Mesh.h"
+#include "PipelineStateObject.h"
+
 namespace CautionEngine::Rendering 
 {
 	struct CAUTION_API CommandFrame

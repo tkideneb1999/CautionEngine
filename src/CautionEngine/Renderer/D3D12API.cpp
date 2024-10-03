@@ -43,10 +43,11 @@ namespace CautionEngine::Rendering
 #endif
 
 		THROW_IF_FAILED(
-			CreateDXGIFactory2( // TODO: benedikt -> you might want to initialize the DXGI factory outside of this project?
-				// https://gamedev.stackexchange.com/questions/128197/why-do-i-get-this-error-about-dllmain-when-using-d3d-from-within-a-dll
+			CreateDXGIFactory2(
 #if _DEBUG
 				DXGI_CREATE_FACTORY_DEBUG,
+#else
+				0,
 #endif
 				IID_PPV_ARGS(&m_factory)
 			),

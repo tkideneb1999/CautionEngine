@@ -63,11 +63,16 @@ namespace CautionEngine::Rendering {
 		// - DSVFormats
 		psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT; // TODO: Make this not hard coded
 		// - RTVFormats
+		psoDesc.NumRenderTargets = 1;
+		psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 		
 		// - Index Buffer
 		psoDesc.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
 		
 		// - SampleDesc (Multi Sample)
+		psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+		psoDesc.SampleDesc.Count = 1;
+		psoDesc.SampleDesc.Quality = 0;
 		
 		// - DepthStencil State TODO
 		psoDesc.DepthStencilState.DepthEnable = false; // TODO: Make this available
@@ -101,5 +106,30 @@ namespace CautionEngine::Rendering {
 			pApi->GetDevicePtr()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_d3d12Pso)),
 			"Failed to create PSO"
 		);
+	}
+	void PipelineStateObject::SetTopologyType(ShaderTopologyType type)
+	{
+		m_topologyType = type;
+		switch (type)
+		{
+		case SHADER_TOPOLOGY_LINE:
+			m_IATopologyType = D3D10_PRIMITIVE_TOPOLOGY_LINELIST;
+			break;
+		case SHADER_TOPOLOGY_TRIANGLE:
+			m_IATopologyType = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+			break;
+		case SHADER_TOPOLOGY_POINT:
+			m_IATopologyType = D3D10_PRIMITIVE_TOPOLOGY_POINTLIST;
+			break;
+		case SHADER_TOPOLOGY_PATCH:
+			m_IATopologyType = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP; // TODO: Check this
+			break;
+		}
+	}
+	void PipelineStateObject::SetState(ID3D12GraphicsCommandList* pCommandList)
+	{
+		pCommandList->SetGraphicsRootSignature(m_pShader->GetRootSignature());
+		pCommandList->IASetPrimitiveTopology(m_IATopologyType);
+		pCommandList->SetPipelineState(m_d3d12Pso.Get());
 	}
 }

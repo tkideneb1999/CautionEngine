@@ -106,6 +106,14 @@ namespace CautionEngine::Rendering {
 		SHADER_LOGIC_OP_OR_INVERTED = D3D12_LOGIC_OP_OR_INVERTED,
 	};
 
+	enum CAUTION_API ShaderBlendColorWrite {
+		SHADER_BLEND_COLOR_WRITE_RED = D3D12_COLOR_WRITE_ENABLE_RED,
+		SHADER_BLEND_COLOR_WRITE_GREEN = D3D12_COLOR_WRITE_ENABLE_GREEN,
+		SHADER_BLEND_COLOR_WRITE_BLUE = D3D12_COLOR_WRITE_ENABLE_BLUE,
+		SHADER_BLEND_COLOR_WRITE_ALPHA = D3D12_COLOR_WRITE_ENABLE_ALPHA,
+		SHADER_BLEND_COLOR_WRITE_ALL = D3D12_COLOR_WRITE_ENABLE_ALL,
+	};
+
 	struct ShaderInput {
 		ShaderInputSemantic semantic;
 		unsigned short int semanticIndex;
@@ -130,7 +138,7 @@ namespace CautionEngine::Rendering {
 		ShaderBlendType destBlendAlpha = SHADER_BLEND_DEST_ALPHA;
 		ShaderBlendOpType blendOpAlpha = SHADER_BLEND_OP_ADD;
 
-		ShaderLogicOpType logicOp = SHADER_LOGIC_OP_CLEAR;
-		UINT8 RenderTargetWriteMask = 0;
+		ShaderLogicOpType logicOp = SHADER_LOGIC_OP_NOOP;
+		UINT8 RenderTargetWriteMask = SHADER_BLEND_COLOR_WRITE_ALL;
 	};
 }
