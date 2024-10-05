@@ -10,12 +10,13 @@
 
 namespace CautionEngine::Rendering 
 {
-	class RenderTargetManager
+	class CAUTION_CLASS RenderTargetManager
 	{
 	private:
 		DescriptorManager* m_pDescriptorManager;
 
-		std::vector<RenderTarget> m_renderTargets;
+		// TODO: Better Allocation -> maybe heap allocate these
+		std::unordered_map<unsigned int, RenderTarget> m_renderTargets;
 	public:
 		
 		RenderTargetManager(DescriptorManager* pDescriptorManager);
@@ -23,6 +24,17 @@ namespace CautionEngine::Rendering
 		RenderTargetManager() = delete;
 		RenderTargetManager(const RenderTargetManager&) = delete;
 
-		RenderTarget* CreateRenderTarget(unsigned int width, unsigned int height, RenderFormat format);
+		unsigned int CreateRenderTarget(unsigned int width, unsigned int height, RenderFormat format, unsigned int mipLevel = 1, const float* clearValue = nullptr);
+		RenderTarget* GetRenderTarget(unsigned int id);
+
+		void Shutdown();
+
+	private:
+		void CreateRenderTargetResource(
+			unsigned int width, unsigned int height, RenderFormat format, unsigned int mipLevels, bool isDepthRT,
+			const float* pClearValue, Microsoft::WRL::ComPtr<ID3D12Resource>& pRenderTargetResource
+		);
+
+		unsigned int GetFreeID();
 	};
 }

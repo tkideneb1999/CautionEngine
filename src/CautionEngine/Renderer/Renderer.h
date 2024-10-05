@@ -23,13 +23,14 @@ namespace CautionEngine::Rendering
 	class CAUTION_CLASS Renderer
 	{
 	public:
-		D3D12API* const pD3D12API;
-
-		DescriptorManager descriptorManager;
+		D3D12API* const pD3D12API; // TODO: Make this private
 
 		unsigned int numBackBuffers;
 
 	private:
+		RenderTargetManager* m_pRenderTargetManager;
+		DescriptorManager* m_pDescriptorManager;
+
 		std::vector<RenderTarget> m_swapChainRenderTargets;
 
 		ComPtr<ID3D12CommandQueue> m_commandQueue;
@@ -46,6 +47,12 @@ namespace CautionEngine::Rendering
 		D3D12_VIEWPORT m_viewport = {};
 		D3D12_RECT m_scissorRect = {};
 
+		// Custom Scene Render Target
+		bool m_useCustomSceneRenderTarget = false;
+		unsigned int m_pCustomRenderTargetId;
+		D3D12_VIEWPORT m_customRTViewPort = {};
+		D3D12_RECT m_customRTScissorRect = {};
+
 		// Synchronization Objects
 		UINT m_curFrameIndex = 0;
 		HANDLE m_fenceEvent;
@@ -60,13 +67,13 @@ namespace CautionEngine::Rendering
 
 		void Render();
 
-		static void InitD3D12API() { D3D12API::Get()->Init(); }
 		static ID3D12Device* GetD3D12DevicePtr() { return D3D12API::Get()->GetDevicePtr().Get(); }
 		void InitSwapChain(int width, int height, int frameCount, HWND hWnd);
 		void InitDescriptorHeaps(int cbv_srv_uav_count, int dsv_count, int rtv_count, int sampler_count);
 		void InitCommandFrames();
 		void InitFrameFence();
 		void BeginFrame();
+		void RenderScene(); // TODO: Put Scene Reference here
 		void EndFrame();
 		void CreateRootSignature();
 		void CreateInitialPipelineState();
@@ -78,6 +85,11 @@ namespace CautionEngine::Rendering
 		void ReleaseSwapChainRenderTargets();
 
 		ID3D12GraphicsCommandList6* GetCurrentCommandList(); // TODO: Wrap Command List somehow
-		DXGI_FORMAT GetRTVFormat();
+		DXGI_FORMAT GetRTVFormat(); // TODO: Convert this to 'RenderFormat'
+
+		DescriptorManager* GetDescriptorManager() const { return m_pDescriptorManager; }
+		RenderTargetManager* GetRenderTargetManager() const { return m_pRenderTargetManager; }
+
+		void SetCustomSceneRenderTarget(unsigned int customRenderTargetId);
 	};
 }

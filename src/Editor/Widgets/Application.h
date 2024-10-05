@@ -13,13 +13,12 @@
 #include "imgui.h"
 #include <d3d12.h>
 
-///////////////////////////////
-// Temp Testing Setup
-#include "Renderer/Shader.h"
-
-///////////////////////////////
-
 using namespace CautionEngine::Rendering;
+
+namespace CautionEngine::Rendering
+{
+	class RenderTarget;
+}
 
 namespace Reckless
 {
@@ -99,6 +98,9 @@ namespace Reckless
 		Renderer                  m_renderer;
 		bool                      m_running;
 		SRecklessAppSpecification m_specification;
+
+		// Render Scene into this Render Texture to display it in Viewport
+		unsigned int m_pSceneRenderTextureId;
 		
 		// Timestamps
 		float m_timeStamp = 0.f;
@@ -120,11 +122,5 @@ namespace Reckless
 		void Shutdown();
 		bool Update();
 		void UpdateWindowSize();
-
-
-		//////////////////////////////////////////////////////////////
-		// Temp Testing Setup
-		//Shader fallbackShader = Shader(L"D:\\projects\\CautionEngine\\src\\CautionEngine\\Shaders\\Fallback.hlsl");
-
 	};
 }

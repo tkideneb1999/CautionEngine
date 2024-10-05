@@ -11,6 +11,10 @@ using namespace Microsoft::WRL;
 
 namespace CautionEngine::Rendering
 {
+	CAUTION_CLASS void InitD3D12API();
+
+	CAUTION_CLASS void ShutdownD3D12API();
+
 	class CAUTION_CLASS D3D12API
 	{
 	public:
@@ -23,7 +27,7 @@ namespace CautionEngine::Rendering
 
 		static D3D12API* const Get();
 
-		const ComPtr<ID3D12Device8> GetDevicePtr()
+		const ComPtr<ID3D12Device8>& GetDevicePtr()
 		{ 
 			if (m_initialized)
 				return m_device;
@@ -41,8 +45,6 @@ namespace CautionEngine::Rendering
 		// ! \brief Initiates the shutdown process and releases memory
 		void Shutdown();
 
-		void GatherDREDOUTput();
-
 		bool IsInitialized() const { return m_initialized; }
 
 	private:
@@ -53,4 +55,6 @@ namespace CautionEngine::Rendering
 
 		void GetAdapter(IDXGIAdapter4** ppAdapter, DXGI_GPU_PREFERENCE pref);
 	};
+
+	static D3D12API* g_pD3D12API;
 }

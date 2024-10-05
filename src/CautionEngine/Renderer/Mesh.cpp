@@ -162,7 +162,7 @@ namespace CautionEngine::Rendering
 		uploadHeapProperties.CreationNodeMask = 0;
 		uploadHeapProperties.VisibleNodeMask = 0;
 
-		ComPtr<ID3D12Device8> pDevice = D3D12API::Get()->GetDevicePtr();
+		const ComPtr<ID3D12Device8>& pDevice = D3D12API::Get()->GetDevicePtr();
 		THROW_IF_FAILED(
 			pDevice->CreateCommittedResource(
 				&uploadHeapProperties,
@@ -198,7 +198,7 @@ namespace CautionEngine::Rendering
 		defaultHeapProperties.CreationNodeMask = 0;
 		defaultHeapProperties.VisibleNodeMask = 0;
 
-		ComPtr<ID3D12Device8> pDevice = D3D12API::Get()->GetDevicePtr();
+		const ComPtr<ID3D12Device8>& pDevice = D3D12API::Get()->GetDevicePtr();
 		THROW_IF_FAILED(
 			pDevice->CreateCommittedResource(
 				&defaultHeapProperties,

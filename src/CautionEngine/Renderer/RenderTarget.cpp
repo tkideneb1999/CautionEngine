@@ -4,7 +4,7 @@
 namespace CautionEngine::Rendering
 {
 	RenderTarget::RenderTarget()
-		:descriptorHeapHandle(), resourceView()
+		:descriptorHeapHandle(), pResource()
 	{
 
 	}
@@ -12,6 +12,6 @@ namespace CautionEngine::Rendering
 	RenderTarget::RenderTarget(D3D12::DescriptorHeapHandle handle, Microsoft::WRL::ComPtr<ID3D12Resource> renderTargetResource)
 	{
 		descriptorHeapHandle = handle;
-		resourceView = renderTargetResource;
+		pResource = renderTargetResource;
 	}
 }

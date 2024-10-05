@@ -5,23 +5,23 @@
 
 #include "D3D12Helpers.h"
 
+#include "RenderTargetManager.h"
+
 namespace CautionEngine::Rendering 
 {
 
 	Renderer::Renderer()
 		: m_shaderManager()
 		, pD3D12API(D3D12API::Get())
-	{ }
+	{ 
+		m_pDescriptorManager = new DescriptorManager();
+		m_pRenderTargetManager = new RenderTargetManager(m_pDescriptorManager);
+	}
 
 	void Renderer::Render()
 	{
 		// Present SwapChain
 		HRESULT res = m_swapChain->Present(1, 0);
-		if (!SUCCEEDED(res))
-		{
-			if(res == DXGI_ERROR_DEVICE_REMOVED)
-				pD3D12API->GatherDREDOUTput();
-		}
 		CommandFrame& curFrame = m_commandFrames[m_curFrameIndex];
 		m_fenceValue++;
 		curFrame.fenceValue = m_fenceValue;
@@ -36,7 +36,7 @@ namespace CautionEngine::Rendering
 	{
 		//Check if RTV Descriptor Heap is initialized
 #if _DEBUG
-		if (!descriptorManager.GetRTVHeap()->Initialized())
+		if (!m_pDescriptorManager->GetRTVHeap()->Initialized())
 			throw std::exception("RTV Descriptor Heap not initialized");
 #endif
 
@@ -89,10 +89,10 @@ namespace CautionEngine::Rendering
 			ComPtr<ID3D12Resource> renderTarget;
 			m_swapChain->GetBuffer(i, IID_PPV_ARGS(&renderTarget));
 			renderTarget->SetName((std::wstring(L"SwapChain Render Target ") + std::to_wstring(i)).c_str());
-			D3D12::DescriptorHeapHandle swapChainBufferHandle = descriptorManager.AllocateRTV();
+			D3D12::DescriptorHeapHandle swapChainBufferHandle = m_pDescriptorManager->AllocateRTV();
 			m_swapChainRenderTargets.push_back(RenderTarget(swapChainBufferHandle, renderTarget));
 			pD3D12API->GetDevicePtr()->CreateRenderTargetView(
-				m_swapChainRenderTargets[i].resourceView.Get(), nullptr, m_swapChainRenderTargets[i].descriptorHeapHandle.cpuHandle
+				m_swapChainRenderTargets[i].pResource.Get(), nullptr, m_swapChainRenderTargets[i].descriptorHeapHandle.cpuHandle
 			);
 		}
 
@@ -113,7 +113,7 @@ namespace CautionEngine::Rendering
 
 	void Renderer::InitDescriptorHeaps(int cbv_srv_uav_count, int dsv_count, int rtv_count, int sampler_count)
 	{
-		descriptorManager.Init(pD3D12API, cbv_srv_uav_count, dsv_count, rtv_count, sampler_count);
+		m_pDescriptorManager->Init(pD3D12API, cbv_srv_uav_count, dsv_count, rtv_count, sampler_count);
 	}
 
 	void Renderer::InitCommandFrames()
@@ -153,8 +153,34 @@ namespace CautionEngine::Rendering
 			return m_swapChainRTFormat;
 		DXGI_SWAP_CHAIN_DESC desc;
 		m_swapChain->GetDesc(&desc);
-		m_swapChainRTFormat = m_swapChainRTFormat;
+		m_swapChainRTFormat = desc.BufferDesc.Format;
 		return m_swapChainRTFormat;
+	}
+
+	void Renderer::SetCustomSceneRenderTarget(unsigned int customRenderTargetId)
+	{
+		RenderTarget* pCustomRenderTarget = m_pRenderTargetManager->GetRenderTarget(customRenderTargetId);
+		if (pCustomRenderTarget == nullptr)
+		{
+			// TODO: Add Warning here
+			return;
+		}
+
+		m_useCustomSceneRenderTarget = true;
+		m_pCustomRenderTargetId = customRenderTargetId;
+
+		m_customRTViewPort = {};
+		m_customRTViewPort.TopLeftX = 0;
+		m_customRTViewPort.TopLeftY = 0;
+		m_customRTViewPort.Height = pCustomRenderTarget->GetHeight();
+		m_customRTViewPort.Width = pCustomRenderTarget->GetWidth();
+		m_customRTViewPort.MinDepth = 0.0f;
+		m_customRTViewPort.MaxDepth = 1.0f;
+
+		m_customRTScissorRect.left = 0;
+		m_customRTScissorRect.top = 0;
+		m_customRTScissorRect.right = pCustomRenderTarget->GetHeight();
+		m_customRTScissorRect.bottom = pCustomRenderTarget->GetWidth();
 	}
 
 	void Renderer::InitFrameFence()
@@ -186,7 +212,17 @@ namespace CautionEngine::Rendering
 
 		ComPtr<ID3D12GraphicsCommandList6>& curCommandList = m_commandLists[m_curFrameIndex];
 		curCommandList->Reset(m_commandFrames[m_curFrameIndex].commandAllocator.Get(), nullptr);
-		curCommandList->OMSetRenderTargets(1, &(m_swapChainRenderTargets[m_curFrameIndex].descriptorHeapHandle.cpuHandle), false, nullptr);
+		if (m_useCustomSceneRenderTarget)
+		{
+			// TODO: How to handle Depth RT
+			RenderTarget* pCustomRenderTarget = m_pRenderTargetManager->GetRenderTarget(m_pCustomRenderTargetId);
+			curCommandList->OMSetRenderTargets(
+				1, &(pCustomRenderTarget->descriptorHeapHandle.cpuHandle), false, nullptr);
+		}
+		else
+		{
+			curCommandList->OMSetRenderTargets(1, &(m_swapChainRenderTargets[m_curFrameIndex].descriptorHeapHandle.cpuHandle), false, nullptr);
+		}
 
 		D3D12_RESOURCE_BARRIER barrier{};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -195,11 +231,19 @@ namespace CautionEngine::Rendering
 		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		curCommandList->ResourceBarrier(1, &barrier);
 
-		descriptorManager.SetShaderVisibleDescriptorHeaps(curCommandList.Get());
+		m_pDescriptorManager->SetShaderVisibleDescriptorHeaps(curCommandList.Get());
 
 		curCommandList->SetGraphicsRootSignature(m_rootSignature.Get());
-		curCommandList->RSSetViewports(1, &m_viewport);
-		curCommandList->RSSetScissorRects(1, &m_scissorRect);
+		if (m_useCustomSceneRenderTarget)
+		{
+			curCommandList->RSSetViewports(1, &m_customRTViewPort);
+			curCommandList->RSSetScissorRects(1, &m_customRTScissorRect);
+		}
+		else
+		{
+			curCommandList->RSSetViewports(1, &m_viewport);
+			curCommandList->RSSetScissorRects(1, &m_scissorRect);
+		}
 
 		float color[] = { 0.2, 0.2, 0.3, 1.0 };
 		m_commandLists[m_curFrameIndex]->ClearRenderTargetView(
@@ -207,6 +251,22 @@ namespace CautionEngine::Rendering
 		);
 
 		// TODO: Command List Synchronization
+	}
+
+	void Renderer::RenderScene()
+	{
+		ComPtr<ID3D12GraphicsCommandList6>& curCommandList = m_commandLists[m_curFrameIndex];
+
+		// TODO: Put scene Rendering here
+
+		if (m_useCustomSceneRenderTarget)
+		{
+			curCommandList->OMSetRenderTargets(
+				1, &(m_swapChainRenderTargets[m_curFrameIndex].descriptorHeapHandle.cpuHandle), false, nullptr
+			);
+			curCommandList->RSSetViewports(1, &m_viewport);
+			curCommandList->RSSetScissorRects(1, &m_scissorRect);
+		}
 	}
 
 	void Renderer::EndFrame()
@@ -257,6 +317,34 @@ namespace CautionEngine::Rendering
 		FlushGPU();
 
 		CloseHandle(m_fenceEvent);
+
+		for (int i = 0; i < numBackBuffers; ++i)
+		{
+			if (m_commandFrames[i].commandAllocator)
+			{
+				m_commandFrames[i].commandAllocator.Reset();
+			}
+			if (m_commandLists[i])
+			{
+				m_commandLists[i].Reset();
+			}
+			if (m_swapChainRenderTargets[i].pResource)
+			{
+				m_swapChainRenderTargets[i].pResource.Reset();
+			}
+		}
+
+		SAFE_RELEASE(m_rootSignature);
+		SAFE_RELEASE(m_initialPipelineState);
+		SAFE_RELEASE(m_commandQueue);
+		SAFE_RELEASE(m_swapChain);
+		SAFE_RELEASE(m_fence);
+		m_fence = nullptr;
+
+		m_pRenderTargetManager->Shutdown();
+
+		delete m_pRenderTargetManager;
+		delete m_pDescriptorManager;
 	}
 
 	void Renderer::FlushGPU()
@@ -287,9 +375,9 @@ namespace CautionEngine::Rendering
 		for (int i = 0; i < numBackBuffers; i++)
 		{
 			RenderTarget& renderTarget = m_swapChainRenderTargets[i];
-			m_swapChain->GetBuffer(i, IID_PPV_ARGS(&renderTarget.resourceView));
+			m_swapChain->GetBuffer(i, IID_PPV_ARGS(&renderTarget.pResource));
 			pD3D12API->GetDevicePtr()->CreateRenderTargetView(
-				renderTarget.resourceView.Get(), nullptr, renderTarget.descriptorHeapHandle.cpuHandle
+				renderTarget.pResource.Get(), nullptr, renderTarget.descriptorHeapHandle.cpuHandle
 			);
 		}
 	}
@@ -299,7 +387,7 @@ namespace CautionEngine::Rendering
 		for (int i = 0; i < numBackBuffers; i++)
 		{
 			RenderTarget& renderTarget = m_swapChainRenderTargets[i];
-			renderTarget.resourceView.Reset();
+			renderTarget.pResource.Reset();
 		}
 	}
 }

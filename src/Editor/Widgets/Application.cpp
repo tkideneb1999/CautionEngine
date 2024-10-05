@@ -2,6 +2,7 @@
 
 #include "../Platform/ImGui/RecklessEdTheme.h"
 
+#include "Renderer/RenderTargetManager.h"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -148,6 +149,12 @@ namespace Reckless
 		m_renderer.InitFrameFence();
 		m_renderer.CreateRootSignature();
 
+		DXGI_FORMAT renderFormat = m_renderer.GetRTVFormat();
+		m_pSceneRenderTextureId = m_renderer.GetRenderTargetManager()->CreateRenderTarget(
+			m_height, m_width, (RenderFormat)m_renderer.GetRTVFormat()
+		);
+		m_renderer.SetCustomSceneRenderTarget(m_pSceneRenderTextureId);
+
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		
@@ -187,7 +194,7 @@ namespace Reckless
 
 		// Setting of the ImGui platform and renderer
 		ImGui_ImplWin32_Init(hWnd);
-		DescriptorManager* descriptorManager = &m_renderer.descriptorManager;
+		DescriptorManager* descriptorManager = m_renderer.GetDescriptorManager();
 		D3D12::DescriptorHeapHandle font_descriptor_handle = descriptorManager->GetCbvSrvUavHeap()->Allocate();
 		ImGui_ImplDX12_Init(
 			m_renderer.GetD3D12DevicePtr(),
@@ -236,7 +243,7 @@ namespace Reckless
 
 		{
 			m_renderer.BeginFrame();
-			
+			m_renderer.RenderScene(); // TODO
 
 			ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse;
 
@@ -264,7 +271,7 @@ namespace Reckless
 			// Docking
 			ImGuiIO& io = ImGui::GetIO();
 			ImGuiStyle& style = ImGui::GetStyle();
-			style.WindowMinSize.x = 1080.f;
+			style.WindowMinSize.x = 480.f;
 			ImGui::DockSpace(ImGui::GetID("MyDockspace"));
 
 			// Layers -> Drawing

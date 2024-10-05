@@ -8,6 +8,8 @@
 
 using namespace Microsoft::WRL;
 
+#define SAFE_RELEASE(p) { if ((p)) {(p).Reset();} }
+
 namespace CautionEngine::Rendering
 {
 	CAUTION_CLASS inline void THROW_IF_FAILED(HRESULT res, const char* msg)
