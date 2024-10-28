@@ -41,4 +41,20 @@ namespace CautionEngine::Rendering
 
 		return result;
 	}
+
+	inline int CalcNearestMultiple(unsigned int input, unsigned int multiple)
+	{
+		if (multiple == 0)
+		{
+			return input;
+		}
+
+		unsigned int remainder = input % multiple;
+		if (remainder == 0)
+		{
+			return input;
+		}
+
+		return input + multiple - remainder;
+	}
 }
