@@ -45,7 +45,7 @@ project "RecklessEditor"
         "/",
         "Widgets",
         "../CautionEngine",
-        "../CautionCommon",
+        "../CautionEngine.Common",
         "../../%{IncludeDirectories.ImGui}",
         "../../%{IncludeDirectories.ImGui_backends}",
         "../../%{IncludeDirectories.ImGuizmo}",

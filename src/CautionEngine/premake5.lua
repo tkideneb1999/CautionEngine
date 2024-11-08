@@ -26,36 +26,31 @@ project "CautionEngine"
         "**.h", 
         "**.cpp",
         "**.inl",
-
-        -- common
-        "../CautionCommon/**.h",
-        "../CautionCommon/**.cpp",
-        "../CautionCommon/**.inl",
-
         -- glm
         "../../thirdparty/glm/glm/**.hpp",
         "../../thirdparty/glm/glm/**.inl",
     }
 
+    includedirs
+    {
+        "../CautionEngine",
+        "../CautionEngine.Common",
+        "../../%{IncludeDirectories.glm}",
+        "../../%{IncludeDirectories.usd}",
+        "../../%{IncludeDirectories.json}"
+    }
+
     links
     {
+        -- "CautionEngine.Common",
         "%{Library.dx_12}",
         "%{Library.dx_compiler}",
         "%{Library.dx_gi}",
-		"%{Library.dx_dxcompiler}",
+        "%{Library.dx_dxcompiler}",
         "../../%{Library.usd_utils}",
         "../../%{Library.usd_imaging}",
         "../../%{Library.usd_geom}",
         "../../%{Library.usd_mtlx}"
-    }
-
-    includedirs
-    {
-        "../CautionEngine",
-        "../CautionCommon",
-        "../../%{IncludeDirectories.glm}",
-        "../../%{IncludeDirectories.usd}",
-        "../../%{IncludeDirectories.json}"
     }
 
     pchheader "stdafx.h"

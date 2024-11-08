@@ -37,7 +37,7 @@
 #include <variant>
 #include <cstring>
 
-// CautionCommon
+// CautionEngine.Common
 #include <Platform/CautionPlatform.h>
 
 // # DX and Platform
