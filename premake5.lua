@@ -12,6 +12,10 @@ workspace "CautionEngine"
 		"Release"
 	}
 
+group "Automation"
+	include "scripts"
+group ""
+
 -- ThirdParty solutions
 group "ThirdParty"
 	include "thirdparty/imgui"
@@ -20,7 +24,7 @@ group ""
 
 -- Include other projects / solutions
 group "RecklessEditor"
-	include "src/Editor"
+	include "src/RecklessEd"
 group ""
 
 group "CautionEngine"
