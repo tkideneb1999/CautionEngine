@@ -6,9 +6,15 @@
 namespace CautionEngine::Rendering {
 	enum CAUTION_CLASS ShaderVariableTypes {
 		SHADER_VAR_TYPE_NONE = 0,
+
 		SHADER_VAR_TYPE_UINT = 1,
+
 		SHADER_VAR_TYPE_INT = 2,
-		SHADER_VAR_TYPE_FLOAT = 3,
+
+		SHADER_VAR_TYPE_FLOAT = 2,
+
+		SHADER_VAR_TYPE_MAT = 3, // TODO: Deprecate this
+
 		SHADER_VAR_TYPE_BOOL = 4,
 	};
 
@@ -140,25 +146,5 @@ namespace CautionEngine::Rendering {
 
 		ShaderLogicOpType logicOp = SHADER_LOGIC_OP_NOOP;
 		UINT8 RenderTargetWriteMask = SHADER_BLEND_COLOR_WRITE_ALL;
-	};
-
-	enum CAUTION_CLASS CBufferVariableType {
-		CBUFFER_VAR_FLOAT = 0,
-		CBUFFER_VAR_FLOAT2,
-		CBUFFER_VAR_FLOAT3,
-		CBUFFER_VAR_FLOAT4,
-
-		CBUFFER_VAR_INT = 4,
-		CBUFFER_VAR_INT2,
-		CBUFFER_VAR_INT3,
-		CBUFFER_VAR_INT4,
-
-		CBUFFER_VAR_UINT = 8,
-		CBUFFER_VAR_UINT2,
-		CBUFFER_VAR_UINT3,
-		CBUFFER_VAR_UINT4,
-
-		CBUFFER_VAR_MAT34 = 12,
-		CBUFFER_VAR_MAT44,
 	};
 }

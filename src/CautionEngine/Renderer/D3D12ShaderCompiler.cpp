@@ -8,6 +8,8 @@
 
 #include "D3D12API.h"
 #include "D3D12Helpers.h"
+#include "ConstantBuffer.h"
+#include "ConstantBufferManager.h"
 
 namespace CautionEngine::Rendering {
 	bool D3D12ShaderCompiler::GenerateShaderData()
@@ -84,6 +86,8 @@ namespace CautionEngine::Rendering {
 		shaderRootParamIndexMap->clear();
 		std::vector<D3D12_ROOT_PARAMETER1> rootParams = {};
 
+		std::unordered_map<std::string, ConstantBufferLayout> constantBufferLayouts;
+
 		for (int si = 0; si < SHADER_STAGE_COUNT; si++) {
 			if (m_reflectionData[si] == nullptr)
 				continue;
@@ -106,8 +110,8 @@ namespace CautionEngine::Rendering {
 					cbufferReflection->GetDesc(&bufferDesc);
 
 					// Buffer Validation (TODO: Skip when not in Editor)
-
-					std::vector<D3D12ConstantBufferVariable> cbufferElements = std::vector<D3D12ConstantBufferVariable>();
+					std::string bufferName = bufferDesc.Name;
+					ConstantBufferLayout bufferLayout(bufferName);
 
 					for (int vi = 0; vi < bufferDesc.Variables; vi++)
 					{
@@ -120,17 +124,14 @@ namespace CautionEngine::Rendering {
 						varType->GetDesc(&varTypeDesc);
 
 						ShaderVariableTypes cBufferVarType = {};
+						unsigned int size = 0;
 
-						if (GetShaderVarType(&varTypeDesc.Type, &cBufferVarType))
+						if (GetShaderVarType(&varTypeDesc, &cBufferVarType, size))
 						{
-							D3D12ConstantBufferVariable bufferLayoutVar = {
-							.name = std::string(varDesc.Name),
-							.type = cBufferVarType,
-							.count = (unsigned short int)(varTypeDesc.Columns * varTypeDesc.Rows),
-							.offset = (unsigned short int)varDesc.StartOffset,
-							};
-
-							cbufferElements.push_back(bufferLayoutVar);
+							std::string name = varTypeDesc.Name;
+							bufferLayout.AppendData(
+								size * varTypeDesc.Columns * varTypeDesc.Rows, name, cBufferVarType, varTypeDesc.Columns, varTypeDesc.Rows
+							);
 						}
 						else if (varTypeDesc.Type == D3D_SVT_VOID && varTypeDesc.Class == D3D_SVC_STRUCT)
 						{
@@ -140,12 +141,6 @@ namespace CautionEngine::Rendering {
 						else
 							throw std::exception("Shader Variable type currently not supported");
 					}
-
-					D3D12ConstantBufferLayout bufferLayout =
-					{
-						.elements = cbufferElements,
-						.name = resourceName,
-					};
 
 					// Create Root Param
 					D3D12_ROOT_PARAMETER1 cbvRootParam
@@ -159,7 +154,8 @@ namespace CautionEngine::Rendering {
 					};
 					(*shaderRootParamIndexMap)[resourceName] = rootParams.size();
 					rootParams.push_back(cbvRootParam);
-					m_pShader->m_bufferLayouts.push_back(bufferLayout);
+					m_pShader->m_cbufferIDs.emplace_back(m_pCBufferManager->GetOrCreateBuffer(bufferLayout));
+
 					std::cout << "Found CBuffer: " << resourceBindDesc.Name << std::endl;
 				}
 				else if (resourceBindDesc.Type == D3D_SIT_TEXTURE) {
@@ -275,7 +271,8 @@ namespace CautionEngine::Rendering {
 		return result;
 	}
 
-	D3D12ShaderCompiler::D3D12ShaderCompiler(Shader* shader)
+	D3D12ShaderCompiler::D3D12ShaderCompiler(Shader* shader, ConstantBufferManager* const cbufferManager)
+		: m_pCBufferManager(cbufferManager)
 	{
 		m_pShader = shader;
 		m_shaderSource = DxcBuffer();
@@ -327,18 +324,29 @@ namespace CautionEngine::Rendering {
 		return true;
 	}
 
-	bool D3D12ShaderCompiler::GetShaderVarType(const D3D_SHADER_VARIABLE_TYPE* dxcType, ShaderVariableTypes* engineType)
+	bool D3D12ShaderCompiler::GetShaderVarType(const D3D12_SHADER_TYPE_DESC* dxcTypeInfo, ShaderVariableTypes* engineType, unsigned int& size)
 	{
-		if (*dxcType == D3D_SVT_FLOAT)
+		switch (dxcTypeInfo->Type)
+		{
+		case D3D_SVT_FLOAT:
 			*engineType = SHADER_VAR_TYPE_FLOAT;
-		else if (*dxcType == D3D_SVT_BOOL)
+			size = sizeof(float);
+			break;
+		case D3D_SVT_BOOL:
 			*engineType = SHADER_VAR_TYPE_BOOL;
-		else if (*dxcType == D3D_SVT_INT)
-			*engineType = SHADER_VAR_TYPE_INT;
-		else if (*dxcType == D3D_SVT_UINT)
+			size = sizeof(bool);
+			break;
+		case D3D_SVT_UINT:
 			*engineType = SHADER_VAR_TYPE_UINT;
-		else
+			size = sizeof(unsigned int);
+			break;
+		case D3D_SVT_INT:
+			*engineType = SHADER_VAR_TYPE_INT;
+			size = sizeof(int);
+			break;
+		default:
 			return false;
+		}
 		return true;
 	}
 

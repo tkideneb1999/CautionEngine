@@ -6,13 +6,13 @@
 #include "D3D12Helpers.h"
 
 #include "RenderTargetManager.h"
+#include "ConstantBufferManager.h"
 
 namespace CautionEngine::Rendering 
 {
 
 	Renderer::Renderer()
-		: m_shaderManager()
-		, pD3D12API(D3D12API::Get())
+		: pD3D12API(D3D12API::Get())
 	{ 
 		m_pDescriptorManager = new DescriptorManager();
 		m_pRenderTargetManager = new RenderTargetManager(m_pDescriptorManager);
@@ -41,6 +41,9 @@ namespace CautionEngine::Rendering
 #endif
 
 		numBackBuffers = frameCount;
+
+		m_pConstantBufferManager = new ConstantBufferManager(numBackBuffers);
+		m_pShaderManager = new ShaderManager(m_pConstantBufferManager);
 
 		// Init Command Queue
 		D3D12_COMMAND_QUEUE_DESC commandQueueDesc = {};
@@ -167,7 +170,7 @@ namespace CautionEngine::Rendering
 		}
 
 		m_useCustomSceneRenderTarget = true;
-		m_pCustomRenderTargetId = customRenderTargetId;
+		m_customRenderTargetId = customRenderTargetId;
 
 		m_customRTViewPort = {};
 		m_customRTViewPort.TopLeftX = 0;
@@ -181,6 +184,12 @@ namespace CautionEngine::Rendering
 		m_customRTScissorRect.top = 0;
 		m_customRTScissorRect.right = pCustomRenderTarget->GetHeight();
 		m_customRTScissorRect.bottom = pCustomRenderTarget->GetWidth();
+	}
+
+	void Renderer::DisableCustomSceneRenderTarget()
+	{
+		m_useCustomSceneRenderTarget = false;
+		m_customRenderTargetId = 0;
 	}
 
 	void Renderer::InitFrameFence()
@@ -215,7 +224,7 @@ namespace CautionEngine::Rendering
 		if (m_useCustomSceneRenderTarget)
 		{
 			// TODO: How to handle Depth RT
-			RenderTarget* pCustomRenderTarget = m_pRenderTargetManager->GetRenderTarget(m_pCustomRenderTargetId);
+			RenderTarget* pCustomRenderTarget = m_pRenderTargetManager->GetRenderTarget(m_customRenderTargetId);
 			curCommandList->OMSetRenderTargets(
 				1, &(pCustomRenderTarget->descriptorHeapHandle.cpuHandle), false, nullptr);
 		}
@@ -305,11 +314,9 @@ namespace CautionEngine::Rendering
 			pD3D12API->GetDevicePtr()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)),
 			"Couldn't create Root Signature"
 		);
-	}
 
-	void Renderer::CreateInitialPipelineState()
-	{
-
+		// TEST
+		Shader* pFallback = m_pShaderManager->CreateShader("F:\\projects\\CautionEngine\\src\\CautionEngine\\Shaders\\Fallback.hlsl");
 	}
 
 	void Renderer::Shutdown()

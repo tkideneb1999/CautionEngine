@@ -15,7 +15,7 @@ namespace CautionEngine::Rendering
 		}
 		std::wstring wStringFilePath(filePath.begin(), filePath.end());
 		Shader* pShader = new Shader(wStringFilePath.c_str());
-		D3D12ShaderCompiler compiler(pShader);
+		D3D12ShaderCompiler compiler(pShader, m_pCBufferManager);
 		if (!compiler.Compile())
 		{
 			// Shader could not be compiled, do something with error here

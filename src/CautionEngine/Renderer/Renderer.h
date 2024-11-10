@@ -14,6 +14,8 @@
 
 namespace CautionEngine::Rendering 
 {
+	class ConstantBufferManager;
+
 	struct CAUTION_CLASS CommandFrame
 	{
 		ComPtr<ID3D12CommandAllocator> commandAllocator;
@@ -28,8 +30,10 @@ namespace CautionEngine::Rendering
 		unsigned int numBackBuffers;
 
 	private:
-		RenderTargetManager* m_pRenderTargetManager;
-		DescriptorManager* m_pDescriptorManager;
+		RenderTargetManager* m_pRenderTargetManager = nullptr;
+		DescriptorManager* m_pDescriptorManager = nullptr;
+		ConstantBufferManager* m_pConstantBufferManager = nullptr;
+		ShaderManager* m_pShaderManager;
 
 		std::vector<RenderTarget> m_swapChainRenderTargets;
 
@@ -49,7 +53,7 @@ namespace CautionEngine::Rendering
 
 		// Custom Scene Render Target
 		bool m_useCustomSceneRenderTarget = false;
-		unsigned int m_pCustomRenderTargetId;
+		unsigned int m_customRenderTargetId;
 		D3D12_VIEWPORT m_customRTViewPort = {};
 		D3D12_RECT m_customRTScissorRect = {};
 
@@ -58,8 +62,6 @@ namespace CautionEngine::Rendering
 		HANDLE m_fenceEvent;
 		UINT64 m_fenceValue = 0;
 		ComPtr<ID3D12Fence> m_fence;
-
-		ShaderManager m_shaderManager;
 
 	public:
 		Renderer();
@@ -76,7 +78,6 @@ namespace CautionEngine::Rendering
 		void RenderScene(); // TODO: Put Scene Reference here
 		void EndFrame();
 		void CreateRootSignature();
-		void CreateInitialPipelineState();
 		void Shutdown();
 		void FlushGPU();
 
@@ -91,5 +92,6 @@ namespace CautionEngine::Rendering
 		RenderTargetManager* GetRenderTargetManager() const { return m_pRenderTargetManager; }
 
 		void SetCustomSceneRenderTarget(unsigned int customRenderTargetId);
+		void DisableCustomSceneRenderTarget();
 	};
 }

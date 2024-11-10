@@ -1,3 +1,11 @@
+struct TestConstantBuffer
+{
+    float4x4 mvp;
+    float4 color;
+};
+
+ConstantBuffer<TestConstantBuffer> cBuffer;
+
 struct VSInput
 {
 	float4 position: POSITION;
@@ -20,5 +28,5 @@ PSInput VSMain(VSInput IN)
 
 float4 PSMain(PSInput IN): SV_TARGET
 {
-	return float4(IN.color.rgb, 1);
+	return float4(cBuffer.color.rgb, 1);
 }

@@ -6,22 +6,34 @@
 
 namespace CautionEngine::Rendering
 {
-	bool ConstantBufferLayout::AppendData(unsigned int dataSize, std::string& name, CBufferVariableType type)
+	bool ConstantBufferLayout::AppendData(
+		unsigned int dataSize, std::string& name, ShaderVariableTypes type, unsigned int columns, unsigned int rows
+	)
 	{
 		if (m_nameMapping.find(name) != m_nameMapping.end())
 		{
 			return false;
 		}
 		m_nameMapping.insert(std::pair<std::string, size_t>(name, m_layout.size()));
-		m_layout.emplace_back(dataSize, m_size + dataSize, type);
+		m_layout.emplace_back(dataSize, m_size + dataSize, type, columns, rows);
 		m_size += dataSize;
 		return true;
 	}
 
-	inline bool ConstantBuffer::SetData(size_t index, void* pData, size_t size, CBufferVariableType type)
+	bool ConstantBufferLayout::IsEqual(ConstantBufferLayout const& other)
+	{
+		if (m_name != other.m_name)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	inline bool ConstantBuffer::SetData(size_t index, void* pData, size_t size, ShaderVariableTypes type, unsigned int columns, unsigned int rows)
 	{
 		ConstantBufferLayout::ConstantBufferElement& layoutElement = m_bufferLayout.m_layout[index];
-		if (size != layoutElement.m_size || layoutElement.m_type != type)
+		if (size != layoutElement.m_size || layoutElement.m_type != type || layoutElement.m_columns != columns || layoutElement.m_rows != rows)
 		{
 			return false;
 		}
@@ -30,14 +42,14 @@ namespace CautionEngine::Rendering
 		return true;
 	}
 
-	inline bool ConstantBuffer::SetDataFromName(std::string& name, void* pData, size_t size, CBufferVariableType type)
+	inline bool ConstantBuffer::SetDataFromName(std::string& name, void* pData, size_t size, ShaderVariableTypes type, unsigned int columns, unsigned int rows)
 	{
 		int index = GetIndexFromName(name);
 		if (index < 0)
 		{
 			return false;
 		}
-		return SetData(index, pData, size, type);
+		return SetData(index, pData, size, type, columns, rows);
 	}
 
 	void ConstantBuffer::CreateUploadBuffer(Microsoft::WRL::ComPtr<ID3D12Resource>& pUploadBuffer)
@@ -78,8 +90,8 @@ namespace CautionEngine::Rendering
 	}
 
 	ConstantBuffer::ConstantBuffer(ConstantBufferLayout& layout, unsigned int numBackBuffers)
+		:m_bufferLayout(layout)
 	{
-		m_bufferLayout = layout;
 		m_pBufferMemory = (byte*)malloc(layout.m_size);
 		if (m_pBufferMemory != nullptr)
 		{

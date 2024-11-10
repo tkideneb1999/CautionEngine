@@ -10,9 +10,11 @@
 #include "Shader.h"
 #include "ShaderData.h"
 
-using namespace Microsoft::WRL;
+using namespace Microsoft::WRL; // TODO: Remove this
 
-namespace CautionEngine::Rendering {
+namespace CautionEngine::Rendering 
+{
+	class ConstantBufferManager;
 
 	class D3D12ShaderCompiler 
 	{
@@ -90,13 +92,15 @@ namespace CautionEngine::Rendering {
 			return shaderModelStr;
 		}
 
-		static bool GetShaderVarType(const D3D_SHADER_VARIABLE_TYPE* dxcType, ShaderVariableTypes* engineType);
+		static bool GetShaderVarType(const D3D12_SHADER_TYPE_DESC* dxcTypeInfo, ShaderVariableTypes* engineType, unsigned int& size);
 
-		ComPtr<IDxcCompiler3> m_compiler;
-		ComPtr<IDxcIncludeHandler> m_includeHandler;
-		ComPtr<IDxcUtils> m_utils;
+		Microsoft::WRL::ComPtr<IDxcCompiler3> m_compiler;
+		Microsoft::WRL::ComPtr<IDxcIncludeHandler> m_includeHandler;
+		Microsoft::WRL::ComPtr<IDxcUtils> m_utils;
 
-		ComPtr<ID3D12ShaderReflection> m_reflectionData[SHADER_STAGE_COUNT];
+		Microsoft::WRL::ComPtr<ID3D12ShaderReflection> m_reflectionData[SHADER_STAGE_COUNT];
+
+		ConstantBufferManager* m_pCBufferManager;
 
 		Shader* m_pShader;
 		DxcBuffer m_shaderSource;
@@ -108,7 +112,7 @@ namespace CautionEngine::Rendering {
 
 	public:
 		D3D12ShaderCompiler() = delete;
-		D3D12ShaderCompiler(Shader* shader);
+		D3D12ShaderCompiler(Shader* shader, ConstantBufferManager* const cbufferManager);
 
 		bool Compile();
 

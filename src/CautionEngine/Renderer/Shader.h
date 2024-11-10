@@ -9,7 +9,6 @@
 #include "wrl/client.h"
 
 #include "ShaderData.h"
-#include "D3D12ConstantBufferLayout.h"
 
 using namespace Microsoft::WRL;
 
@@ -31,8 +30,7 @@ namespace CautionEngine::Rendering
 		std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputElementDescs;
 		std::vector<std::string> m_semanticNames;
 
-		// Used for validation
-		std::vector<D3D12ConstantBufferLayout> m_bufferLayouts;
+		std::vector<unsigned int> m_cbufferIDs;
 
 	public:
 		Shader() = delete;

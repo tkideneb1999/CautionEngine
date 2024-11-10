@@ -7,16 +7,20 @@
 
 namespace CautionEngine::Rendering {
 
+	class ConstantBufferManager;
+
 	class CAUTION_CLASS ShaderManager 
 	{
 	private:
 		std::hash<std::string_view> m_hash;
 		std::unordered_map<size_t, Shader*> m_shaders;
+		ConstantBufferManager* const m_pCBufferManager;
 
 	public:
-		ShaderManager()
-			:m_hash()
-			,m_shaders()
+		ShaderManager(ConstantBufferManager* const pCBufferManager)
+			: m_hash()
+			, m_shaders()
+			, m_pCBufferManager(pCBufferManager)
 		{}
 
 		~ShaderManager();
