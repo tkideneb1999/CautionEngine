@@ -25,11 +25,6 @@ project "RecklessEditor"
         "**.cpp",
         "**.inl",
 
-        -- common
-        "../CautionCommon/**.h",
-        "../CautionCommon/**.cpp",
-        "../CautionCommon/**.inl",
-
         -- imguizmo
         "../../thirdparty/imguizmo/ImGuizmo.h",
         "../../thirdparty/imguizmo/ImGuizmo.cpp",
@@ -41,11 +36,11 @@ project "RecklessEditor"
 
     includedirs
     {
-        -- Editor
+        -- RecklessEd
         "/",
         "Widgets",
         "../CautionEngine",
-        "../CautionCommon",
+        "../CautionEngine.Common",
         "../../%{IncludeDirectories.ImGui}",
         "../../%{IncludeDirectories.ImGui_backends}",
         "../../%{IncludeDirectories.ImGuizmo}",

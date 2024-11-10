@@ -20,6 +20,7 @@ LibraryDirectories["dxcompiler"] = "%{wks.location}/thirdparty/libraries/dxcompi
 Library = {}
 
 Library["caution_engine_lib"] = "CautionEngine.lib"
+Library["caution_engine_common_lib"] = "CautionEngine.Common.lib"
 
 Library["dx_12"] = "d3d12.lib"
 Library["dx_compiler"] = "d3dcompiler.lib"
