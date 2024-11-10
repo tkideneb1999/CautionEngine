@@ -316,7 +316,7 @@ namespace CautionEngine::Rendering
 		);
 
 		// TEST
-		Shader* pFallback = m_pShaderManager->CreateShader("F:\\projects\\CautionEngine\\src\\CautionEngine\\Shaders\\Fallback.hlsl");
+		Shader* pFallback = m_pShaderManager->CreateShader("..\\..\\src\\CautionEngine\\Shaders\\Fallback.hlsl");
 	}
 
 	void Renderer::Shutdown()
