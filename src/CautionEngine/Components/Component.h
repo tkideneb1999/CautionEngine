@@ -21,14 +21,14 @@ namespace CautionEngine::Components
 		virtual void Serialize() = 0;
 		virtual void Deserialize() = 0;
 
-		const CObjectID& GetID() const { return m_id; }
+		const SObjectID& GetID() const { return m_id; }
 
 		CEntity* GetEntityOwner() const { return m_pOwner; }
 		inline void SetOwner(CEntity* owner) { m_pOwner = owner; }
 	protected:
 		friend CEntity;
-		CObjectID         m_componentId;
-		CObjectID         m_id;
+		SObjectID         m_componentId;
+		SObjectID         m_id;
 		CEntity*          m_pOwner;
 	};
 }

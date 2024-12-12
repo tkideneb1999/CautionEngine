@@ -36,6 +36,8 @@
 #include <set>
 #include <variant>
 #include <cstring>
+#include <random>
+#include <thread>
 
 // CautionEngine.Common
 #include <Platform/CautionPlatform.h>

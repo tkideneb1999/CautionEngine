@@ -5,6 +5,7 @@
 
 // CautionEngine
 #include <Renderer/D3D12API.h>
+#include <Core/Entity.h>
 
 // configs
 const wchar_t CLASS_NAME[] = L"Reckless Editor Class";
@@ -47,7 +48,18 @@ int main(int argc, char** argv)
 	CProperyEditorSharedPtr pProperties = std::make_shared<CProperyEditor>();
 	GetRecklessEditor()->AddEditorLayer(pProperties);
 
+	// TEST Entity Generation
+	using namespace CautionEngine;
+	std::vector<std::shared_ptr<Core::CEntity>> m_entities;
+	for (size_t i = 0; i < 10; ++i)
+	{
+		Core::CEntity* pEntity = new Core::CEntity("Entity Sample");
+		m_entities.emplace_back(pEntity);
+	}
+
+
 	s_recklessEditor->Run();
+	m_entities.clear();
 	delete s_recklessEditor;
 	CautionEngine::Rendering::ShutdownD3D12API();
 	return 0;

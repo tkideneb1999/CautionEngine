@@ -7,11 +7,11 @@ namespace CautionEngine::Core
 	class CAUTION_CLASS CObject
 	{
 	public:
-		CObject() = default;
+		CObject();
 
-		const CObjectID& GetID() const { return m_id; }
+		const SObjectID& GetID() const { return m_id; }
 
 	protected:
-		CObjectID m_id;
+		SObjectID m_id;
 	};
 }
