@@ -4,7 +4,7 @@
 
 namespace CautionEngine::Components
 {
-	class CAUTION_CLASS CTransformComponent : public CEntityComponent
+	class CAUTION_ENGINE_CLASS CTransformComponent : public CEntityComponent
 	{
 	public: 
 		// TODO: benedikt -> your math library here?

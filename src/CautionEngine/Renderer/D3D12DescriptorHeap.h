@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CautionDefinitions.h>
+#include <CautionEngineDefinitions.h>
 
 #include <d3d12.h>
 #include <wrl/client.h>
@@ -9,13 +9,13 @@ using namespace Microsoft::WRL;
 
 namespace CautionEngine::Rendering::D3D12
 {
-	struct CAUTION_CLASS DescriptorHeapHandle
+	struct CAUTION_ENGINE_CLASS DescriptorHeapHandle
 	{
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle;
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle;
 	};
 
-	class CAUTION_CLASS DescriptorHeap
+	class CAUTION_ENGINE_CLASS DescriptorHeap
 	{
 	private:
 		ComPtr<ID3D12DescriptorHeap> m_DescriptorHeap = {};

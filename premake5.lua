@@ -35,3 +35,7 @@ group ""
 group "GamesDLL"
 	include "src/Game"
 group ""
+
+group "Common"
+	include "src/CautionCommon"
+group ""

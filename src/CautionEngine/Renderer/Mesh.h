@@ -1,19 +1,19 @@
 #pragma once
-#include <CautionDefinitions.h>
+#include <CautionEngineDefinitions.h>
 
 #include <d3d12.h>
 #include <glm/glm.hpp>
 
 namespace CautionEngine::Rendering
 {
-	class CAUTION_CLASS Vertex
+	class CAUTION_ENGINE_CLASS Vertex
 	{
 	public:
 		glm::vec4 position;
 		glm::vec4 color;
 	};
 
-	class CAUTION_CLASS Mesh
+	class CAUTION_ENGINE_CLASS Mesh
 	{
 	public:
 		Mesh();

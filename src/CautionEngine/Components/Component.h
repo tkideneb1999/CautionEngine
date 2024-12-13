@@ -1,13 +1,13 @@
 #pragma once
 
 #include <Core/ObjectID.h>
-#include <CautionDefinitions.h>
+#include <CautionEngineDefinitions.h>
 
 class CEntity;
 
 namespace CautionEngine::Components
 {
-	class CAUTION_CLASS CEntityComponent
+	class CAUTION_ENGINE_CLASS CEntityComponent
 	{
 	public:
 		CEntityComponent() = default;

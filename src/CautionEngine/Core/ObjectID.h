@@ -1,8 +1,8 @@
 #pragma once
 #include "stdafx.h"
-#include <CautionDefinitions.h>
+#include <CautionEngineDefinitions.h>
 
-struct CAUTION_CLASS SObjectID
+struct CAUTION_ENGINE_CLASS SObjectID
 {
 	SObjectID() {}
 

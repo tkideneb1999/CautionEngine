@@ -22,7 +22,8 @@ project "GameDLL"
     
     files 
     {
-        "**.h", 
+        "**.h",
+        "**.hpp",
         "**.cpp"
     }
 

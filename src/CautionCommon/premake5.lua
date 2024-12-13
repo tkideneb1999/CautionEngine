@@ -1,4 +1,4 @@
-project "CautionEngine.Common"
+project "CautionCommon"
     -- StaticLib = .lib
     -- SharedLib = .dll
     kind "SharedLib"
@@ -26,36 +26,37 @@ project "CautionEngine.Common"
         "**.h", 
         "**.hpp",
         "**.cpp",
-        "**.inl",
+        "**.inl"
     }
 
-    pchheader "stdafx.h"
-    pchsource "stdafx.cpp"
+    includedirs
+    {
+        "../CautionCommon"
+    }
 
     filter "system:windows"
-        systemversion "latest"
-        defines
-        {
-            "WINDOWS",
-            "WIN32"
-        }
+    systemversion "latest"
+    defines
+    {
+        "WINDOWS",
+        "WIN32",
+        "CAUTION_COMMON_EXPORT",
+    }
 
     filter "configurations:Debug"
-        runtime "Debug"
-        defines 
-        {
-            "DEBUG",
-            "CAUTION_SHARED"
-        }
-        symbols "On"
-        inlining("Auto")
+    runtime "Debug"
+    defines 
+    {
+        "DEBUG",
+    }
+    symbols "On"
+    inlining("Auto")
         
     filter "configurations:Release"
-        runtime "Release"
-        defines 
-        {
-            "RELEASE",
-            "CAUTION_SHARED"
-        }
-        optimize "On"
-        inlining("Auto")
+    runtime "Release"
+    defines 
+    {
+        "RELEASE",
+    }
+    optimize "On"
+    inlining("Auto")

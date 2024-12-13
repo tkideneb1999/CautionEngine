@@ -2,11 +2,12 @@
 
 #include <memory>
 
-#ifdef CAUTION_SHARED
-#define CAUTION_COMMON_API __declspec(dllexport)
+#ifdef CAUTION_COMMON_EXPORT
+#define CAUTIONCOMMON_API __declspec(dllexport)
 #else
-#define CAUTION_COMMON_API __declspec(dllimport)
+#define CAUTIONCOMMON_API __declspec(dllimport)
 #endif
+
 
 #define DECLARE_SHARED_POINTERS(name)                   \
   typedef std::shared_ptr<name> name ##       SharedPtr;      \

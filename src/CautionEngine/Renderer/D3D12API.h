@@ -1,5 +1,5 @@
 #pragma once
-#include <CautionDefinitions.h>
+#include <CautionEngineDefinitions.h>
 #include "D3D12DescriptorHeap.h"
 
 #include <d3d12.h>
@@ -11,11 +11,11 @@ using namespace Microsoft::WRL;
 
 namespace CautionEngine::Rendering
 {
-	CAUTION_CLASS void InitD3D12API();
+	CAUTION_ENGINE_CLASS void InitD3D12API();
 
-	CAUTION_CLASS void ShutdownD3D12API();
+	CAUTION_ENGINE_CLASS void ShutdownD3D12API();
 
-	class CAUTION_CLASS D3D12API
+	class CAUTION_ENGINE_CLASS D3D12API
 	{
 	public:
 		D3D12API();

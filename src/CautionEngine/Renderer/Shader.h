@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CautionDefinitions.h>
+#include <CautionEngineDefinitions.h>
 
 #include <vector>
 #include <string>
@@ -37,16 +37,16 @@ namespace CautionEngine::Rendering
 	public:
 		Shader() = delete;
 		Shader(const Shader& other) = delete;
-		CAUTION_CLASS Shader(const LPCWSTR shaderFilepath);
+		CAUTION_ENGINE_CLASS Shader(const LPCWSTR shaderFilepath);
 
-		CAUTION_CLASS void Serialize();
-		CAUTION_CLASS void Deserialize();
+		CAUTION_ENGINE_CLASS void Serialize();
+		CAUTION_ENGINE_CLASS void Deserialize();
 
 		bool GetStageShaderCode(const void** ppBuffer, size_t* pLength, ShaderStage stage);
 		ID3D12RootSignature* GetRootSignature() { return m_rootSignature.Get(); }
 		const std::vector<D3D12_INPUT_ELEMENT_DESC>* GetInputLayoutDescs() { return &m_InputElementDescs; }
 
-		CAUTION_CLASS const LPCWSTR GetFilepath() { return m_filepath; }
+		CAUTION_ENGINE_CLASS const LPCWSTR GetFilepath() { return m_filepath; }
 
 	private:
 		bool SetShaderStageInPSODesc(D3D12_SHADER_BYTECODE* pByteCodeStructure, ShaderStage stage);

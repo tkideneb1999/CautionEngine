@@ -10,14 +10,12 @@ using namespace CautionEngine::Components;
 
 namespace CautionEngine::Core
 {
-	class CAUTION_CLASS CEntity : public CObject
+	class CAUTION_ENGINE_CLASS CEntity : public CObject
 	{
 	public:
 		CEntity();
 		CEntity(const char* name);
 		~CEntity();
-
-		CEntity operator=(CEntity&& other);
 
 		inline const char* GetComponentName() const { return m_name.c_str(); }
 

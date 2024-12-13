@@ -2,7 +2,7 @@
 
 namespace CautionEngine::Engine
 {
-	class CAUTION_CLASS CEngine
+	class CAUTION_ENGINE_CLASS CEngine
 	{
 	public:
 		static void Initialize();

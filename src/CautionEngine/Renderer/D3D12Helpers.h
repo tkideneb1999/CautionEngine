@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CautionDefinitions.h>
+#include <CautionEngineDefinitions.h>
 
 #include <exception>
 #include <string>
@@ -12,7 +12,7 @@ using namespace Microsoft::WRL;
 
 namespace CautionEngine::Rendering
 {
-	CAUTION_CLASS inline void THROW_IF_FAILED(HRESULT res, const char* msg)
+	CAUTION_ENGINE_CLASS inline void THROW_IF_FAILED(HRESULT res, const char* msg)
 	{
 		if (!SUCCEEDED(res))
 		{

@@ -23,7 +23,8 @@ project "CautionEngine"
     files 
     {
         -- source
-        "**.h", 
+        "**.h",
+        "**.hpp",
         "**.cpp",
         "**.inl",
         -- glm
@@ -35,6 +36,7 @@ project "CautionEngine"
     {
         "../CautionEngine",
         "../CautionEngine.Common",
+        "../CautionCommon",
         "../../%{IncludeDirectories.glm}",
         "../../%{IncludeDirectories.usd}",
         "../../%{IncludeDirectories.json}"
@@ -42,6 +44,7 @@ project "CautionEngine"
 
     links
     {
+        -- "CautionCommon", -- TODO: enable when we already have implementations of CautionCommon
         -- "CautionEngine.Common",
         "%{Library.dx_12}",
         "%{Library.dx_compiler}",
@@ -61,7 +64,8 @@ project "CautionEngine"
         defines
         {
             "WINDOWS",
-            "WIN32"
+            "WIN32",
+            "CAUTION_ENGINE_EXPORT"
         }
 
         postbuildcommands
@@ -77,7 +81,6 @@ project "CautionEngine"
         defines 
         {
             "DEBUG",
-            "CAUTION_SHARED"
         }
         symbols "On"
         inlining("Auto")
@@ -87,7 +90,6 @@ project "CautionEngine"
         defines 
         {
             "RELEASE",
-            "CAUTION_SHARED"
         }
         optimize "On"
         inlining("Auto")

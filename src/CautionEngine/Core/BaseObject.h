@@ -4,7 +4,7 @@
 
 namespace CautionEngine::Core
 {
-	class CAUTION_CLASS CObject
+	class CAUTION_ENGINE_CLASS CObject
 	{
 	public:
 		CObject();
