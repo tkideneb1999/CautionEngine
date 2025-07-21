@@ -14,13 +14,14 @@ def initialize_repository(build_all : bool):
     print ('Checking your python installation...')
     pyutils.validate_py_version()
     pyutils.validate_packages()
-
+    
+    os.chdir('./scripts/')
     if build_all:
         print("Building USD binaries...")
-        subprocess.call([os.path.abspath('./scripts/build_usd.bat'), 'nopause'])
+        subprocess.call([os.path.abspath('./build_usd.bat'), 'nopause'])
 
     print ('Generating solutions...')
-    subprocess.call([os.path.abspath('./scripts/generate_solutions_vs2022.bat'), 'nopause'])
+    subprocess.call([os.path.abspath('./generate_solutions_vs2022.bat'), 'nopause'])
 
 if __name__ == "__main__":
     build_all = True
