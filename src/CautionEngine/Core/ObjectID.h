@@ -2,6 +2,8 @@
 #include "stdafx.h"
 #include <CautionEngineDefinitions.h>
 
+#include <chrono>
+
 struct CAUTION_ENGINE_CLASS SObjectID
 {
 	SObjectID() {}
