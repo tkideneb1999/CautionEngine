@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CautionDefinitions.h>
+#include <CautionEngineDefinitions.h>
 
 #include "D3D12API.h"
 #include "D3D12DescriptorHeap.h"
@@ -8,7 +8,7 @@
 namespace CautionEngine::Rendering
 {
 
-	class CAUTION_CLASS DescriptorManager
+	class CAUTION_ENGINE_CLASS DescriptorManager
 	{
 	private:
 		D3D12::DescriptorHeap m_cbv_srv_uav_descHeap;

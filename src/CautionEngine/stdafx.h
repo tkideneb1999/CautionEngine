@@ -6,7 +6,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-#include "CautionDefinitions.h"
+#include "CautionEngineDefinitions.h"
 
 // # STD ----------------------------
 #include <string>
@@ -36,8 +36,10 @@
 #include <set>
 #include <variant>
 #include <cstring>
+#include <random>
+#include <thread>
 
-// CautionCommon
+// CautionEngine.Common
 #include <Platform/CautionPlatform.h>
 
 // # DX and Platform

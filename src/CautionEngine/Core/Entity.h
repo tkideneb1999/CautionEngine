@@ -4,19 +4,18 @@
 
 #include <Components/Component.h>
 
-struct CObjectID;
+struct SObjectID;
 // !Namespaces..
 using namespace CautionEngine::Components;
 
 namespace CautionEngine::Core
 {
-	class CAUTION_CLASS CEntity : public CObject
+	class CAUTION_ENGINE_CLASS CEntity : public CObject
 	{
 	public:
 		CEntity();
 		CEntity(const char* name);
-
-		CEntity operator=(CEntity&& other);
+		~CEntity();
 
 		inline const char* GetComponentName() const { return m_name.c_str(); }
 
@@ -25,7 +24,7 @@ namespace CautionEngine::Core
 			m_components.emplace_back(pComponent);
 		};
 
-		CEntityComponent* GetComponentByID(const CObjectID* id);
+		CEntityComponent* GetComponentByID(const SObjectID* id);
 
 		template <typename T>
 		// ! \brief Templated function to get Component by Class
@@ -47,8 +46,17 @@ namespace CautionEngine::Core
 
 		void Destroy();
 
+		void AddChild(CEntity* pEntity);
+		void RemoveChild(CEntity* pEntity);
+
+		// Parent
+		CEntity* GetParent() const { return m_pParent; }
+		void     SetParent(CEntity* pParent);
 	private:
 		std::string m_name;
+		CEntity*    m_pParent;
+
 		std::vector<std::shared_ptr<CEntityComponent>> m_components;
+		std::vector<std::shared_ptr<CEntity>>          m_children;
 	};
 }

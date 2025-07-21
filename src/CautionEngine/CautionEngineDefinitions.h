@@ -3,10 +3,10 @@
 // Compiler specific macros...
 #if defined (_MSC_VER)
 
-#ifdef CAUTION_SHARED
-	#define CAUTION_CLASS __declspec(dllexport)
+#ifdef CAUTION_ENGINE_EXPORT
+	#define CAUTION_ENGINE_CLASS __declspec(dllexport)
 #else
-	#define CAUTION_CLASS __declspec(dllimport)
+	#define CAUTION_ENGINE_CLASS __declspec(dllimport)
 #endif
 
 ////////////////////// Disable Warning from the compiler (MSVC) //////////////////////

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CautionDefinitions.h>
+#include <CautionEngineDefinitions.h>
 
 #include <vector>
 
@@ -10,7 +10,7 @@
 
 namespace CautionEngine::Rendering 
 {
-	class CAUTION_CLASS RenderTargetManager
+	class CAUTION_ENGINE_CLASS RenderTargetManager
 	{
 	private:
 		DescriptorManager* m_pDescriptorManager;

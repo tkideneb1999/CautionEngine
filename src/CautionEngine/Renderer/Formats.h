@@ -1,11 +1,11 @@
 #pragma once
 
-#include <CautionDefinitions.h>
+#include <CautionEngineDefinitions.h>
 #include <dxgiformat.h>
 
 namespace CautionEngine::Rendering
 {
-	enum CAUTION_CLASS RenderFormat
+	enum CAUTION_ENGINE_CLASS RenderFormat
 	{
 		RENDER_FORMAT_UNKOWN = DXGI_FORMAT_UNKNOWN,
 

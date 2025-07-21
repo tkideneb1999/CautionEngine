@@ -1,56 +1,51 @@
-project "GameDLL"
+project "CautionEngine.Common"
     -- StaticLib = .lib
     -- SharedLib = .dll
     kind "SharedLib"
 
-	local lang = "C++"
-	local dialect = "C++20"
-	
-	local buildname = "%{prj.name}_%{cfg.buildcfg}"
-    local solutionlocations = "../../solutions/%{prj.name}"
-    
+    local lang = "C++"
+    local dialect = "C++20"
+
+    local buildname = "%{prj.name}_%{cfg.buildcfg}"
+	local solutionlocations = "../../solutions/%{prj.name}"
+
     local builddir = ("../../bin/")
 	local intermediate = ("../../intermediate/")
 
     language (lang)
     cppdialect (dialect)
-    
+
     location (solutionlocations)
-    
+
     targetdir (builddir)
     objdir (intermediate)
-    
+
     files 
     {
-        "**.h",
+        -- source
+        "**.h", 
         "**.hpp",
-        "**.cpp"
+        "**.cpp",
+        "**.inl",
     }
 
-    includedirs
-    {
-        "src/Game",
-        "../../src/CautionEngine",
-        "%{IncludeDirectories.ImGui}",
-        "%{IncludeDirectories.usd}"
-    }
+    pchheader "stdafx.h"
+    pchsource "stdafx.cpp"
 
-    links
-    {
-        "CautionEngine",
-        (builddir.. "%{Library.caution_engine_lib}")
-    }
+    filter "system:windows"
+        systemversion "latest"
+        defines
+        {
+            "WINDOWS",
+            "WIN32"
+        }
 
-    libdirs
-    {
-        builddir
-    }
-    
     filter "configurations:Debug"
         runtime "Debug"
         defines 
         {
-            "DEBUG"
+            "DEBUG",
+            "CAUTION_SHARED"
         }
         symbols "On"
         inlining("Auto")
@@ -59,7 +54,8 @@ project "GameDLL"
         runtime "Release"
         defines 
         {
-            "RELEASE"
+            "RELEASE",
+            "CAUTION_SHARED"
         }
         optimize "On"
         inlining("Auto")

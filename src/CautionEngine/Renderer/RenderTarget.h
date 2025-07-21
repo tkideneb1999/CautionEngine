@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CautionDefinitions.h>
+#include <CautionEngineDefinitions.h>
 #include "D3D12DescriptorHeap.h"
 
 namespace CautionEngine::Rendering
@@ -8,7 +8,7 @@ namespace CautionEngine::Rendering
 	// forward declaration from RenderTargetManager.h
 	class RenderTargetManager;
 
-	class CAUTION_CLASS RenderTarget
+	class CAUTION_ENGINE_CLASS RenderTarget
 	{
 		friend class RenderTargetManager;
 	public:

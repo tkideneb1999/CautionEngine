@@ -11,13 +11,13 @@ namespace CautionEngine::Rendering
 {
 	extern D3D12API* g_pD3D12API;
 
-	extern CAUTION_CLASS void InitD3D12API()
+	extern CAUTION_ENGINE_CLASS void InitD3D12API()
 	{
 		g_pD3D12API = new D3D12API();
 		g_pD3D12API->Init();
 	}
 
-	extern CAUTION_CLASS void ShutdownD3D12API()
+	extern CAUTION_ENGINE_CLASS void ShutdownD3D12API()
 	{
 		g_pD3D12API->Shutdown();
 		delete g_pD3D12API;

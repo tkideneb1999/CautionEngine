@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CautionDefinitions.h>
+#include <CautionEngineDefinitions.h>
 
 #include "D3D12API.h"
 #include "DescriptorManager.h"
@@ -16,13 +16,13 @@ namespace CautionEngine::Rendering
 {
 	class ConstantBufferManager;
 
-	struct CAUTION_CLASS CommandFrame
+	struct CAUTION_ENGINE_CLASS CommandFrame
 	{
 		ComPtr<ID3D12CommandAllocator> commandAllocator;
 		UINT64 fenceValue;
 	};
 
-	class CAUTION_CLASS Renderer
+	class CAUTION_ENGINE_CLASS Renderer
 	{
 	public:
 		D3D12API* const pD3D12API; // TODO: Make this private

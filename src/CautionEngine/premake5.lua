@@ -23,39 +23,37 @@ project "CautionEngine"
     files 
     {
         -- source
-        "**.h", 
+        "**.h",
+        "**.hpp",
         "**.cpp",
         "**.inl",
-
-        -- common
-        "../CautionCommon/**.h",
-        "../CautionCommon/**.cpp",
-        "../CautionCommon/**.inl",
-
         -- glm
         "../../thirdparty/glm/glm/**.hpp",
         "../../thirdparty/glm/glm/**.inl",
     }
 
-    links
-    {
-        "%{Library.dx_12}",
-        "%{Library.dx_compiler}",
-        "%{Library.dx_gi}",
-		"%{Library.dx_dxcompiler}",
-        "../../%{Library.usd_utils}",
-        "../../%{Library.usd_imaging}",
-        "../../%{Library.usd_geom}",
-        "../../%{Library.usd_mtlx}"
-    }
-
     includedirs
     {
         "../CautionEngine",
+        "../CautionEngine.Common",
         "../CautionCommon",
         "../../%{IncludeDirectories.glm}",
         "../../%{IncludeDirectories.usd}",
         "../../%{IncludeDirectories.json}"
+    }
+
+    links
+    {
+        -- "CautionCommon", -- TODO: enable when we already have implementations of CautionCommon
+        -- "CautionEngine.Common",
+        "%{Library.dx_12}",
+        "%{Library.dx_compiler}",
+        "%{Library.dx_gi}",
+        "%{Library.dx_dxcompiler}",
+        "../../%{Library.usd_utils}",
+        "../../%{Library.usd_imaging}",
+        "../../%{Library.usd_geom}",
+        "../../%{Library.usd_mtlx}"
     }
 
     pchheader "stdafx.h"
@@ -66,7 +64,8 @@ project "CautionEngine"
         defines
         {
             "WINDOWS",
-            "WIN32"
+            "WIN32",
+            "CAUTION_ENGINE_EXPORT"
         }
 
         postbuildcommands
@@ -82,7 +81,6 @@ project "CautionEngine"
         defines 
         {
             "DEBUG",
-            "CAUTION_SHARED"
         }
         symbols "On"
         inlining("Auto")
@@ -92,7 +90,6 @@ project "CautionEngine"
         defines 
         {
             "RELEASE",
-            "CAUTION_SHARED"
         }
         optimize "On"
         inlining("Auto")
