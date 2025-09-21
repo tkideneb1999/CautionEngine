@@ -14,7 +14,11 @@
 
 namespace CautionEngine::Rendering 
 {
-	class ConstantBufferManager;
+	// Forward Declaration
+	namespace ConstantBuffers
+	{
+		class ConstantBufferManager;
+	}
 
 	struct CAUTION_ENGINE_CLASS CommandFrame
 	{
@@ -32,7 +36,7 @@ namespace CautionEngine::Rendering
 	private:
 		RenderTargetManager* m_pRenderTargetManager = nullptr;
 		DescriptorManager* m_pDescriptorManager = nullptr;
-		ConstantBufferManager* m_pConstantBufferManager = nullptr;
+		ConstantBuffers::ConstantBufferManager* m_pConstantBufferManager = nullptr;
 		ShaderManager* m_pShaderManager;
 
 		std::vector<RenderTarget> m_swapChainRenderTargets;

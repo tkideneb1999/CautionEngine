@@ -6,7 +6,7 @@
 #include "D3D12Helpers.h"
 
 #include "RenderTargetManager.h"
-#include "ConstantBufferManager.h"
+#include "ConstantBuffers/ConstantBufferManager.h"
 
 namespace CautionEngine::Rendering 
 {
@@ -42,7 +42,7 @@ namespace CautionEngine::Rendering
 
 		numBackBuffers = frameCount;
 
-		m_pConstantBufferManager = new ConstantBufferManager(numBackBuffers);
+		m_pConstantBufferManager = new ConstantBuffers::ConstantBufferManager(numBackBuffers);
 		m_pShaderManager = new ShaderManager(m_pConstantBufferManager);
 
 		// Init Command Queue
@@ -316,7 +316,7 @@ namespace CautionEngine::Rendering
 		);
 
 		// TEST
-		Shader* pFallback = m_pShaderManager->CreateShader("F:\\projects\\CautionEngine\\src\\CautionEngine\\Shaders\\Fallback.hlsl");
+		Shader* pFallback = m_pShaderManager->CreateShader("D:\\projects\\CautionEngine\\src\\CautionEngine\\Shaders\\Fallback.hlsl");
 	}
 
 	void Renderer::Shutdown()

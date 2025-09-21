@@ -10,11 +10,13 @@
 #include "Shader.h"
 #include "ShaderData.h"
 
-using namespace Microsoft::WRL; // TODO: Remove this
-
 namespace CautionEngine::Rendering 
 {
-	class ConstantBufferManager;
+	// Forward Declaration
+	namespace ConstantBuffers
+	{
+		class ConstantBufferManager;
+	}
 
 	class D3D12ShaderCompiler 
 	{
@@ -92,7 +94,7 @@ namespace CautionEngine::Rendering
 			return shaderModelStr;
 		}
 
-		static bool GetShaderVarType(const D3D12_SHADER_TYPE_DESC* dxcTypeInfo, ShaderVariableTypes* engineType, unsigned int& size);
+		static bool GetShaderVarType(const D3D12_SHADER_TYPE_DESC* dxcTypeInfo, ShaderVariableTypes& engineType, unsigned int& size);
 
 		Microsoft::WRL::ComPtr<IDxcCompiler3> m_compiler;
 		Microsoft::WRL::ComPtr<IDxcIncludeHandler> m_includeHandler;
@@ -100,7 +102,7 @@ namespace CautionEngine::Rendering
 
 		Microsoft::WRL::ComPtr<ID3D12ShaderReflection> m_reflectionData[SHADER_STAGE_COUNT];
 
-		ConstantBufferManager* m_pCBufferManager;
+		ConstantBuffers::ConstantBufferManager* m_pCBufferManager;
 
 		Shader* m_pShader;
 		DxcBuffer m_shaderSource;
@@ -112,7 +114,7 @@ namespace CautionEngine::Rendering
 
 	public:
 		D3D12ShaderCompiler() = delete;
-		D3D12ShaderCompiler(Shader* shader, ConstantBufferManager* const cbufferManager);
+		D3D12ShaderCompiler(Shader* shader, ConstantBuffers::ConstantBufferManager* const cbufferManager);
 
 		bool Compile();
 

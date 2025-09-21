@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ConstantBufferManager.h"
 
-namespace CautionEngine::Rendering
+namespace CautionEngine::Rendering::ConstantBuffers
 {
 	unsigned int ConstantBufferManager::CreateBuffer(ConstantBufferLayout& layout)
 	{

@@ -5,7 +5,7 @@
 
 #include "ConstantBuffer.h"
 
-namespace CautionEngine::Rendering
+namespace CautionEngine::Rendering::ConstantBuffers
 {
 	class ConstantBufferManager
 	{
