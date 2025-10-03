@@ -1,6 +1,7 @@
 #pragma once
 
 #include <CautionEngineDefinitions.h>
+#include "Formats.h"
 #include "D3D12DescriptorHeap.h"
 
 namespace CautionEngine::Rendering
@@ -17,14 +18,18 @@ namespace CautionEngine::Rendering
 
 		const Microsoft::WRL::ComPtr<ID3D12Resource>& GetPtr() { return pResource; }
 
-		RenderTarget();
+		RenderTarget(
+			RenderFormat format, unsigned int width, unsigned int height, unsigned int id, 
+			int mipLevels, float clearValue[]
+		);
 
-		// TODO: Remove this
-		RenderTarget(D3D12::DescriptorHeapHandle handle, Microsoft::WRL::ComPtr<ID3D12Resource> renderTargetResource);
+		RenderTarget(D3D12::DescriptorHeapHandle& handle, Microsoft::WRL::ComPtr<ID3D12Resource> resource);
 
 		const unsigned int GetWidth() const { return m_width; }
 		const unsigned int GetHeight() const { return m_height; }
 		const unsigned int GetId() const { return m_id; }
+		const bool IsDepthRT() const { return m_isDepthRT; }
+		const RenderFormat GetRenderFormat() const { return m_renderFormat; }
 
 		void Release() 
 		{ 
@@ -37,6 +42,10 @@ namespace CautionEngine::Rendering
 	private:
 		unsigned int m_width = 0;
 		unsigned int m_height = 0;
-		unsigned int m_id;
+		unsigned int m_id = 0;
+		RenderFormat m_renderFormat;
+		bool m_isDepthRT;
+		unsigned int m_mipLevels;
+		float m_clearValue[4];
 	};
 }

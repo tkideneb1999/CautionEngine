@@ -10,7 +10,6 @@
 
 namespace CautionEngine::Rendering 
 {
-
 	Renderer::Renderer()
 		: pD3D12API(D3D12API::Get())
 	{ 
@@ -112,6 +111,7 @@ namespace CautionEngine::Rendering
 		m_scissorRect.right = width;
 		m_scissorRect.bottom = height;
 
+		m_DSRenderTargetHandle = m_pRenderTargetManager->CreateRenderTarget(width, height, RENDER_FORMAT_D32_FLOAT);
 	}
 
 	void Renderer::InitDescriptorHeaps(int cbv_srv_uav_count, int dsv_count, int rtv_count, int sampler_count)
@@ -220,6 +220,8 @@ namespace CautionEngine::Rendering
 
 		curFrame.commandAllocator->Reset();
 
+		RenderTarget* pDSRenderTarget = m_pRenderTargetManager->GetRenderTarget(m_DSRenderTargetHandle);
+
 		ComPtr<ID3D12GraphicsCommandList6>& curCommandList = m_commandLists[m_curFrameIndex];
 		curCommandList->Reset(m_commandFrames[m_curFrameIndex].commandAllocator.Get(), nullptr);
 		if (m_useCustomSceneRenderTarget)
@@ -231,8 +233,12 @@ namespace CautionEngine::Rendering
 		}
 		else
 		{
+			
 			curCommandList->OMSetRenderTargets(
-				1, &(m_swapChainRenderTargets[m_curFrameIndex].descriptorHeapHandle.cpuHandle), false, nullptr
+				1, 
+				&(m_swapChainRenderTargets[m_curFrameIndex].descriptorHeapHandle.cpuHandle), 
+				false, 
+				&(pDSRenderTarget->descriptorHeapHandle.cpuHandle)
 			);
 		}
 
@@ -255,6 +261,7 @@ namespace CautionEngine::Rendering
 		{
 			curCommandList->RSSetViewports(1, &m_viewport);
 			curCommandList->RSSetScissorRects(1, &m_scissorRect);
+			curCommandList->ClearDepthStencilView(pDSRenderTarget->descriptorHeapHandle.cpuHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 		}
 
 		float color[] = { 0.2, 0.2, 0.3, 1.0 };
@@ -301,7 +308,6 @@ namespace CautionEngine::Rendering
 			m_testMesh.Draw(curCommandList.Get());
 		}
 		
-		// !!! Can cause Race Condition with other command lists
 		if (!m_testMesh.IsUploaded())
 			m_testMesh.ScheduleUpload(curCommandList.Get());
 
@@ -431,6 +437,7 @@ namespace CautionEngine::Rendering
 		ReleaseSwapChainRenderTargets();
 		m_swapChain->ResizeBuffers(0, newWidth, newHeight, DXGI_FORMAT_UNKNOWN, 0);
 		CreateSwapChainRenderTargets();
+		m_pRenderTargetManager->ResizeRenderTarget(m_DSRenderTargetHandle, newWidth, newHeight);
 	}
 
 	void Renderer::CreateSwapChainRenderTargets()

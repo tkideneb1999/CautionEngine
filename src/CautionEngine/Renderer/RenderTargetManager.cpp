@@ -20,58 +20,38 @@ namespace CautionEngine::Rendering
 	)
 	{
 		unsigned int id = GetFreeID();
-		RenderTarget rt = RenderTarget();
-		rt.m_width = width;
-		rt.m_height = height;
-		rt.m_id = id;
-
-		if (format == RENDER_FORMAT_D32_FLOAT)
+		bool isDepthRT = format == RENDER_FORMAT_D32_FLOAT;
+		float finalClearValue[4]{};
+		if (clearValue == 0)
 		{
-			// TODO
-			CreateRenderTargetResource(
-				width, height, format, mipLevel, true,
-				nullptr, rt.pResource
-			);
-			rt.descriptorHeapHandle = m_pDescriptorManager->AllocateDSV();
-			D3D12_DEPTH_STENCIL_VIEW_DESC desc = {};
-			desc.Format = DXGI_FORMAT_D32_FLOAT;
-			desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-			desc.Flags = D3D12_DSV_FLAG_NONE;
+			if (isDepthRT)
+				finalClearValue[0] = 1.0f;
+			else
+			{
+				finalClearValue[0] = 0.0f;
+				finalClearValue[1] = 0.0f;
+				finalClearValue[2] = 0.0f;
+				finalClearValue[3] = 1.0f;
+			}
+		}
 
-			D3D12API::Get()->GetDevicePtr()->CreateDepthStencilView(
-				rt.pResource.Get(), &desc, rt.descriptorHeapHandle.cpuHandle
-			);
+		RenderTarget rt = RenderTarget(format, width, height, id, mipLevel, finalClearValue);
+		CreateRenderTargetResource(
+			width, height, format, mipLevel, isDepthRT,
+			finalClearValue, rt.pResource
+		);
+
+		if (isDepthRT)
+		{
+			rt.descriptorHeapHandle = m_pDescriptorManager->AllocateDSV();
+			CreateDepthStencilView(rt);
 		}
 		else
 		{
-			// TODO: Make this prettier
-			if (clearValue == nullptr)
-			{
-				float clearValue[] = { 0.0, 0.0, 0.0, 1.0 };
-				CreateRenderTargetResource(
-					width, height, format, mipLevel, false, 
-					&clearValue[0], rt.pResource
-				);
-			}
-			else
-			{
-				CreateRenderTargetResource(
-					width, height, format, mipLevel, false, 
-					clearValue, rt.pResource
-				);
-			}
 			rt.descriptorHeapHandle = m_pDescriptorManager->AllocateRTV();
-			D3D12_RENDER_TARGET_VIEW_DESC desc = {};
-			desc.Format = (DXGI_FORMAT)format;
-			desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-			desc.Texture2D.MipSlice = 0;
-			desc.Texture2D.PlaneSlice = 0;
-			D3D12API::Get()->GetDevicePtr()->CreateRenderTargetView(
-				rt.pResource.Get(), &desc, rt.descriptorHeapHandle.cpuHandle
-			);
-			m_renderTargets.insert(std::pair<unsigned int, RenderTarget>(id, rt));
+			CreateRenderTargetView(rt);
 		}
-		
+		m_renderTargets.insert(std::pair<unsigned int, RenderTarget>(id, rt));
 		return id;
 	}
 
@@ -83,6 +63,38 @@ namespace CautionEngine::Rendering
 			return nullptr;
 		}
 		return &(res->second);
+	}
+
+	void RenderTargetManager::ReleaseRenderTarget(unsigned int id)
+	{
+		auto res = m_renderTargets.find(id);
+		if (res == m_renderTargets.end())
+		{
+			return;
+		}
+		res->second.Release();
+		m_renderTargets.erase(id);
+	}
+
+	void RenderTargetManager::ResizeRenderTarget(unsigned int id, unsigned int newWidth, unsigned int newHeight)
+	{
+		auto res = m_renderTargets.find(id);
+		if (res == m_renderTargets.end())
+		{
+			return;
+		}
+		RenderTarget& rt = res->second;
+		rt.pResource = ComPtr<ID3D12Resource>{};
+		CreateRenderTargetResource(newWidth, newHeight, 
+			rt.m_renderFormat, rt.m_mipLevels, rt.m_isDepthRT, rt.m_clearValue, rt.pResource);
+		if (rt.m_isDepthRT)
+		{
+			CreateDepthStencilView(rt);
+		}
+		else
+		{
+			CreateRenderTargetView(rt);
+		}
 	}
 
 	void RenderTargetManager::Shutdown()
@@ -135,7 +147,7 @@ namespace CautionEngine::Rendering
 		if (isDepthRT)
 		{
 			clearValue.Format = (DXGI_FORMAT)format;
-			clearValue.DepthStencil.Depth = 1.0f;
+			clearValue.DepthStencil.Depth = *pClearValue;
 			clearValue.DepthStencil.Stencil = 0;
 		}
 		else
@@ -160,6 +172,30 @@ namespace CautionEngine::Rendering
 				IID_PPV_ARGS(&pRenderTargetResource)
 			),
 			"Could not create Rendertarget"
+		);
+	}
+
+	void RenderTargetManager::CreateRenderTargetView(RenderTarget& rt)
+	{
+		D3D12_RENDER_TARGET_VIEW_DESC desc = {};
+		desc.Format = (DXGI_FORMAT)rt.m_renderFormat;
+		desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+		desc.Texture2D.MipSlice = 0;
+		desc.Texture2D.PlaneSlice = 0;
+		D3D12API::Get()->GetDevicePtr()->CreateRenderTargetView(
+			rt.pResource.Get(), &desc, rt.descriptorHeapHandle.cpuHandle
+		);
+	}
+
+	void RenderTargetManager::CreateDepthStencilView(RenderTarget& rt)
+	{
+		D3D12_DEPTH_STENCIL_VIEW_DESC desc = {};
+		desc.Format = DXGI_FORMAT_D32_FLOAT;
+		desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+		desc.Flags = D3D12_DSV_FLAG_NONE;
+
+		D3D12API::Get()->GetDevicePtr()->CreateDepthStencilView(
+			rt.pResource.Get(), &desc, rt.descriptorHeapHandle.cpuHandle
 		);
 	}
 

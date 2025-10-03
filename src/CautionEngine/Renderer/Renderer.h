@@ -41,6 +41,8 @@ namespace CautionEngine::Rendering
 
 		std::vector<RenderTarget> m_swapChainRenderTargets;
 
+		unsigned int m_DSRenderTargetHandle;
+
 		ComPtr<ID3D12CommandQueue> m_commandQueue;
 
 		ComPtr<IDXGISwapChain4> m_swapChain;
