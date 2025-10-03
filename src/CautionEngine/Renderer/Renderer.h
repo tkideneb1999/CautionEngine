@@ -34,9 +34,9 @@ namespace CautionEngine::Rendering
 		unsigned int numBackBuffers;
 
 	private:
-		RenderTargetManager* m_pRenderTargetManager = nullptr;
-		DescriptorManager* m_pDescriptorManager = nullptr;
-		ConstantBuffers::ConstantBufferManager* m_pConstantBufferManager = nullptr;
+		std::shared_ptr<RenderTargetManager> m_pRenderTargetManager = nullptr;
+		std::shared_ptr<DescriptorManager> m_pDescriptorManager = nullptr;
+		std::shared_ptr<ConstantBuffers::ConstantBufferManager> m_pConstantBufferManager = nullptr;
 		ShaderManager* m_pShaderManager;
 
 		std::vector<RenderTarget> m_swapChainRenderTargets;
@@ -67,6 +67,11 @@ namespace CautionEngine::Rendering
 		UINT64 m_fenceValue = 0;
 		ComPtr<ID3D12Fence> m_fence;
 
+		// TEST MESH
+		PipelineStateObject m_testPSO;
+		Mesh m_testMesh;
+		glm::vec4 m_color;
+
 	public:
 		Renderer();
 		virtual ~Renderer() = default;
@@ -92,8 +97,8 @@ namespace CautionEngine::Rendering
 		ID3D12GraphicsCommandList6* GetCurrentCommandList(); // TODO: Wrap Command List somehow
 		DXGI_FORMAT GetRTVFormat(); // TODO: Convert this to 'RenderFormat'
 
-		DescriptorManager* GetDescriptorManager() const { return m_pDescriptorManager; }
-		RenderTargetManager* GetRenderTargetManager() const { return m_pRenderTargetManager; }
+		DescriptorManager* GetDescriptorManager() const { return m_pDescriptorManager.get(); }
+		RenderTargetManager* GetRenderTargetManager() const { return m_pRenderTargetManager.get(); }
 
 		void SetCustomSceneRenderTarget(unsigned int customRenderTargetId);
 		void DisableCustomSceneRenderTarget();

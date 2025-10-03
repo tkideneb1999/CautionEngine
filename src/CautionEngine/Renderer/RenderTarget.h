@@ -22,9 +22,9 @@ namespace CautionEngine::Rendering
 		// TODO: Remove this
 		RenderTarget(D3D12::DescriptorHeapHandle handle, Microsoft::WRL::ComPtr<ID3D12Resource> renderTargetResource);
 
-		const unsigned int GetWidth() { return m_width; }
-		const unsigned int GetHeight() { return m_height; }
-		const unsigned int GetId() { return m_id; }
+		const unsigned int GetWidth() const { return m_width; }
+		const unsigned int GetHeight() const { return m_height; }
+		const unsigned int GetId() const { return m_id; }
 
 		void Release() 
 		{ 

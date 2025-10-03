@@ -14,8 +14,8 @@ namespace CautionEngine::Rendering
 	Renderer::Renderer()
 		: pD3D12API(D3D12API::Get())
 	{ 
-		m_pDescriptorManager = new DescriptorManager();
-		m_pRenderTargetManager = new RenderTargetManager(m_pDescriptorManager);
+		m_pDescriptorManager = std::make_shared<DescriptorManager>();
+		m_pRenderTargetManager = std::make_shared<RenderTargetManager>(m_pDescriptorManager);
 	}
 
 	void Renderer::Render()
@@ -42,7 +42,7 @@ namespace CautionEngine::Rendering
 
 		numBackBuffers = frameCount;
 
-		m_pConstantBufferManager = new ConstantBuffers::ConstantBufferManager(numBackBuffers);
+		m_pConstantBufferManager = std::make_shared<ConstantBuffers::ConstantBufferManager>(numBackBuffers, m_pDescriptorManager);
 		m_pShaderManager = new ShaderManager(m_pConstantBufferManager);
 
 		// Init Command Queue
@@ -142,6 +142,7 @@ namespace CautionEngine::Rendering
 				pD3D12API->GetDevicePtr()->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&(m_commandLists[i]))),
 				"Command List Creation Failed"
 			);
+			m_commandLists[i]->SetName((std::wstring(L"Render Command List ") + std::to_wstring(i)).c_str());
 		}
 	}
 
@@ -230,7 +231,9 @@ namespace CautionEngine::Rendering
 		}
 		else
 		{
-			curCommandList->OMSetRenderTargets(1, &(m_swapChainRenderTargets[m_curFrameIndex].descriptorHeapHandle.cpuHandle), false, nullptr);
+			curCommandList->OMSetRenderTargets(
+				1, &(m_swapChainRenderTargets[m_curFrameIndex].descriptorHeapHandle.cpuHandle), false, nullptr
+			);
 		}
 
 		D3D12_RESOURCE_BARRIER barrier{};
@@ -268,6 +271,42 @@ namespace CautionEngine::Rendering
 
 		// TODO: Put scene Rendering here
 
+		// Test Render
+		if (m_testMesh.IsUploaded())
+		{
+			std::string bufferName("cBuffer");
+			std::string colorName("color");
+			if (m_color.r > 1.0f)
+				m_color.r = 0.0f;
+			else
+				m_color.r += 0.01f;
+			if (m_color.g > 1.0)
+				m_color.g = 0.0f;
+			else
+				m_color.g += 0.01f;
+			if (m_color.b > 1.0)
+				m_color.b = 0.0f;
+			else
+				m_color.b += 0.01f;
+			ConstantBuffers::ConstantBuffer* pTestBuffer = m_pConstantBufferManager->GetBuffer(bufferName);
+			pTestBuffer->SetFloat4(colorName, &m_color);
+			m_testPSO.SetState(curCommandList.Get());
+			for (const std::pair<unsigned int, unsigned int> CBufferId : m_testPSO.GetShader()->GetConstantBufferID())
+			{
+				ConstantBuffers::ConstantBuffer* pBuffer = m_pConstantBufferManager->GetBuffer(CBufferId.first);
+				pBuffer->SetAsRootConstant(m_curFrameIndex, CBufferId.second, curCommandList.Get());
+			}
+
+			m_pConstantBufferManager->UpdateConstantBufferGPUData(m_curFrameIndex);
+			m_testMesh.Draw(curCommandList.Get());
+		}
+		
+		// !!! Can cause Race Condition with other command lists
+		if (!m_testMesh.IsUploaded())
+			m_testMesh.ScheduleUpload(curCommandList.Get());
+
+		
+
 		if (m_useCustomSceneRenderTarget)
 		{
 			curCommandList->OMSetRenderTargets(
@@ -284,7 +323,8 @@ namespace CautionEngine::Rendering
 
 		D3D12_RESOURCE_BARRIER barrier{};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Transition.pResource = m_swapChainRenderTargets[m_curFrameIndex].GetPtr().Get();
+		const Microsoft::WRL::ComPtr< ID3D12Resource>& resourcePtr = m_swapChainRenderTargets[m_curFrameIndex].GetPtr();
+		barrier.Transition.pResource = resourcePtr.Get();
 		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 
@@ -294,6 +334,7 @@ namespace CautionEngine::Rendering
 		// Execute Command List
 		ID3D12CommandList* ppCommandLists[] = { curCommandList.Get() };
 		m_commandQueue->ExecuteCommandLists(1, ppCommandLists);
+
 	}
 
 	void Renderer::CreateRootSignature()
@@ -317,6 +358,24 @@ namespace CautionEngine::Rendering
 
 		// TEST
 		Shader* pFallback = m_pShaderManager->CreateShader("D:\\projects\\CautionEngine\\src\\CautionEngine\\Shaders\\Fallback.hlsl");
+		m_testPSO = PipelineStateObject();
+		m_testPSO.SetShader(pFallback);
+		m_testPSO.Generate();
+		
+		std::vector<Vertex> testVertices{
+			{{-0.5,-0.5, 0.5, 1}, {1,0,0,1}},
+			{{   0, 0.5, 0.5, 1}, {0,1,0,1}},
+			{{   1,   1, 0.5, 1}, {0,0,1,1}}
+		};
+		std::vector<int> testIndices{ 
+			0,1,2
+		};
+
+		m_color = { 0.0f, 0.33f, 0.66f, 0.0f };
+
+		m_testMesh = Mesh();
+		m_testMesh.SetVertices(testVertices.data(), testVertices.size());
+		m_testMesh.SetIndices(testIndices.data(), testIndices.size());
 	}
 
 	void Renderer::Shutdown()
@@ -349,9 +408,6 @@ namespace CautionEngine::Rendering
 		m_fence = nullptr;
 
 		m_pRenderTargetManager->Shutdown();
-
-		delete m_pRenderTargetManager;
-		delete m_pDescriptorManager;
 	}
 
 	void Renderer::FlushGPU()

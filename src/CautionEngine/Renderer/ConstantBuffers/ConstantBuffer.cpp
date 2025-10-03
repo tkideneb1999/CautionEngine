@@ -6,7 +6,7 @@
 
 namespace CautionEngine::Rendering::ConstantBuffers
 {
-	inline bool ConstantBuffer::SetData(size_t index, void* pData, size_t size, ShaderVariableTypes type, unsigned int columns, unsigned int rows)
+	bool ConstantBuffer::SetData(size_t index, void* pData, size_t size, ShaderVariableTypes type, unsigned int columns, unsigned int rows)
 	{
 		ConstantBufferLayout::ConstantBufferElement& layoutElement = m_bufferLayout.m_layout[index];
 		if (size != layoutElement.m_size || layoutElement.m_type != type || layoutElement.m_columns != columns || layoutElement.m_rows != rows)
@@ -18,7 +18,7 @@ namespace CautionEngine::Rendering::ConstantBuffers
 		return true;
 	}
 
-	inline bool ConstantBuffer::SetDataFromName(std::string& name, void* pData, size_t size, ShaderVariableTypes type, unsigned int columns, unsigned int rows)
+	bool ConstantBuffer::SetDataFromName(std::string& name, void* pData, size_t size, ShaderVariableTypes type, unsigned int columns, unsigned int rows)
 	{
 		int index = GetIndexFromName(name);
 		if (index < 0)
@@ -65,15 +65,18 @@ namespace CautionEngine::Rendering::ConstantBuffers
 		pUploadBuffer->SetName(L"CBuffer Resource Heap");
 	}
 
-	ConstantBuffer::ConstantBuffer(ConstantBufferLayout& layout, unsigned int numBackBuffers)
-		:m_bufferLayout(layout)
+	ConstantBuffer::ConstantBuffer(const ConstantBufferLayout& layout, unsigned int numBackBuffers)
+		: m_bufferLayout(layout)
+		, m_gpuAddresses()
 	{
-		m_pBufferMemory = (byte*)malloc(layout.m_size);
+		size_t alignedSize = GetAlignedSizeInBytes();
+		m_pBufferMemory = (byte*)malloc(alignedSize);
 		if (m_pBufferMemory != nullptr)
 		{
-			ZeroMemory(m_pBufferMemory, layout.m_size);
+			ZeroMemory(m_pBufferMemory, alignedSize);
 		}
 		m_bufferResources.resize(numBackBuffers);
+		m_gpuAddresses.resize(numBackBuffers);
 	}
 
 	ConstantBuffer::~ConstantBuffer()
@@ -82,10 +85,14 @@ namespace CautionEngine::Rendering::ConstantBuffers
 		m_pBufferMemory = nullptr;
 	}
 
-	void ConstantBuffer::Init(DescriptorManager* pDescriptorManager)
+	void ConstantBuffer::Init(std::shared_ptr<DescriptorManager> pDescriptorManager)
 	{
 		using namespace Microsoft::WRL;
 		const ComPtr<ID3D12Device8>& pDevice = D3D12API::Get()->GetDevicePtr();
+
+		D3D12_RANGE range = {};
+		range.Begin = 0;
+		range.End = 0;
 
 		for (size_t i = 0; i < m_bufferResources.size(); ++i)
 		{
@@ -97,21 +104,24 @@ namespace CautionEngine::Rendering::ConstantBuffers
 			cbvDesc.SizeInBytes = CalcNearestMultiple(m_bufferLayout.m_size, 256);
 			D3D12::DescriptorHeapHandle handle = pDescriptorManager->AllocateCbvSrvUav();
 			pDevice->CreateConstantBufferView(&cbvDesc, handle.cpuHandle);
+
+			THROW_IF_FAILED(
+				m_bufferResources[i]->Map(0, &range, &m_gpuAddresses[i]),
+				"Can not map constant buffer"
+			);
+
 			UpdateGPUMemory(i);
 		}
 	}
 
 	void ConstantBuffer::UpdateGPUMemory(int backBufferIndex)
 	{
-		D3D12_RANGE range = {};
-		range.Begin = 0;
-		range.End = 0;
-		void* pData = nullptr;
-		THROW_IF_FAILED(
-			m_bufferResources[backBufferIndex]->Map(0, &range, &pData),
-			"Can not map constant buffer"
-		);
-		memcpy(pData, m_pBufferMemory, GetSizeInBytes());
+		memcpy(m_gpuAddresses[backBufferIndex], m_pBufferMemory, GetSizeInBytes());
+	}
+
+	void ConstantBuffer::SetAsRootConstant(int backBufferIndex, unsigned int rootParameterIndex, ID3D12GraphicsCommandList* pCommandList)
+	{
+		pCommandList->SetGraphicsRootConstantBufferView(rootParameterIndex, m_bufferResources[backBufferIndex]->GetGPUVirtualAddress());
 	}
 
 	int ConstantBuffer::GetIndexFromName(std::string& name)

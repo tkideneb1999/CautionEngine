@@ -13,13 +13,13 @@ namespace CautionEngine::Rendering
 	class CAUTION_ENGINE_CLASS RenderTargetManager
 	{
 	private:
-		DescriptorManager* m_pDescriptorManager;
+		std::shared_ptr<DescriptorManager> m_pDescriptorManager;
 
 		// TODO: Better Allocation -> maybe heap allocate these
 		std::unordered_map<unsigned int, RenderTarget> m_renderTargets;
 	public:
 		
-		RenderTargetManager(DescriptorManager* pDescriptorManager);
+		RenderTargetManager(std::shared_ptr<DescriptorManager> pDescriptorManager);
 
 		RenderTargetManager() = delete;
 		RenderTargetManager(const RenderTargetManager&) = delete;

@@ -4,6 +4,7 @@
 
 #include <d3d12.h>
 #include <vector>
+#include <array>
 
 #include <glm/common.hpp>
 
@@ -25,19 +26,27 @@ namespace CautionEngine::Rendering::ConstantBuffers
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> m_bufferResources;
 		ConstantBufferLayout m_bufferLayout;
 		byte* m_pBufferMemory;
+		
+		std::vector<void*> m_gpuAddresses;
 
-		inline bool SetData(size_t index, void* pData, size_t size, ShaderVariableTypes type, unsigned int columns, unsigned int rows);
-		inline bool SetDataFromName(std::string& name, void* pData, size_t size, ShaderVariableTypes type, unsigned int columns, unsigned int rows);
+		bool SetData(size_t index, void* pData, size_t size, ShaderVariableTypes type, unsigned int columns, unsigned int rows);
+		bool SetDataFromName(std::string& name, void* pData, size_t size, ShaderVariableTypes type, unsigned int columns, unsigned int rows);
 
 		void CreateUploadBuffer(Microsoft::WRL::ComPtr<ID3D12Resource>& pUploadBuffer);
 
 	public:
-		ConstantBuffer(ConstantBufferLayout& layout, unsigned int numBackBuffers);
-		ConstantBuffer(ConstantBuffer& other) = delete;
+		ConstantBuffer(const ConstantBufferLayout& layout, unsigned int numBackBuffers);
+
+		ConstantBuffer(ConstantBuffer& ) = delete;
+		ConstantBuffer(ConstantBuffer&& ) = delete;
+		ConstantBuffer& operator=(const ConstantBuffer&) = delete;
+		ConstantBuffer& operator=(ConstantBuffer&&) = delete;
+
 		~ConstantBuffer();
 
-		void Init(DescriptorManager* pDescriptorManager);
+		void Init(std::shared_ptr<DescriptorManager> pDescriptorManager);
 		void UpdateGPUMemory(int backBufferIndex);
+		void SetAsRootConstant(int backBufferIndex, unsigned int rootParameterIndex, ID3D12GraphicsCommandList* pCommandList);
 
 #define DECLARE_SET(name, type, shaderVarType, columns, rows) \
 		bool name(size_t index, type* pValue) { return SetData(index, static_cast<void*>(pValue), sizeof(type), shaderVarType, columns, rows); } \
@@ -73,7 +82,7 @@ namespace CautionEngine::Rendering::ConstantBuffers
 #undef DECLARE_SET
 
 		size_t GetSizeInBytes() const { return m_bufferLayout.m_size; }
-		size_t GetAlignedSizeInBytes() const { return CalcNearestMultiple(m_bufferLayout.m_size, 64); }
+		size_t GetAlignedSizeInBytes() const { return CalcNearestMultiple(m_bufferLayout.m_size, 256); }
 		size_t GetElementCount() const { return m_bufferLayout.m_layout.size(); }
 		int GetIndexFromName(std::string& name);
 		ShaderVariableTypes GetType(size_t index) const { return m_bufferLayout.m_layout[index].m_type; }

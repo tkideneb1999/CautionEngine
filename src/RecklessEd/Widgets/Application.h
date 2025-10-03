@@ -93,6 +93,7 @@ namespace Reckless
 
 		//! \brief Gets the Renderer of the Engine
 		Renderer* GetRenderer() { return &m_renderer; }
+		unsigned int GetSceneRenderTextureId() const { return m_sceneRenderTextureId; }
 
 	private:
 		Renderer                  m_renderer;
@@ -100,7 +101,7 @@ namespace Reckless
 		SRecklessAppSpecification m_specification;
 
 		// Render Scene into this Render Texture to display it in Viewport
-		unsigned int m_pSceneRenderTextureId;
+		unsigned int m_sceneRenderTextureId;
 		
 		// Timestamps
 		float m_timeStamp = 0.f;

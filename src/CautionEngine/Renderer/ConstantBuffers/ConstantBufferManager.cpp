@@ -3,19 +3,25 @@
 
 namespace CautionEngine::Rendering::ConstantBuffers
 {
-	unsigned int ConstantBufferManager::CreateBuffer(ConstantBufferLayout& layout)
+	unsigned int ConstantBufferManager::CreateBuffer(const ConstantBufferLayout& layout)
 	{
 		ConstantBuffer* pBuffer = new ConstantBuffer(layout, m_numBackbuffers);
-		m_constantBuffers.insert(
-			std::pair<unsigned int, ConstantBuffer*>(m_counter, pBuffer)
-		);
 		unsigned int res = m_counter;
+		m_constantBuffers.insert(
+			std::pair<unsigned int, ConstantBuffer*>(res, pBuffer)
+		);
+		m_nameMapping.insert(
+			std::pair<std::string, unsigned int>(layout.GetName(), res)
+		);
+		pBuffer->Init(m_pDescriptorManager);
+		
 		++m_counter;
 		return res;
 	}
 
-	ConstantBufferManager::ConstantBufferManager(unsigned int numBackbuffers)
+	ConstantBufferManager::ConstantBufferManager(unsigned int numBackbuffers, std::shared_ptr<DescriptorManager> pDescriptorManager)
 		: m_numBackbuffers(numBackbuffers)
+		, m_pDescriptorManager(pDescriptorManager)
 	{
 	}
 
@@ -70,6 +76,14 @@ namespace CautionEngine::Rendering::ConstantBuffers
 			return nullptr;
 		}
 		return GetBuffer(id);
+	}
+
+	void ConstantBufferManager::UpdateConstantBufferGPUData(int backBufferIndex)
+	{
+		for (auto& buffer : m_constantBuffers)
+		{
+			buffer.second->UpdateGPUMemory(backBufferIndex);
+		}
 	}
 
 

@@ -131,5 +131,6 @@ namespace CautionEngine::Rendering {
 		pCommandList->SetGraphicsRootSignature(m_pShader->GetRootSignature());
 		pCommandList->IASetPrimitiveTopology(m_IATopologyType);
 		pCommandList->SetPipelineState(m_d3d12Pso.Get());
+		
 	}
 }

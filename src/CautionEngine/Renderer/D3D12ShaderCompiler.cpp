@@ -151,8 +151,8 @@ namespace CautionEngine::Rendering {
 									isValid = false;
 									break;
 								}
-
-								std::string name = memberTypeDesc.Name;
+								
+								std::string name = varType->GetMemberTypeName(memberIndex);
 								bufferLayout.AppendData(
 									size* memberTypeDesc.Columns* memberTypeDesc.Rows, name, cBufferVarType, 
 									memberTypeDesc.Columns, memberTypeDesc.Rows
@@ -176,10 +176,12 @@ namespace CautionEngine::Rendering {
 							.RegisterSpace = resourceBindDesc.Space,
 							.Flags = D3D12_ROOT_DESCRIPTOR_FLAG_NONE,
 						},
+						.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL,
 					};
 					(*shaderRootParamIndexMap)[resourceName] = rootParams.size();
 					rootParams.push_back(cbvRootParam);
-					m_pShader->m_cbufferIDs.emplace_back(m_pCBufferManager->GetOrCreateBuffer(bufferLayout));
+					unsigned int bufferId = m_pCBufferManager->GetOrCreateBuffer(bufferLayout);
+					m_pShader->m_cbufferIdRootParamSlotMap.insert(std::pair<unsigned int, unsigned int>(bufferId, rootParams.size() - 1));
 
 					std::cout << "Found CBuffer: " << resourceBindDesc.Name << std::endl;
 				}
@@ -226,7 +228,11 @@ namespace CautionEngine::Rendering {
 			),
 			"Root Signature Creation failed!"
 		);
-				
+
+#if _DEBUG
+		std::filesystem::path shaderPath(m_pShader->GetFilepath());
+		m_pShader->m_rootSignature->SetName(shaderPath.filename().wstring().c_str());
+#endif
 		return true;
 	}
 
@@ -296,7 +302,7 @@ namespace CautionEngine::Rendering {
 		return result;
 	}
 
-	D3D12ShaderCompiler::D3D12ShaderCompiler(Shader* shader, ConstantBuffers::ConstantBufferManager* const cbufferManager)
+	D3D12ShaderCompiler::D3D12ShaderCompiler(Shader* shader, std::shared_ptr<ConstantBuffers::ConstantBufferManager> cbufferManager)
 		: m_pCBufferManager(cbufferManager)
 	{
 		m_pShader = shader;

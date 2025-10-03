@@ -9,7 +9,7 @@
 
 namespace CautionEngine::Rendering 
 {
-	RenderTargetManager::RenderTargetManager(DescriptorManager* pDescriptorManager)
+	RenderTargetManager::RenderTargetManager(std::shared_ptr<DescriptorManager> pDescriptorManager)
 	{
 		m_pDescriptorManager = pDescriptorManager;
 	}
@@ -148,7 +148,7 @@ namespace CautionEngine::Rendering
 		}
 
 		D3D12_HEAP_FLAGS heapFlags = isDepthRT == false ? D3D12_HEAP_FLAG_ALLOW_DISPLAY : D3D12_HEAP_FLAG_NONE;
-		D3D12_RESOURCE_STATES initialState = isDepthRT == false ? D3D12_RESOURCE_STATE_COMMON : D3D12_RESOURCE_STATE_DEPTH_WRITE;
+		D3D12_RESOURCE_STATES initialState = isDepthRT == false ? D3D12_RESOURCE_STATE_RENDER_TARGET : D3D12_RESOURCE_STATE_DEPTH_WRITE;
 
 		THROW_IF_FAILED(
 			D3D12API::Get()->GetDevicePtr()->CreateCommittedResource(

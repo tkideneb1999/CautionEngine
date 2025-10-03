@@ -11,11 +11,11 @@ namespace CautionEngine::Rendering {
 
 		SHADER_VAR_TYPE_INT = 2,
 
-		SHADER_VAR_TYPE_FLOAT = 2,
+		SHADER_VAR_TYPE_FLOAT = 3,
 
-		SHADER_VAR_TYPE_MAT = 3, // TODO: Deprecate this
+		SHADER_VAR_TYPE_MAT = 4, // TODO: Deprecate this
 
-		SHADER_VAR_TYPE_BOOL = 4,
+		SHADER_VAR_TYPE_BOOL = 5,
 	};
 
 	enum CAUTION_ENGINE_CLASS ShaderStage {

@@ -102,7 +102,7 @@ namespace CautionEngine::Rendering
 
 		Microsoft::WRL::ComPtr<ID3D12ShaderReflection> m_reflectionData[SHADER_STAGE_COUNT];
 
-		ConstantBuffers::ConstantBufferManager* m_pCBufferManager;
+		std::shared_ptr<ConstantBuffers::ConstantBufferManager> m_pCBufferManager;
 
 		Shader* m_pShader;
 		DxcBuffer m_shaderSource;
@@ -114,7 +114,7 @@ namespace CautionEngine::Rendering
 
 	public:
 		D3D12ShaderCompiler() = delete;
-		D3D12ShaderCompiler(Shader* shader, ConstantBuffers::ConstantBufferManager* const cbufferManager);
+		D3D12ShaderCompiler(Shader* shader, std::shared_ptr<ConstantBuffers::ConstantBufferManager> cbufferManager);
 
 		bool Compile();
 

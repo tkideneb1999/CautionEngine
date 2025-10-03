@@ -1,6 +1,7 @@
 #pragma once
 
 #include <CautionEngineDefinitions.h>
+#include <memory>
 
 #include "Shader.h"
 #include "D3D12ShaderCompiler.h"
@@ -18,10 +19,10 @@ namespace CautionEngine::Rendering {
 	private:
 		std::hash<std::string_view> m_hash;
 		std::unordered_map<size_t, Shader*> m_shaders;
-		ConstantBuffers::ConstantBufferManager* const m_pCBufferManager;
+		std::shared_ptr<ConstantBuffers::ConstantBufferManager> const m_pCBufferManager;
 
 	public:
-		ShaderManager(ConstantBuffers::ConstantBufferManager* const pCBufferManager)
+		ShaderManager(std::shared_ptr<ConstantBuffers::ConstantBufferManager> pCBufferManager)
 			: m_hash()
 			, m_shaders()
 			, m_pCBufferManager(pCBufferManager)

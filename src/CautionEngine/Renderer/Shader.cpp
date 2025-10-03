@@ -41,7 +41,10 @@ namespace CautionEngine::Rendering
 	}
 
 	Shader::Shader(const LPCWSTR shaderFilepath)
-		:m_filepath(shaderFilepath), m_rootParameterIndexMap(), m_semanticNames()
+		: m_filepath(shaderFilepath)
+		, m_rootParameterIndexMap()
+		, m_semanticNames()
+		, m_cbufferIdRootParamSlotMap()
 	{
 		m_vsInputs = std::vector<ShaderInput>();
 		for (int i = 0; i < SHADER_STAGE_COUNT; i++) {

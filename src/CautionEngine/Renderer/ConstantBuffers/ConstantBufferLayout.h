@@ -61,7 +61,9 @@ namespace CautionEngine::Rendering::ConstantBuffers
 
 		}
 
+		ConstantBufferLayout(const ConstantBufferLayout& other);
+
 		std::string const& GetName() const { return m_name; }
-		bool IsEqual(ConstantBufferLayout const& other);
+		bool IsEqual(ConstantBufferLayout const& other) const;
 	};
 }

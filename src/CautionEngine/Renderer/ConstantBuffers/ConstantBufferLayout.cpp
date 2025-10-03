@@ -12,12 +12,20 @@ namespace CautionEngine::Rendering::ConstantBuffers
 			return false;
 		}
 		m_nameMapping.insert(std::pair<std::string, size_t>(name, m_layout.size()));
-		m_layout.emplace_back(dataSize, m_size + dataSize, type, columns, rows);
+		m_layout.emplace_back(dataSize, m_size, type, columns, rows);
 		m_size += dataSize;
 		return true;
 	}
 
-	bool ConstantBufferLayout::IsEqual(ConstantBufferLayout const& other)
+	ConstantBufferLayout::ConstantBufferLayout(const ConstantBufferLayout& other)
+		: m_size(other.m_size)
+		, m_name(other.m_name)
+	{
+		m_layout = other.m_layout;
+		m_nameMapping = other.m_nameMapping;
+	}
+
+	bool ConstantBufferLayout::IsEqual(ConstantBufferLayout const& other) const
 	{
 		if (m_name != other.m_name)
 		{

@@ -30,7 +30,7 @@ namespace CautionEngine::Rendering
 		std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputElementDescs;
 		std::vector<std::string> m_semanticNames;
 
-		std::vector<unsigned int> m_cbufferIDs;
+		std::unordered_map<unsigned int, unsigned int> m_cbufferIdRootParamSlotMap;
 
 	public:
 		Shader() = delete;
@@ -43,6 +43,7 @@ namespace CautionEngine::Rendering
 		bool GetStageShaderCode(const void** ppBuffer, size_t* pLength, ShaderStage stage);
 		ID3D12RootSignature* GetRootSignature() { return m_rootSignature.Get(); }
 		const std::vector<D3D12_INPUT_ELEMENT_DESC>* GetInputLayoutDescs() { return &m_InputElementDescs; }
+		const std::unordered_map<unsigned int, unsigned int>& GetConstantBufferID() const { return m_cbufferIdRootParamSlotMap; }
 
 		CAUTION_ENGINE_CLASS const LPCWSTR GetFilepath() { return m_filepath; }
 
