@@ -6,9 +6,8 @@
 
 namespace Reckless
 {
-	class IEditorLayer
+	struct IEditorLayer
 	{
-	public:
 		IEditorLayer() = default;
 		virtual ~IEditorLayer() = default;
 

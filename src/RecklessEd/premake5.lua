@@ -21,14 +21,10 @@ project "RecklessEditor"
     files 
     {
         -- source
-        "**.h", 
+        "**.h",
+        "**.hpp",
         "**.cpp",
         "**.inl",
-
-        -- common
-        "../CautionCommon/**.h",
-        "../CautionCommon/**.cpp",
-        "../CautionCommon/**.inl",
 
         -- imguizmo
         "../../thirdparty/imguizmo/ImGuizmo.h",
@@ -41,11 +37,12 @@ project "RecklessEditor"
 
     includedirs
     {
-        -- Editor
+        -- RecklessEd
         "/",
         "Widgets",
-        "../CautionEngine",
         "../CautionCommon",
+        "../CautionEngine",
+        "../CautionEngine.Common",
         "../../%{IncludeDirectories.ImGui}",
         "../../%{IncludeDirectories.ImGui_backends}",
         "../../%{IncludeDirectories.ImGuizmo}",
@@ -56,7 +53,8 @@ project "RecklessEditor"
     links
     {
         "ImGui",
-        "CautionEngine",
+        -- "CautionCommon", -- TODO: enable when we already have implementations of CautionCommon
+        "CautionEngine", -- TODO: once we have proper API, we can proper link against the engine here...
         (builddir.. "%{Library.caution_engine_lib}"),
         "%{Library.dx_12}",
         "%{Library.dx_compiler}",

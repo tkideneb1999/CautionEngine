@@ -3,29 +3,22 @@
 #include <string>
 #include <vector>
 
-struct CObjectID;
-
-namespace CautionEngine
+namespace CautionEngine::Core
 {
-	namespace Core
+	class CEntity;
+	class CObjectID;
+	
+	class CEntityManager
 	{
-		class CEntity;
-		class CScene;
+	public:
+		CEntityManager() = default;
 
-		class CAUTION_API CEntityManager
-		{
-		public:
-			CEntityManager() = default;
+		void AddEntity(CEntity* entity);
 
-			void AddEntity(CEntity* entity);
+		CEntity* GetEntity(CObjectID entityId);
+		CEntity* GetEntity(std::string_view entityName);
 
-			CEntity* GetEntity(CObjectID entityId);
-			CEntity* GetEntity(std::string_view entityName);
-
-			CEntity* CreateEntity(const char* entityName, const CScene* pScene);
-
-		private:
-			std::vector<CEntity*> m_entities;
-		};
-	}
+	private:
+		std::vector<CEntity*> m_entities;
+	};
 }

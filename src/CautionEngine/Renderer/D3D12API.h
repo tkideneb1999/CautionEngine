@@ -1,5 +1,5 @@
 #pragma once
-#include <CautionDefinitions.h>
+#include <CautionEngineDefinitions.h>
 #include "D3D12DescriptorHeap.h"
 
 #include <d3d12.h>
@@ -11,7 +11,11 @@ using namespace Microsoft::WRL;
 
 namespace CautionEngine::Rendering
 {
-	class CAUTION_API D3D12API
+	CAUTION_ENGINE_CLASS void InitD3D12API();
+
+	CAUTION_ENGINE_CLASS void ShutdownD3D12API();
+
+	class CAUTION_ENGINE_CLASS D3D12API
 	{
 	public:
 		D3D12API();
@@ -21,7 +25,9 @@ namespace CautionEngine::Rendering
 		D3D12API(const D3D12API& original) = delete;
 		D3D12API& operator=(const D3D12API& original) = delete;
 
-		const ComPtr<ID3D12Device8> GetDevicePtr()
+		static D3D12API* const Get();
+
+		const ComPtr<ID3D12Device8>& GetDevicePtr()
 		{ 
 			if (m_initialized)
 				return m_device;
@@ -39,8 +45,6 @@ namespace CautionEngine::Rendering
 		// ! \brief Initiates the shutdown process and releases memory
 		void Shutdown();
 
-		void GatherDREDOUTput();
-
 		bool IsInitialized() const { return m_initialized; }
 
 	private:
@@ -51,4 +55,6 @@ namespace CautionEngine::Rendering
 
 		void GetAdapter(IDXGIAdapter4** ppAdapter, DXGI_GPU_PREFERENCE pref);
 	};
+
+	static D3D12API* g_pD3D12API;
 }

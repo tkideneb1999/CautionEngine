@@ -9,6 +9,20 @@
 
 namespace CautionEngine::Rendering
 {
+	extern D3D12API* g_pD3D12API;
+
+	extern CAUTION_ENGINE_CLASS void InitD3D12API()
+	{
+		g_pD3D12API = new D3D12API();
+		g_pD3D12API->Init();
+	}
+
+	extern CAUTION_ENGINE_CLASS void ShutdownD3D12API()
+	{
+		g_pD3D12API->Shutdown();
+		delete g_pD3D12API;
+	}
+
 	D3D12API::D3D12API()
 	{
 	}
@@ -18,28 +32,30 @@ namespace CautionEngine::Rendering
 		Shutdown();
 	}
 
+	D3D12API* const D3D12API::Get()
+	{
+		return g_pD3D12API;
+	}
+
 	void D3D12API::Init()
 	{
 		if (m_initialized)
 			return;
 #if _DEBUG
 		{
-			ComPtr<ID3D12Debug> debugController;
+			ComPtr<ID3D12Debug1> debugController;
 			THROW_IF_FAILED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)), "Couldn't get Debug Interface");
 			debugController->EnableDebugLayer();
-
-			ComPtr<ID3D12DeviceRemovedExtendedDataSettings1> dredSettings;
-			THROW_IF_FAILED(D3D12GetDebugInterface(IID_PPV_ARGS(&dredSettings)), "Couldn't get Debug Interface");
-			dredSettings->SetAutoBreadcrumbsEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
-			dredSettings->SetPageFaultEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
+			debugController->SetEnableGPUBasedValidation(true);
 		}
 #endif
 
 		THROW_IF_FAILED(
-			CreateDXGIFactory2( // TODO: benedikt -> you might want to initialize the DXGI factory outside of this project?
-				// https://gamedev.stackexchange.com/questions/128197/why-do-i-get-this-error-about-dllmain-when-using-d3d-from-within-a-dll
+			CreateDXGIFactory2(
 #if _DEBUG
 				DXGI_CREATE_FACTORY_DEBUG,
+#else
+				0,
 #endif
 				IID_PPV_ARGS(&m_factory)
 			),
@@ -60,20 +76,25 @@ namespace CautionEngine::Rendering
 
 	void D3D12API::Shutdown()
 	{
-		m_device->Release();
-		m_factory->Release();
-	}
+		if (!m_initialized)
+		{
+			return;
+		}
 
-	void D3D12API::GatherDREDOUTput()
-	{
-		ComPtr<ID3D12DeviceRemovedExtendedData1> dredData;
-		THROW_IF_FAILED(m_device->QueryInterface(dredData.GetAddressOf()), "Query Interface Failed");
+#if _DEBUG
+		ComPtr<ID3D12DebugDevice> pDebugDevice;
+		m_device->QueryInterface(IID_PPV_ARGS(&pDebugDevice));
+		if (pDebugDevice)
+		{
+			pDebugDevice->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL);
+		}
+#endif
 
-		D3D12_DRED_AUTO_BREADCRUMBS_OUTPUT1 dredOutput{};
-		D3D12_DRED_PAGE_FAULT_OUTPUT1 dredPageFaultOutput{};
-		dredData->GetAutoBreadcrumbsOutput1(&dredOutput);
-		dredData->GetPageFaultAllocationOutput1(&dredPageFaultOutput);
-		DebugBreak();
+		m_factory.Reset();
+		m_factory = nullptr;
+		m_device.Reset();
+		m_device = nullptr;
+		m_initialized = false;
 	}
 
 	void D3D12API::GetAdapter(IDXGIAdapter4** ppAdapter, DXGI_GPU_PREFERENCE pref)

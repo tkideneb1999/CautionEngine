@@ -1,10 +1,12 @@
+////// Caution Engine PCH //////
+
 #pragma once
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-#include "CautionDefinitions.h"
+#include "CautionEngineDefinitions.h"
 
 // # STD ----------------------------
 #include <string>
@@ -34,8 +36,10 @@
 #include <set>
 #include <variant>
 #include <cstring>
+#include <random>
+#include <thread>
 
-// CautionCommon
+// CautionEngine.Common
 #include <Platform/CautionPlatform.h>
 
 // # DX and Platform
@@ -54,3 +58,9 @@
 // Thirdparty Libraries
 #include <json.hpp>
 #include <glm/glm.hpp>
+
+
+// STL
+#include <vector>
+#include <string>
+#include <memory>

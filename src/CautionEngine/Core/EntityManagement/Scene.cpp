@@ -14,8 +14,10 @@ namespace CautionEngine::Core
 		: m_sceneName(name)
 	{
 	}
-	void CScene::AddEntity(CEntity* pEntity)
+	void CScene::Render()
 	{
-		m_entities.emplace_back(pEntity);
+	}
+	void CScene::Destroy()
+	{
 	}
 }

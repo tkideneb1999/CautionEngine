@@ -2,7 +2,11 @@
 #include "D3D12ShaderCompiler.h"
 
 #include <vector>
+#include <filesystem>
+#include <iostream>
+#include <ostream>
 
+#include "D3D12API.h"
 #include "D3D12Helpers.h"
 
 namespace CautionEngine::Rendering {
@@ -20,12 +24,15 @@ namespace CautionEngine::Rendering {
 
 		// Get Vertex Shader Inputs
 		D3D12_SHADER_DESC* vsShaderDesc = &shaderDescs[SHADER_STAGE_VERTEX];
-		m_pShader->m_InputElementDescs = std::vector<D3D12_INPUT_ELEMENT_DESC>(vsShaderDesc->InputParameters);
+		m_pShader->m_InputElementDescs = std::vector<D3D12_INPUT_ELEMENT_DESC>();
+		m_pShader->m_InputElementDescs.reserve(vsShaderDesc->InputParameters);
+		m_pShader->m_semanticNames.reserve(vsShaderDesc->InputParameters);
 
 		m_pShader->m_vsInputs = std::vector<ShaderInput>(vsShaderDesc->InputParameters);
 		for (unsigned int i = 0; i < vsShaderDesc->InputParameters; i++) {
 			D3D12_SIGNATURE_PARAMETER_DESC inputParameterDesc{};
 			vsReflection->GetInputParameterDesc(i, &inputParameterDesc);
+			m_pShader->m_semanticNames.push_back({ inputParameterDesc.SemanticName });
 
 			// Get if float, float2, etc.
 			unsigned short int paramAmount = 0;
@@ -57,7 +64,7 @@ namespace CautionEngine::Rendering {
 				return false;
 			}
 			m_pShader->m_InputElementDescs.push_back({
-				.SemanticName = inputParameterDesc.SemanticName,
+				.SemanticName = m_pShader->m_semanticNames[i].c_str(),
 				.SemanticIndex = inputParameterDesc.SemanticIndex,
 				.Format = GetInputElementFormat(&inputParameterDesc),
 				.InputSlot = 0,
@@ -189,17 +196,15 @@ namespace CautionEngine::Rendering {
 			std::cout << "Root Signature Serialization failed:\n" << GetErrorMessageFromBlob(errors.Get()) << std::endl;
 		}
 
-		// Generate PSO
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-		m_pShader->SetShaderStageInPSODesc(&psoDesc.VS, SHADER_STAGE_VERTEX);
-		m_pShader->SetShaderStageInPSODesc(&psoDesc.HS, SHADER_STAGE_HULL);
-		m_pShader->SetShaderStageInPSODesc(&psoDesc.DS, SHADER_STAGE_DOMAIN);
-		m_pShader->SetShaderStageInPSODesc(&psoDesc.GS, SHADER_STAGE_GEOMETRY);
-		m_pShader->SetShaderStageInPSODesc(&psoDesc.PS, SHADER_STAGE_PIXEL);
-
-		// TODO: Add Input layout here
-		psoDesc.InputLayout.NumElements = m_pShader->m_InputElementDescs.size();
-		psoDesc.InputLayout.pInputElementDescs = m_pShader->m_InputElementDescs.data();
+		THROW_IF_FAILED(
+			D3D12API::Get()->GetDevicePtr()->CreateRootSignature(
+				0, 
+				m_pShader->m_serializedRootSignature->GetBufferPointer(), 
+				m_pShader->m_serializedRootSignature->GetBufferSize(), 
+				IID_PPV_ARGS(&(m_pShader->m_rootSignature))
+			),
+			"Root Signature Creation failed!"
+		);
 				
 		return true;
 	}
@@ -295,8 +300,6 @@ namespace CautionEngine::Rendering {
 
 	bool D3D12ShaderCompiler::Compile()
 	{
-		PSOInfo psoInfo;
-
 		// Load Shader
 		ComPtr<IDxcBlobEncoding> encodingSource = nullptr;
 		m_utils->LoadFile(m_pShader->GetFilepath(), nullptr, &encodingSource);
@@ -343,6 +346,8 @@ namespace CautionEngine::Rendering {
 	{
 		// Construct args
 		// TODO: Decide what to do with ShaderModel
+		std::filesystem::path shaderPath(m_pShader->GetFilepath());
+		shaderPath.remove_filename();
 		std::wstring shaderModel = GetShaderModel(stage, SHADER_MODEL_6_0);
 		std::vector<LPCWSTR> args = {
 			m_pShader->GetFilepath(), // Filepath for debugging
@@ -350,6 +355,7 @@ namespace CautionEngine::Rendering {
 			L"-T", shaderModel.c_str(), // Shader Model (TODO Check if Get Shader Model works)
 #if _DEBUG
 			L"-Zi", // Debug Information
+			L"-Fd", shaderPath.c_str(),
 			L"-Od", // Disable Optimizations
 #endif
 			L"-Qstrip_reflect", // Don't bake reflection into Shader Object
@@ -380,6 +386,19 @@ namespace CautionEngine::Rendering {
 			std::wcout << L"Compilation Error:\n" << errors->GetStringPointer() << std::endl;
 			return false;
 		}
+
+#if _DEBUG
+		// PDBs
+		ComPtr<IDxcBlob> pDebugData;
+		ComPtr<IDxcBlobUtf16> pDebugDataPath;
+		results->GetOutput(DXC_OUT_PDB, IID_PPV_ARGS(&pDebugData), &pDebugDataPath);
+		LPCWSTR path = pDebugDataPath->GetStringPointer();
+		shaderPath.replace_filename(path);
+		std::ofstream debugFile(shaderPath.c_str());
+		const char* dataPointer = static_cast<const char*>(pDebugData->GetBufferPointer());
+		debugFile.write(dataPointer, pDebugData->GetBufferSize());
+		debugFile.close();
+#endif
 
 		//Reflection
 		ComPtr<IDxcBlob> pReflectionDataSource = {};

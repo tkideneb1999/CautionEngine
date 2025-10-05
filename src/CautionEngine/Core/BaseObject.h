@@ -4,18 +4,14 @@
 
 namespace CautionEngine::Core
 {
-	class CObject
+	class CAUTION_ENGINE_CLASS CObject
 	{
 	public:
-		CObject() = default;
+		CObject();
 
-		const CObjectID& GetID() const { return m_id; }
-
-		void SetName(std::string_view name) { m_name = name; }
-		std::string_view GetName() const { return m_name; }
+		const SObjectID& GetID() const { return m_id; }
 
 	protected:
-		CObjectID     m_id;
-		std::string   m_name;
+		SObjectID m_id;
 	};
 }
