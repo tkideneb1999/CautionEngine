@@ -7,6 +7,8 @@
 #include <dxcapi.h>
 #include <d3d12shader.h>
 
+#include <filesystem>
+
 #include "Shader.h"
 #include "ShaderData.h"
 
@@ -111,6 +113,8 @@ namespace CautionEngine::Rendering
 		bool GenerateShaderData();
 
 		DXGI_FORMAT GetInputElementFormat(D3D12_SIGNATURE_PARAMETER_DESC* reflectionData);
+
+		std::filesystem::path GetCompiledShadersPath();
 
 	public:
 		D3D12ShaderCompiler() = delete;

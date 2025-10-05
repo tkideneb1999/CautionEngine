@@ -2,7 +2,6 @@
 #include "D3D12ShaderCompiler.h"
 
 #include <vector>
-#include <filesystem>
 #include <iostream>
 #include <ostream>
 
@@ -302,6 +301,17 @@ namespace CautionEngine::Rendering {
 		return result;
 	}
 
+	std::filesystem::path D3D12ShaderCompiler::GetCompiledShadersPath()
+	{
+		// Get Exe Path
+		wchar_t buffer[256];
+		GetModuleFileName(nullptr, buffer, sizeof(buffer));
+		std::filesystem::path shaderDirPath(buffer);
+		shaderDirPath = shaderDirPath.parent_path();
+		shaderDirPath /= "Shaders";
+		return shaderDirPath;
+	}
+
 	D3D12ShaderCompiler::D3D12ShaderCompiler(Shader* shader, std::shared_ptr<ConstantBuffers::ConstantBufferManager> cbufferManager)
 		: m_pCBufferManager(cbufferManager)
 	{
@@ -389,7 +399,30 @@ namespace CautionEngine::Rendering {
 
 		std::wstring shaderModel = GetShaderModel(stage, SHADER_MODEL_6_0);
 #if _DEBUG
-		std::wstring debugInfo = shaderPath.wstring() + L"\\";
+		std::filesystem::path compiledShaderPath = GetCompiledShadersPath();
+		std::string suffix;
+		switch (stage)
+		{
+		case SHADER_STAGE_VERTEX:
+			suffix = ".vs.pdb";
+			break;
+		case SHADER_STAGE_HULL:
+			suffix = ".hs.pdb";
+			break;
+		case SHADER_STAGE_DOMAIN:
+			suffix = ".ds.pdb";
+			break;
+		case SHADER_STAGE_GEOMETRY:
+			suffix = ".gs.pdb";
+			break;
+		case SHADER_STAGE_PIXEL:
+			suffix = ".ps.pdb";
+			break;
+		default:
+			suffix = ".NA.pdb";
+			break;
+		}
+		std::wstring debugInfo = compiledShaderPath / (shaderPath.filename().string() + suffix);
 #endif
 		std::vector<LPCWSTR> args = {
 			L"-E", GetShaderEntryPoint(stage),
@@ -434,11 +467,16 @@ namespace CautionEngine::Rendering {
 		ComPtr<IDxcBlobUtf16> pDebugDataPath;
 		results->GetOutput(DXC_OUT_PDB, IID_PPV_ARGS(&pDebugData), &pDebugDataPath);
 		LPCWSTR path = pDebugDataPath->GetStringPointer();
-		shaderPath.replace_filename(path);
-		std::ofstream debugFile(shaderPath.c_str());
-		const char* dataPointer = static_cast<const char*>(pDebugData->GetBufferPointer());
-		debugFile.write(dataPointer, pDebugData->GetBufferSize());
-		debugFile.close();
+		std::filesystem::path pdbPath = compiledShaderPath / path;
+		if (!std::filesystem::exists(compiledShaderPath))
+		{
+			std::filesystem::create_directories(compiledShaderPath);
+		}
+		// Shader PDBs make PIX currently crash
+		//std::ofstream debugFile(pdbPath.c_str(), std::ios::trunc);
+		//const char* dataPointer = static_cast<const char*>(pDebugData->GetBufferPointer());
+		//debugFile.write(dataPointer, pDebugData->GetBufferSize());
+		//debugFile.close();
 #endif
 
 		//Reflection
