@@ -14,6 +14,12 @@
 
 namespace CautionEngine::Rendering 
 {
+	// Forward Declaration
+	namespace ConstantBuffers
+	{
+		class ConstantBufferManager;
+	}
+
 	struct CAUTION_ENGINE_CLASS CommandFrame
 	{
 		ComPtr<ID3D12CommandAllocator> commandAllocator;
@@ -28,10 +34,14 @@ namespace CautionEngine::Rendering
 		unsigned int numBackBuffers;
 
 	private:
-		RenderTargetManager* m_pRenderTargetManager;
-		DescriptorManager* m_pDescriptorManager;
+		std::shared_ptr<RenderTargetManager> m_pRenderTargetManager = nullptr;
+		std::shared_ptr<DescriptorManager> m_pDescriptorManager = nullptr;
+		std::shared_ptr<ConstantBuffers::ConstantBufferManager> m_pConstantBufferManager = nullptr;
+		ShaderManager* m_pShaderManager;
 
 		std::vector<RenderTarget> m_swapChainRenderTargets;
+
+		unsigned int m_DSRenderTargetHandle;
 
 		ComPtr<ID3D12CommandQueue> m_commandQueue;
 
@@ -49,7 +59,7 @@ namespace CautionEngine::Rendering
 
 		// Custom Scene Render Target
 		bool m_useCustomSceneRenderTarget = false;
-		unsigned int m_pCustomRenderTargetId;
+		unsigned int m_customRenderTargetId;
 		D3D12_VIEWPORT m_customRTViewPort = {};
 		D3D12_RECT m_customRTScissorRect = {};
 
@@ -59,7 +69,10 @@ namespace CautionEngine::Rendering
 		UINT64 m_fenceValue = 0;
 		ComPtr<ID3D12Fence> m_fence;
 
-		ShaderManager m_shaderManager;
+		// TEST MESH
+		PipelineStateObject m_testPSO;
+		Mesh m_testMesh;
+		glm::vec4 m_color;
 
 	public:
 		Renderer();
@@ -76,7 +89,6 @@ namespace CautionEngine::Rendering
 		void RenderScene(); // TODO: Put Scene Reference here
 		void EndFrame();
 		void CreateRootSignature();
-		void CreateInitialPipelineState();
 		void Shutdown();
 		void FlushGPU();
 
@@ -87,9 +99,10 @@ namespace CautionEngine::Rendering
 		ID3D12GraphicsCommandList6* GetCurrentCommandList(); // TODO: Wrap Command List somehow
 		DXGI_FORMAT GetRTVFormat(); // TODO: Convert this to 'RenderFormat'
 
-		DescriptorManager* GetDescriptorManager() const { return m_pDescriptorManager; }
-		RenderTargetManager* GetRenderTargetManager() const { return m_pRenderTargetManager; }
+		DescriptorManager* GetDescriptorManager() const { return m_pDescriptorManager.get(); }
+		RenderTargetManager* GetRenderTargetManager() const { return m_pRenderTargetManager.get(); }
 
 		void SetCustomSceneRenderTarget(unsigned int customRenderTargetId);
+		void DisableCustomSceneRenderTarget();
 	};
 }

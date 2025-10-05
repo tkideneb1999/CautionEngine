@@ -8,10 +8,14 @@
 
 #include "D3D12API.h"
 #include "D3D12Helpers.h"
+#include "ConstantBuffers/ConstantBuffer.h"
+#include "ConstantBuffers/ConstantBufferManager.h"
 
 namespace CautionEngine::Rendering {
 	bool D3D12ShaderCompiler::GenerateShaderData()
 	{
+		using namespace ConstantBuffers;
+
 		// Get VS Inputs
 		ComPtr<ID3D12ShaderReflection> vsReflection = m_reflectionData[SHADER_STAGE_VERTEX];
 
@@ -84,6 +88,8 @@ namespace CautionEngine::Rendering {
 		shaderRootParamIndexMap->clear();
 		std::vector<D3D12_ROOT_PARAMETER1> rootParams = {};
 
+		std::unordered_map<std::string, ConstantBufferLayout> constantBufferLayouts;
+
 		for (int si = 0; si < SHADER_STAGE_COUNT; si++) {
 			if (m_reflectionData[si] == nullptr)
 				continue;
@@ -106,8 +112,13 @@ namespace CautionEngine::Rendering {
 					cbufferReflection->GetDesc(&bufferDesc);
 
 					// Buffer Validation (TODO: Skip when not in Editor)
+					std::string bufferName = bufferDesc.Name;
+					ConstantBufferLayout bufferLayout(bufferName);
 
-					std::vector<D3D12ConstantBufferVariable> cbufferElements = std::vector<D3D12ConstantBufferVariable>();
+					bool isValid = true;
+
+					ShaderVariableTypes cBufferVarType = {};
+					unsigned int size = 0;
 
 					for (int vi = 0; vi < bufferDesc.Variables; vi++)
 					{
@@ -119,33 +130,42 @@ namespace CautionEngine::Rendering {
 						D3D12_SHADER_TYPE_DESC varTypeDesc;
 						varType->GetDesc(&varTypeDesc);
 
-						ShaderVariableTypes cBufferVarType = {};
-
-						if (GetShaderVarType(&varTypeDesc.Type, &cBufferVarType))
+						if (GetShaderVarType(&varTypeDesc, cBufferVarType, size))
 						{
-							D3D12ConstantBufferVariable bufferLayoutVar = {
-							.name = std::string(varDesc.Name),
-							.type = cBufferVarType,
-							.count = (unsigned short int)(varTypeDesc.Columns * varTypeDesc.Rows),
-							.offset = (unsigned short int)varDesc.StartOffset,
-							};
-
-							cbufferElements.push_back(bufferLayoutVar);
+							std::string name = varTypeDesc.Name;
+							bufferLayout.AppendData(
+								size * varTypeDesc.Columns * varTypeDesc.Rows, name, cBufferVarType, 
+								varTypeDesc.Columns, varTypeDesc.Rows
+							);
 						}
-						else if (varTypeDesc.Type == D3D_SVT_VOID && varTypeDesc.Class == D3D_SVC_STRUCT)
+						else if (bufferDesc.Variables == 1 && varTypeDesc.Type == D3D_SVT_VOID && varTypeDesc.Class == D3D_SVC_STRUCT)
 						{
-							std::cout << "Buffers defined via ConstantBuffer<Struct> currently not supported" << std::endl;
+							for (int memberIndex = 0; memberIndex < varTypeDesc.Members; memberIndex++)
+							{
+								ID3D12ShaderReflectionType* memberType = varType->GetMemberTypeByIndex(memberIndex);
+								D3D12_SHADER_TYPE_DESC memberTypeDesc;
+								memberType->GetDesc(&memberTypeDesc);
+								if (!GetShaderVarType(&memberTypeDesc, cBufferVarType, size))
+								{
+									std::cout << "Invalid Constant Buffer Type" << std::endl;
+									isValid = false;
+									break;
+								}
+								
+								std::string name = varType->GetMemberTypeName(memberIndex);
+								bufferLayout.AppendData(
+									size* memberTypeDesc.Columns* memberTypeDesc.Rows, name, cBufferVarType, 
+									memberTypeDesc.Columns, memberTypeDesc.Rows
+									);
+							}
 							break;
 						}
 						else
 							throw std::exception("Shader Variable type currently not supported");
 					}
 
-					D3D12ConstantBufferLayout bufferLayout =
-					{
-						.elements = cbufferElements,
-						.name = resourceName,
-					};
+					if (!isValid)
+						throw std::exception("Error processing Constant Buffers");
 
 					// Create Root Param
 					D3D12_ROOT_PARAMETER1 cbvRootParam
@@ -156,10 +176,13 @@ namespace CautionEngine::Rendering {
 							.RegisterSpace = resourceBindDesc.Space,
 							.Flags = D3D12_ROOT_DESCRIPTOR_FLAG_NONE,
 						},
+						.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL,
 					};
 					(*shaderRootParamIndexMap)[resourceName] = rootParams.size();
 					rootParams.push_back(cbvRootParam);
-					m_pShader->m_bufferLayouts.push_back(bufferLayout);
+					unsigned int bufferId = m_pCBufferManager->GetOrCreateBuffer(bufferLayout);
+					m_pShader->m_cbufferIdRootParamSlotMap.insert(std::pair<unsigned int, unsigned int>(bufferId, rootParams.size() - 1));
+
 					std::cout << "Found CBuffer: " << resourceBindDesc.Name << std::endl;
 				}
 				else if (resourceBindDesc.Type == D3D_SIT_TEXTURE) {
@@ -205,7 +228,11 @@ namespace CautionEngine::Rendering {
 			),
 			"Root Signature Creation failed!"
 		);
-				
+
+#if _DEBUG
+		std::filesystem::path shaderPath(m_pShader->GetFilepath());
+		m_pShader->m_rootSignature->SetName(shaderPath.filename().wstring().c_str());
+#endif
 		return true;
 	}
 
@@ -275,7 +302,8 @@ namespace CautionEngine::Rendering {
 		return result;
 	}
 
-	D3D12ShaderCompiler::D3D12ShaderCompiler(Shader* shader)
+	D3D12ShaderCompiler::D3D12ShaderCompiler(Shader* shader, std::shared_ptr<ConstantBuffers::ConstantBufferManager> cbufferManager)
+		: m_pCBufferManager(cbufferManager)
 	{
 		m_pShader = shader;
 		m_shaderSource = DxcBuffer();
@@ -327,18 +355,29 @@ namespace CautionEngine::Rendering {
 		return true;
 	}
 
-	bool D3D12ShaderCompiler::GetShaderVarType(const D3D_SHADER_VARIABLE_TYPE* dxcType, ShaderVariableTypes* engineType)
+	bool D3D12ShaderCompiler::GetShaderVarType(const D3D12_SHADER_TYPE_DESC* dxcTypeInfo, ShaderVariableTypes& engineType, unsigned int& size)
 	{
-		if (*dxcType == D3D_SVT_FLOAT)
-			*engineType = SHADER_VAR_TYPE_FLOAT;
-		else if (*dxcType == D3D_SVT_BOOL)
-			*engineType = SHADER_VAR_TYPE_BOOL;
-		else if (*dxcType == D3D_SVT_INT)
-			*engineType = SHADER_VAR_TYPE_INT;
-		else if (*dxcType == D3D_SVT_UINT)
-			*engineType = SHADER_VAR_TYPE_UINT;
-		else
+		switch (dxcTypeInfo->Type)
+		{
+		case D3D_SVT_FLOAT:
+			engineType = SHADER_VAR_TYPE_FLOAT;
+			size = sizeof(float);
+			break;
+		case D3D_SVT_BOOL:
+			engineType = SHADER_VAR_TYPE_BOOL;
+			size = sizeof(bool);
+			break;
+		case D3D_SVT_UINT:
+			engineType = SHADER_VAR_TYPE_UINT;
+			size = sizeof(unsigned int);
+			break;
+		case D3D_SVT_INT:
+			engineType = SHADER_VAR_TYPE_INT;
+			size = sizeof(int);
+			break;
+		default:
 			return false;
+		}
 		return true;
 	}
 
@@ -347,15 +386,17 @@ namespace CautionEngine::Rendering {
 		// Construct args
 		// TODO: Decide what to do with ShaderModel
 		std::filesystem::path shaderPath(m_pShader->GetFilepath());
-		shaderPath.remove_filename();
+
 		std::wstring shaderModel = GetShaderModel(stage, SHADER_MODEL_6_0);
+#if _DEBUG
+		std::wstring debugInfo = shaderPath.wstring() + L"\\";
+#endif
 		std::vector<LPCWSTR> args = {
-			m_pShader->GetFilepath(), // Filepath for debugging
 			L"-E", GetShaderEntryPoint(stage),
 			L"-T", shaderModel.c_str(), // Shader Model (TODO Check if Get Shader Model works)
 #if _DEBUG
 			L"-Zi", // Debug Information
-			L"-Fd", shaderPath.c_str(),
+			L"-Fd", debugInfo.c_str(),
 			L"-Od", // Disable Optimizations
 #endif
 			L"-Qstrip_reflect", // Don't bake reflection into Shader Object

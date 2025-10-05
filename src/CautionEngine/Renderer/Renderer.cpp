@@ -6,16 +6,15 @@
 #include "D3D12Helpers.h"
 
 #include "RenderTargetManager.h"
+#include "ConstantBuffers/ConstantBufferManager.h"
 
 namespace CautionEngine::Rendering 
 {
-
 	Renderer::Renderer()
-		: m_shaderManager()
-		, pD3D12API(D3D12API::Get())
+		: pD3D12API(D3D12API::Get())
 	{ 
-		m_pDescriptorManager = new DescriptorManager();
-		m_pRenderTargetManager = new RenderTargetManager(m_pDescriptorManager);
+		m_pDescriptorManager = std::make_shared<DescriptorManager>();
+		m_pRenderTargetManager = std::make_shared<RenderTargetManager>(m_pDescriptorManager);
 	}
 
 	void Renderer::Render()
@@ -41,6 +40,9 @@ namespace CautionEngine::Rendering
 #endif
 
 		numBackBuffers = frameCount;
+
+		m_pConstantBufferManager = std::make_shared<ConstantBuffers::ConstantBufferManager>(numBackBuffers, m_pDescriptorManager);
+		m_pShaderManager = new ShaderManager(m_pConstantBufferManager);
 
 		// Init Command Queue
 		D3D12_COMMAND_QUEUE_DESC commandQueueDesc = {};
@@ -109,6 +111,7 @@ namespace CautionEngine::Rendering
 		m_scissorRect.right = width;
 		m_scissorRect.bottom = height;
 
+		m_DSRenderTargetHandle = m_pRenderTargetManager->CreateRenderTarget(width, height, RENDER_FORMAT_D32_FLOAT);
 	}
 
 	void Renderer::InitDescriptorHeaps(int cbv_srv_uav_count, int dsv_count, int rtv_count, int sampler_count)
@@ -139,6 +142,7 @@ namespace CautionEngine::Rendering
 				pD3D12API->GetDevicePtr()->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&(m_commandLists[i]))),
 				"Command List Creation Failed"
 			);
+			m_commandLists[i]->SetName((std::wstring(L"Render Command List ") + std::to_wstring(i)).c_str());
 		}
 	}
 
@@ -167,7 +171,7 @@ namespace CautionEngine::Rendering
 		}
 
 		m_useCustomSceneRenderTarget = true;
-		m_pCustomRenderTargetId = customRenderTargetId;
+		m_customRenderTargetId = customRenderTargetId;
 
 		m_customRTViewPort = {};
 		m_customRTViewPort.TopLeftX = 0;
@@ -181,6 +185,12 @@ namespace CautionEngine::Rendering
 		m_customRTScissorRect.top = 0;
 		m_customRTScissorRect.right = pCustomRenderTarget->GetHeight();
 		m_customRTScissorRect.bottom = pCustomRenderTarget->GetWidth();
+	}
+
+	void Renderer::DisableCustomSceneRenderTarget()
+	{
+		m_useCustomSceneRenderTarget = false;
+		m_customRenderTargetId = 0;
 	}
 
 	void Renderer::InitFrameFence()
@@ -210,18 +220,26 @@ namespace CautionEngine::Rendering
 
 		curFrame.commandAllocator->Reset();
 
+		RenderTarget* pDSRenderTarget = m_pRenderTargetManager->GetRenderTarget(m_DSRenderTargetHandle);
+
 		ComPtr<ID3D12GraphicsCommandList6>& curCommandList = m_commandLists[m_curFrameIndex];
 		curCommandList->Reset(m_commandFrames[m_curFrameIndex].commandAllocator.Get(), nullptr);
 		if (m_useCustomSceneRenderTarget)
 		{
 			// TODO: How to handle Depth RT
-			RenderTarget* pCustomRenderTarget = m_pRenderTargetManager->GetRenderTarget(m_pCustomRenderTargetId);
+			RenderTarget* pCustomRenderTarget = m_pRenderTargetManager->GetRenderTarget(m_customRenderTargetId);
 			curCommandList->OMSetRenderTargets(
 				1, &(pCustomRenderTarget->descriptorHeapHandle.cpuHandle), false, nullptr);
 		}
 		else
 		{
-			curCommandList->OMSetRenderTargets(1, &(m_swapChainRenderTargets[m_curFrameIndex].descriptorHeapHandle.cpuHandle), false, nullptr);
+			
+			curCommandList->OMSetRenderTargets(
+				1, 
+				&(m_swapChainRenderTargets[m_curFrameIndex].descriptorHeapHandle.cpuHandle), 
+				false, 
+				&(pDSRenderTarget->descriptorHeapHandle.cpuHandle)
+			);
 		}
 
 		D3D12_RESOURCE_BARRIER barrier{};
@@ -243,6 +261,7 @@ namespace CautionEngine::Rendering
 		{
 			curCommandList->RSSetViewports(1, &m_viewport);
 			curCommandList->RSSetScissorRects(1, &m_scissorRect);
+			curCommandList->ClearDepthStencilView(pDSRenderTarget->descriptorHeapHandle.cpuHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 		}
 
 		float color[] = { 0.2, 0.2, 0.3, 1.0 };
@@ -258,6 +277,41 @@ namespace CautionEngine::Rendering
 		ComPtr<ID3D12GraphicsCommandList6>& curCommandList = m_commandLists[m_curFrameIndex];
 
 		// TODO: Put scene Rendering here
+
+		// Test Render
+		if (m_testMesh.IsUploaded())
+		{
+			std::string bufferName("cBuffer");
+			std::string colorName("color");
+			if (m_color.r > 1.0f)
+				m_color.r = 0.0f;
+			else
+				m_color.r += 0.01f;
+			if (m_color.g > 1.0)
+				m_color.g = 0.0f;
+			else
+				m_color.g += 0.01f;
+			if (m_color.b > 1.0)
+				m_color.b = 0.0f;
+			else
+				m_color.b += 0.01f;
+			ConstantBuffers::ConstantBuffer* pTestBuffer = m_pConstantBufferManager->GetBuffer(bufferName);
+			pTestBuffer->SetFloat4(colorName, &m_color);
+			m_testPSO.SetState(curCommandList.Get());
+			for (const std::pair<unsigned int, unsigned int> CBufferId : m_testPSO.GetShader()->GetConstantBufferID())
+			{
+				ConstantBuffers::ConstantBuffer* pBuffer = m_pConstantBufferManager->GetBuffer(CBufferId.first);
+				pBuffer->SetAsRootConstant(m_curFrameIndex, CBufferId.second, curCommandList.Get());
+			}
+
+			m_pConstantBufferManager->UpdateConstantBufferGPUData(m_curFrameIndex);
+			m_testMesh.Draw(curCommandList.Get());
+		}
+		
+		if (!m_testMesh.IsUploaded())
+			m_testMesh.ScheduleUpload(curCommandList.Get());
+
+		
 
 		if (m_useCustomSceneRenderTarget)
 		{
@@ -275,7 +329,8 @@ namespace CautionEngine::Rendering
 
 		D3D12_RESOURCE_BARRIER barrier{};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Transition.pResource = m_swapChainRenderTargets[m_curFrameIndex].GetPtr().Get();
+		const Microsoft::WRL::ComPtr< ID3D12Resource>& resourcePtr = m_swapChainRenderTargets[m_curFrameIndex].GetPtr();
+		barrier.Transition.pResource = resourcePtr.Get();
 		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 
@@ -285,6 +340,7 @@ namespace CautionEngine::Rendering
 		// Execute Command List
 		ID3D12CommandList* ppCommandLists[] = { curCommandList.Get() };
 		m_commandQueue->ExecuteCommandLists(1, ppCommandLists);
+
 	}
 
 	void Renderer::CreateRootSignature()
@@ -305,11 +361,27 @@ namespace CautionEngine::Rendering
 			pD3D12API->GetDevicePtr()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)),
 			"Couldn't create Root Signature"
 		);
-	}
 
-	void Renderer::CreateInitialPipelineState()
-	{
+		// TEST
+		Shader* pFallback = m_pShaderManager->CreateShader("D:\\projects\\CautionEngine\\src\\CautionEngine\\Shaders\\Fallback.hlsl");
+		m_testPSO = PipelineStateObject();
+		m_testPSO.SetShader(pFallback);
+		m_testPSO.Generate();
+		
+		std::vector<Vertex> testVertices{
+			{{-0.5,-0.5, 0.5, 1}, {1,0,0,1}},
+			{{   0, 0.5, 0.5, 1}, {0,1,0,1}},
+			{{   1,   1, 0.5, 1}, {0,0,1,1}}
+		};
+		std::vector<int> testIndices{ 
+			0,1,2
+		};
 
+		m_color = { 0.0f, 0.33f, 0.66f, 0.0f };
+
+		m_testMesh = Mesh();
+		m_testMesh.SetVertices(testVertices.data(), testVertices.size());
+		m_testMesh.SetIndices(testIndices.data(), testIndices.size());
 	}
 
 	void Renderer::Shutdown()
@@ -342,9 +414,6 @@ namespace CautionEngine::Rendering
 		m_fence = nullptr;
 
 		m_pRenderTargetManager->Shutdown();
-
-		delete m_pRenderTargetManager;
-		delete m_pDescriptorManager;
 	}
 
 	void Renderer::FlushGPU()
@@ -368,6 +437,7 @@ namespace CautionEngine::Rendering
 		ReleaseSwapChainRenderTargets();
 		m_swapChain->ResizeBuffers(0, newWidth, newHeight, DXGI_FORMAT_UNKNOWN, 0);
 		CreateSwapChainRenderTargets();
+		m_pRenderTargetManager->ResizeRenderTarget(m_DSRenderTargetHandle, newWidth, newHeight);
 	}
 
 	void Renderer::CreateSwapChainRenderTargets()

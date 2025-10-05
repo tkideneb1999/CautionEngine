@@ -6,6 +6,9 @@ namespace Reckless
 {
 	class CEditorViewport : public IEditorLayer
 	{
+	private:
+		unsigned int m_sceneTextureId = 0;
+
 	public:
 		virtual void OnEditorLayerAttach() override;
 		virtual void Update() override;

@@ -14,11 +14,11 @@ namespace CautionEngine::Rendering::D3D12
 	) : m_isShaderVisible(isShaderVisible)
 	{
 		if (type == D3D12_DESCRIPTOR_HEAP_TYPE_DSV || type == D3D12_DESCRIPTOR_HEAP_TYPE_RTV)
-			isShaderVisible = false;
+			m_isShaderVisible = false;
 		D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
 		heapDesc.Type = type;
 		heapDesc.NumDescriptors = numDescriptors;
-		heapDesc.Flags = isShaderVisible? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+		heapDesc.Flags = m_isShaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 
 #if _DEBUG
 		std::stringstream report;
@@ -35,7 +35,10 @@ namespace CautionEngine::Rendering::D3D12
 		);
 		m_incrementSize = pDevice->GetDescriptorHandleIncrementSize(type);
 		m_cpuStartHandle = m_DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-		m_gpuStartHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		if (m_isShaderVisible)
+			m_gpuStartHandle = m_DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		else
+			m_gpuStartHandle = D3D12_GPU_DESCRIPTOR_HANDLE();
 		m_maxDescriptors = numDescriptors;
 	}
 

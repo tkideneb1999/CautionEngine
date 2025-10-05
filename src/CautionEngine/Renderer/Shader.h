@@ -9,7 +9,6 @@
 #include "wrl/client.h"
 
 #include "ShaderData.h"
-#include "D3D12ConstantBufferLayout.h"
 
 using namespace Microsoft::WRL;
 
@@ -31,8 +30,7 @@ namespace CautionEngine::Rendering
 		std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputElementDescs;
 		std::vector<std::string> m_semanticNames;
 
-		// Used for validation
-		std::vector<D3D12ConstantBufferLayout> m_bufferLayouts;
+		std::unordered_map<unsigned int, unsigned int> m_cbufferIdRootParamSlotMap;
 
 	public:
 		Shader() = delete;
@@ -45,6 +43,7 @@ namespace CautionEngine::Rendering
 		bool GetStageShaderCode(const void** ppBuffer, size_t* pLength, ShaderStage stage);
 		ID3D12RootSignature* GetRootSignature() { return m_rootSignature.Get(); }
 		const std::vector<D3D12_INPUT_ELEMENT_DESC>* GetInputLayoutDescs() { return &m_InputElementDescs; }
+		const std::unordered_map<unsigned int, unsigned int>& GetConstantBufferID() const { return m_cbufferIdRootParamSlotMap; }
 
 		CAUTION_ENGINE_CLASS const LPCWSTR GetFilepath() { return m_filepath; }
 

@@ -19,6 +19,8 @@
 #define DX12_ENABLE_DEBUG_LAYER
 #endif
 
+#define ENABLE_IMGUI 0
+
 #ifdef DX12_ENABLE_DEBUG_LAYER
 #include <dxgidebug.h>
 #pragma comment(lib, "dxguid.lib")
@@ -148,13 +150,12 @@ namespace Reckless
 		m_renderer.InitCommandFrames();
 		m_renderer.InitFrameFence();
 		m_renderer.CreateRootSignature();
-
-		DXGI_FORMAT renderFormat = m_renderer.GetRTVFormat();
-		m_pSceneRenderTextureId = m_renderer.GetRenderTargetManager()->CreateRenderTarget(
+#if ENABLE_IMGUI
+		m_sceneRenderTextureId = m_renderer.GetRenderTargetManager()->CreateRenderTarget(
 			m_height, m_width, (RenderFormat)m_renderer.GetRTVFormat()
 		);
-		m_renderer.SetCustomSceneRenderTarget(m_pSceneRenderTextureId);
-
+		m_renderer.SetCustomSceneRenderTarget(m_sceneRenderTextureId);
+#endif
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		
@@ -194,6 +195,7 @@ namespace Reckless
 
 		// Setting of the ImGui platform and renderer
 		ImGui_ImplWin32_Init(hWnd);
+#if ENABLE_IMGUI
 		DescriptorManager* descriptorManager = m_renderer.GetDescriptorManager();
 		D3D12::DescriptorHeapHandle font_descriptor_handle = descriptorManager->GetCbvSrvUavHeap()->Allocate();
 		ImGui_ImplDX12_Init(
@@ -203,7 +205,7 @@ namespace Reckless
 			descriptorManager->GetCbvSrvUavHeap()->GetHeapPtr().Get(),
 			font_descriptor_handle.cpuHandle, font_descriptor_handle.gpuHandle
 		);
-
+#endif
 
 		// Initialize Engine Core Systems
 		// TODO: ////
@@ -232,34 +234,35 @@ namespace Reckless
 			// Do Shutdown here
 			return false;
 		}
-
+#if ENABLE_IMGUI
 		// Rendering, ImGuiContext
 		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplWin32_NewFrame();
-
+#endif
 		ID3D12GraphicsCommandList6* curCommandList = m_renderer.GetCurrentCommandList();
-
+#if ENABLE_IMGUI
 		ImGui::NewFrame();
-
+#endif
 		{
+
 			m_renderer.BeginFrame();
 			m_renderer.RenderScene(); // TODO
-
+#if ENABLE_IMGUI
 			ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse;
 
 			ImGuiViewport* viewport = ImGui::GetMainViewport();
 			ImGui::SetNextWindowPos(viewport->Pos);
 			ImGui::SetNextWindowSize(viewport->Size);
 			ImGui::SetNextWindowViewport(viewport->ID);
-		/*	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);*/
+			//ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			//ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
 			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
 			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 			window_flags |= ImGuiWindowFlags_MenuBar;
 
-			/*ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.0f, 6.0f));
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 3.0f);*/
+			//ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.0f, 6.0f));
+			//ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 3.0f);
 
 			//ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 			//ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -278,8 +281,9 @@ namespace Reckless
 			UpdateEditorLayers();
 
 			ImGui::End();
+#endif
 		}
-
+#if ENABLE_IMGUI
 		ImGui::Render();
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), curCommandList);
 
@@ -288,7 +292,7 @@ namespace Reckless
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
 		}
-
+#endif
 		m_renderer.EndFrame();
 		m_renderer.Render();
 
@@ -306,6 +310,7 @@ namespace Reckless
 
 		m_editorLayers.clear();
 
+#if ENABLE_IMGUI
 		// ImGui
 		if (ImGui::GetCurrentContext())
 		{
@@ -313,7 +318,7 @@ namespace Reckless
 			ImGui_ImplWin32_Shutdown();
 			ImGui::DestroyContext();
 		}
-
+#endif
 		// Wait for renderer to finish up
 		using namespace CautionEngine::Rendering;
 
