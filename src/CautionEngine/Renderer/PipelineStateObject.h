@@ -25,12 +25,13 @@ namespace CautionEngine::Rendering
 
 
 		// Depth & Stencil Behaviour
-
+		bool m_enableDepthTesting = true;
+		ShaderDepthComp m_depthComp = SHADER_DEPTH_COMP_LESS_EQUAL;
 
 		// Rasterizer State
 		ShaderFillMode m_fillMode = SHADER_FILL_SOLID;
 		ShaderCullMode m_cullMode = SHADER_CULL_NONE;
-		bool m_doConservativeRaster = true;
+		bool m_doConservativeRaster = false;
 
 		//Blend State
 		bool m_doIndividualBlend = false;
@@ -49,14 +50,20 @@ namespace CautionEngine::Rendering
 		void SetShader(Shader* pShader) { m_pShader = pShader; }
 		const Shader* const GetShader() const { return m_pShader; }
 
+		bool GetEnableDepthTesting() const { return m_enableDepthTesting; }
+		void SetEnableDepthTesting(bool enable) { m_enableDepthTesting = enable; }
+
+		ShaderDepthComp GetDepthCompFunction() const { return m_depthComp; }
+		void SetDepthCompFunction(ShaderDepthComp comp) { m_depthComp = comp; }
+
 		void SetTopologyType(ShaderTopologyType type);
-		ShaderTopologyType GetTopologyType() { return m_topologyType; }
+		ShaderTopologyType GetTopologyType() const { return m_topologyType; }
 
 		void SetFillMode(ShaderFillMode fillMode) { m_fillMode = fillMode; }
-		ShaderFillMode GetFillMode() { return m_fillMode; }
+		ShaderFillMode GetFillMode() const { return m_fillMode; }
 
 		void SetCullMode(ShaderCullMode cullMode) { m_cullMode = cullMode; }
-		ShaderCullMode GetCullMode() { return m_cullMode; }
+		ShaderCullMode GetCullMode() const { return m_cullMode; }
 
 		void SetDoConservativeRaster(bool doConservativeRaster) { m_doConservativeRaster = doConservativeRaster; }
 		bool GetDoConservativeRaster() { return m_doConservativeRaster; }

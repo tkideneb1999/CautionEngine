@@ -11,6 +11,8 @@
 
 #include "Mesh.h"
 #include "PipelineStateObject.h"
+#include "Transform.h"
+#include "Camera.h"
 
 namespace CautionEngine::Rendering 
 {
@@ -45,6 +47,10 @@ namespace CautionEngine::Rendering
 
 		ComPtr<ID3D12CommandQueue> m_commandQueue;
 
+		unsigned int m_width;
+		unsigned int m_height;
+		float m_aspect;
+
 		ComPtr<IDXGISwapChain4> m_swapChain;
 		DXGI_FORMAT m_swapChainRTFormat = DXGI_FORMAT_UNKNOWN;
 
@@ -69,10 +75,13 @@ namespace CautionEngine::Rendering
 		UINT64 m_fenceValue = 0;
 		ComPtr<ID3D12Fence> m_fence;
 
-		// TEST MESH
+		// TEST DATA
 		PipelineStateObject m_testPSO;
 		Mesh m_testMesh;
-		glm::vec4 m_color;
+		Transform m_meshTransform;
+
+		Camera m_cam;
+		Transform m_camTransform;
 
 	public:
 		Renderer();

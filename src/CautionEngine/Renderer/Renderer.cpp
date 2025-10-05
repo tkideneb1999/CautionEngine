@@ -10,6 +10,14 @@
 
 namespace CautionEngine::Rendering 
 {
+	static void PrintMatrix(const glm::mat4x4& toPrint)
+	{
+		std::cout << toPrint[0][0] << ", " << toPrint[1][0] << ", " << toPrint[2][0] << ", " << toPrint[3][0] << std::endl;
+		std::cout << toPrint[0][1] << ", " << toPrint[1][1] << ", " << toPrint[2][1] << ", " << toPrint[3][1] << std::endl;
+		std::cout << toPrint[0][2] << ", " << toPrint[1][2] << ", " << toPrint[2][2] << ", " << toPrint[3][2] << std::endl;
+		std::cout << toPrint[0][3] << ", " << toPrint[1][3] << ", " << toPrint[2][3] << ", " << toPrint[3][3] << std::endl;
+	}
+
 	Renderer::Renderer()
 		: pD3D12API(D3D12API::Get())
 	{ 
@@ -33,6 +41,9 @@ namespace CautionEngine::Rendering
 
 	void Renderer::InitSwapChain(int width, int height, int frameCount, HWND hWnd)
 	{
+		m_width = width;
+		m_height = height;
+		m_aspect = static_cast<float>(width) / static_cast<float>(height);
 		//Check if RTV Descriptor Heap is initialized
 #if _DEBUG
 		if (!m_pDescriptorManager->GetRTVHeap()->Initialized())
@@ -282,21 +293,12 @@ namespace CautionEngine::Rendering
 		if (m_testMesh.IsUploaded())
 		{
 			std::string bufferName("cBuffer");
-			std::string colorName("color");
-			if (m_color.r > 1.0f)
-				m_color.r = 0.0f;
-			else
-				m_color.r += 0.01f;
-			if (m_color.g > 1.0)
-				m_color.g = 0.0f;
-			else
-				m_color.g += 0.01f;
-			if (m_color.b > 1.0)
-				m_color.b = 0.0f;
-			else
-				m_color.b += 0.01f;
+			std::string mvpName("mvp");
+			glm::mat4x4 viewProjection = m_cam.CreateViewProjection(m_camTransform);
+			glm::mat4x4 mvp = viewProjection * m_meshTransform.GetMatrix();
 			ConstantBuffers::ConstantBuffer* pTestBuffer = m_pConstantBufferManager->GetBuffer(bufferName);
-			pTestBuffer->SetFloat4(colorName, &m_color);
+			pTestBuffer->SetFloat4x4(mvpName, &mvp);
+
 			m_testPSO.SetState(curCommandList.Get());
 			for (const std::pair<unsigned int, unsigned int> CBufferId : m_testPSO.GetShader()->GetConstantBufferID())
 			{
@@ -369,19 +371,64 @@ namespace CautionEngine::Rendering
 		m_testPSO.Generate();
 		
 		std::vector<Vertex> testVertices{
-			{{-0.5,-0.5, 0.5, 1}, {1,0,0,1}},
-			{{   0, 0.5, 0.5, 1}, {0,1,0,1}},
-			{{   1,   1, 0.5, 1}, {0,0,1,1}}
+			{{-1.0, -1.0, -1.0, 1.0}, {0.5,   0,   0, 1}}, // 0
+			{{-1.0,  1.0, -1.0, 1.0}, {0.5,   0,   0, 1}},
+			{{-1.0,  1.0,  1.0, 1.0}, {0.5,   0,   0, 1}},
+			{{-1.0, -1.0,  1.0, 1.0}, {0.5,   0,   0, 1}}, // -X
+
+			{{-1.0, -1.0, -1.0, 1.0}, {  0, 0.5,   0, 1}}, // 4
+			{{ 1.0, -1.0, -1.0, 1.0}, {  0, 0.5,   0, 1}},
+			{{ 1.0, -1.0,  1.0, 1.0}, {  0, 0.5,   0, 1}},
+			{{-1.0, -1.0,  1.0, 1.0}, {  0, 0.5,   0, 1}}, // -Y
+
+			{{ 1.0, -1.0, -1.0, 1.0}, {1.0,   0,   0, 1}}, // 8
+			{{ 1.0,  1.0, -1.0, 1.0}, {1.0,   0,   0, 1}},
+			{{ 1.0,  1.0,  1.0, 1.0}, {1.0,   0,   0, 1}},
+			{{ 1.0, -1.0,  1.0, 1.0}, {1.0,   0,   0, 1}}, // +X
+
+			{{-1.0,  1.0, -1.0, 1.0}, {  0, 1.0,   0, 1}}, // 12
+			{{ 1.0,  1.0, -1.0, 1.0}, {  0, 1.0,   0, 1}},
+			{{ 1.0,  1.0,  1.0, 1.0}, {  0, 1.0,   0, 1}},
+			{{-1.0,  1.0,  1.0, 1.0}, {  0, 1.0,   0, 1}}, // +Y
+
+			{{-1.0, -1.0, -1.0, 1.0}, {  0,   0, 0.5, 1}}, // 16
+			{{ 1.0, -1.0, -1.0, 1.0}, {  0,   0, 0.5, 1}},
+			{{ 1.0,  1.0, -1.0, 1.0}, {  0,   0, 0.5, 1}},
+			{{-1.0,  1.0, -1.0, 1.0}, {  0,   0, 0.5, 1}}, // -Z
+
+			{{-1.0, -1.0,  1.0, 1.0}, {  0,   0, 1.0, 1}}, // 20
+			{{ 1.0, -1.0,  1.0, 1.0}, {  0,   0, 1.0, 1}},
+			{{ 1.0,  1.0,  1.0, 1.0}, {  0,   0, 1.0, 1}},
+			{{-1.0,  1.0,  1.0, 1.0}, {  0,   0, 1.0, 1}}, // +Z
 		};
 		std::vector<int> testIndices{ 
-			0,1,2
+			 1,  2,  0,
+			 2,  3,  0, // -X
+			 4,  7,  5,
+			 7,  6,  5, // -Y
+			11,  8,  9,
+			10, 11,  9, // +X
+			13, 14, 12,
+			15, 14, 12, // +Y
+			18, 17, 16,
+			19, 18, 16, // -Z
+			23, 22, 21,
+			20, 23, 21, // +Z
 		};
-
-		m_color = { 0.0f, 0.33f, 0.66f, 0.0f };
 
 		m_testMesh = Mesh();
 		m_testMesh.SetVertices(testVertices.data(), testVertices.size());
 		m_testMesh.SetIndices(testIndices.data(), testIndices.size());
+		m_meshTransform = Transform();
+
+		std::cout << "---- Mesh Matrix ----" << std::endl;
+		PrintMatrix(m_meshTransform.GetMatrix());
+
+		m_cam = Camera(45.0f, m_aspect, 0.1f, 100.0f);
+		float rotationY = -45.0f;//0.5f * glm::pi<float>();
+		m_camTransform = Transform({ -3.0f, 0.0f, 3.0f }, { 0.0f, rotationY, 0.0f}, {1.0f, 1.0f, 1.0f});
+		std::cout << "---- View Matrix ----" << std::endl;
+		PrintMatrix(m_cam.CreateViewMatrix(m_camTransform));
 	}
 
 	void Renderer::Shutdown()
@@ -433,11 +480,29 @@ namespace CautionEngine::Rendering
 
 	void Renderer::Resize(int newWidth, int newHeight)
 	{
+		m_width = newWidth;
+		m_height = newHeight;
+		m_aspect = static_cast<float>(newWidth) / static_cast<float>(newHeight);
 		FlushGPU();
 		ReleaseSwapChainRenderTargets();
 		m_swapChain->ResizeBuffers(0, newWidth, newHeight, DXGI_FORMAT_UNKNOWN, 0);
 		CreateSwapChainRenderTargets();
 		m_pRenderTargetManager->ResizeRenderTarget(m_DSRenderTargetHandle, newWidth, newHeight);
+
+		m_viewport.TopLeftX = 0;
+		m_viewport.TopLeftY = 0;
+		m_viewport.Height = m_height;
+		m_viewport.Width = m_width;
+		m_viewport.MinDepth = 0.0;
+		m_viewport.MaxDepth = 1.0;
+
+		m_scissorRect.left = 0;
+		m_scissorRect.top = 0;
+		m_scissorRect.right = m_width;
+		m_scissorRect.bottom = m_height;
+
+		// TODO: Remove
+		m_cam.SetAspectRatio(m_aspect);
 	}
 
 	void Renderer::CreateSwapChainRenderTargets()

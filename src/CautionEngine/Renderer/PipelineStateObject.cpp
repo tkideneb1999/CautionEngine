@@ -75,9 +75,9 @@ namespace CautionEngine::Rendering {
 		psoDesc.SampleDesc.Quality = 0;
 		
 		// - DepthStencil State TODO
-		psoDesc.DepthStencilState.DepthEnable = false; // TODO: Make this available
-		//psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-		//psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+		psoDesc.DepthStencilState.DepthEnable = m_enableDepthTesting;
+		psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+		psoDesc.DepthStencilState.DepthFunc = (D3D12_COMPARISON_FUNC)m_depthComp;
 
 		psoDesc.DepthStencilState.StencilEnable = false; // TODO: Make this optional
 		
